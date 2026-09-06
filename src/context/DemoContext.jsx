@@ -39,17 +39,23 @@ export const DemoProvider = ({ children }) => {
         const parsed = JSON.parse(saved);
         const baseEmployees = initialData.employees || [];
         const savedEmployees = parsed.employees || [];
-        
-        // Merge without duplicates
         const mergedEmployees = [
           ...savedEmployees,
           ...baseEmployees.filter(be => !savedEmployees.some(se => se.name === be.name || se.id === be.id))
         ];
 
+        const baseAbsences = initialData.absences || [];
+        const savedAbsences = parsed.absences || [];
+        const mergedAbsences = [
+          ...savedAbsences,
+          ...baseAbsences.filter(ba => !savedAbsences.some(sa => sa.id === ba.id))
+        ];
+
         return {
           ...JSON.parse(JSON.stringify(initialData)),
           ...parsed,
-          employees: mergedEmployees
+          employees: mergedEmployees,
+          absences: mergedAbsences
         };
       }
     } catch (e) {
@@ -65,7 +71,8 @@ export const DemoProvider = ({ children }) => {
     customers: 0,
     vehicles: 0,
     tasks: 0,
-    employees: 0
+    employees: 0,
+    absences: 0
   });
 
   // Initialize Client, Admin & Trial from URL on mount
@@ -103,10 +110,18 @@ export const DemoProvider = ({ children }) => {
           ...baseEmployees.filter(be => !savedEmployees.some(se => se.name === be.name || se.id === be.id))
         ];
 
+        const baseAbsences = initialData.absences || [];
+        const savedAbsences = parsed.absences || [];
+        const mergedAbsences = [
+          ...savedAbsences,
+          ...baseAbsences.filter(ba => !savedAbsences.some(sa => sa.id === ba.id))
+        ];
+
         setData({
           ...JSON.parse(JSON.stringify(initialData)),
           ...parsed,
-          employees: mergedEmployees
+          employees: mergedEmployees,
+          absences: mergedAbsences
         });
       } else {
         setData(JSON.parse(JSON.stringify(initialData)));

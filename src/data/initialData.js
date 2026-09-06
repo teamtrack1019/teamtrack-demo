@@ -6,6 +6,30 @@ export const initialData = {
     { id: "EMP-03", name: "Jan Becker", role: "Monteur", hourlyRate: 62.0, phone: "+49 173 3456789" }
   ],
 
+  // Abwesenheiten (Urlaub & Krankmeldungen)
+  absences: [
+    {
+      id: "ABS-01",
+      employee: "Max Mustermann",
+      type: "Urlaub",
+      startDate: "2026-09-20",
+      endDate: "2026-09-25",
+      days: 5,
+      status: "Genehmigt",
+      notes: "Sommerurlaub"
+    },
+    {
+      id: "ABS-02",
+      employee: "Sarah Weber",
+      type: "Krankmeldung",
+      startDate: "2026-09-01",
+      endDate: "2026-09-02",
+      days: 2,
+      status: "Genehmigt",
+      notes: "AU digital übermittelt (Grippaler Infekt)"
+    }
+  ],
+
   // Zeiterfassung Initialdaten
   timesheets: [
     {
