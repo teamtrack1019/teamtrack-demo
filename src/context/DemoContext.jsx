@@ -36,7 +36,21 @@ export const DemoProvider = ({ children }) => {
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        const baseEmployees = initialData.employees || [];
+        const savedEmployees = parsed.employees || [];
+        
+        // Merge without duplicates
+        const mergedEmployees = [
+          ...savedEmployees,
+          ...baseEmployees.filter(be => !savedEmployees.some(se => se.name === be.name || se.id === be.id))
+        ];
+
+        return {
+          ...JSON.parse(JSON.stringify(initialData)),
+          ...parsed,
+          employees: mergedEmployees
+        };
       }
     } catch (e) {
       console.error('Failed to load sandbox data', e);
@@ -80,7 +94,20 @@ export const DemoProvider = ({ children }) => {
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
-        setData(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        const baseEmployees = initialData.employees || [];
+        const savedEmployees = parsed.employees || [];
+        
+        const mergedEmployees = [
+          ...savedEmployees,
+          ...baseEmployees.filter(be => !savedEmployees.some(se => se.name === be.name || se.id === be.id))
+        ];
+
+        setData({
+          ...JSON.parse(JSON.stringify(initialData)),
+          ...parsed,
+          employees: mergedEmployees
+        });
       } else {
         setData(JSON.parse(JSON.stringify(initialData)));
       }

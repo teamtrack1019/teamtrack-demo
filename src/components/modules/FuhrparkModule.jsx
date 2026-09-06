@@ -467,11 +467,14 @@ export const FuhrparkModule = () => {
                     onChange={(e) => setNewVehicle({ ...newVehicle, driver: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   >
-                    {(data.employees && data.employees.length > 0 ? data.employees : [
-                      { id: '1', name: 'Max Mustermann' },
-                      { id: '2', name: 'Sarah Weber' },
-                      { id: '3', name: 'Jan Becker' }
-                    ]).map(emp => (
+                    {[
+                      ...(data.employees || []),
+                      ...[
+                        { id: 'EMP-01', name: 'Max Mustermann' },
+                        { id: 'EMP-02', name: 'Sarah Weber' },
+                        { id: 'EMP-03', name: 'Jan Becker' }
+                      ].filter(be => !(data.employees || []).some(de => de.name === be.name || de.id === be.id))
+                    ].map(emp => (
                       <option key={emp.id || emp.name} value={emp.name}>
                         {emp.name}
                       </option>

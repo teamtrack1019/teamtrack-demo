@@ -130,13 +130,17 @@ export const ZeiterfassungModule = () => {
     }
   };
 
-  const employeeList = (data.employees && data.employees.length > 0)
-    ? data.employees
-    : [
-        { id: "EMP-01", name: "Max Mustermann", role: "Bauleiter / Meister", hourlyRate: 75.0, phone: "+49 171 1234567" },
-        { id: "EMP-02", name: "Sarah Weber", role: "Elektro-Technikerin", hourlyRate: 68.0, phone: "+49 172 2345678" },
-        { id: "EMP-03", name: "Jan Becker", role: "Monteur", hourlyRate: 62.0, phone: "+49 173 3456789" }
-      ];
+  const baseEmployees = [
+    { id: "EMP-01", name: "Max Mustermann", role: "Bauleiter / Meister", hourlyRate: 75.0, phone: "+49 171 1234567" },
+    { id: "EMP-02", name: "Sarah Weber", role: "Elektro-Technikerin", hourlyRate: 68.0, phone: "+49 172 2345678" },
+    { id: "EMP-03", name: "Jan Becker", role: "Monteur", hourlyRate: 62.0, phone: "+49 173 3456789" }
+  ];
+
+  const rawList = data.employees || [];
+  const employeeList = [
+    ...rawList,
+    ...baseEmployees.filter(be => !rawList.some(re => re.name === be.name || re.id === be.id))
+  ];
 
   const handleAddEmployee = (e) => {
     e.preventDefault();
