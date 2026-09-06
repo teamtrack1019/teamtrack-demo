@@ -86,20 +86,46 @@ export const ShareLinkModal = () => {
               {generatedUrl}
             </div>
           </div>
+
+          {/* Social Preview Preview Box */}
+          <div className="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-2">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">WhatsApp & Social Vorschau:</span>
+            <div className="flex items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
+              <img src="/logo.jpg" alt="TeamTrack" className="w-11 h-11 rounded-lg object-contain bg-slate-900 border border-brand-500/20 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <h4 className="text-xs font-bold text-white truncate">TeamTrack | Interaktives Demo-Portal</h4>
+                <p className="text-[10px] text-slate-400 line-clamp-1">Kunden-Testumgebung für {clientInput || 'Interessent'} ({daysInput} Tage)</p>
+                <span className="text-[9px] text-brand-400">team-track.de</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+        <div className="pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
           <span className="text-[11px] text-slate-400">
-            Jeder Link besitzt eigene isolierte Daten.
+            100% isolierte Mandanten-Umgebung.
           </span>
 
-          <button
-            onClick={handleCopy}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-brand-500/25 transition-all"
-          >
-            {copied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'Kopiert!' : 'Link kopieren'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <a
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für die TeamTrack Handwerker- & Firmen-Software (${cleanClient}):\n\n🔗 ${generatedUrl}\n\nEnthaltene Module:\n⏱️ Zeiterfassung & Live-Stempeluhr\n📑 Rechnungen & DATEV\n👥 CRM & Kundenkartei\n🚗 Fuhrpark & TÜV-Manager\n📋 Auftragsdisposition\n\nViele Grüße,\nTeamTrack Softwareentwicklung`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/20 transition-all"
+            >
+              <span>📲 Per WhatsApp senden</span>
+            </a>
+
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-brand-500/25 transition-all"
+            >
+              {copied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
+              <span>{copied ? 'Kopiert!' : 'Link kopieren'}</span>
+            </button>
+          </div>
         </div>
 
       </div>
