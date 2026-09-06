@@ -730,10 +730,10 @@ export const ZeiterfassungModule = () => {
         <div className="space-y-6 animate-in fade-in duration-200">
           
           {/* Worker PWA Top Status Card */}
-          <div className="glass-card p-4 sm:p-6 rounded-2xl border-emerald-500/30 bg-gradient-to-r from-slate-900 via-emerald-950/20 to-slate-900 shadow-xl">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="glass-card p-4 sm:p-5 rounded-2xl border-emerald-500/30 bg-gradient-to-r from-slate-900 via-emerald-950/20 to-slate-900 shadow-xl">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-lg border border-emerald-500/30 shadow-inner">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-base border border-emerald-500/30 shadow-inner shrink-0">
                   {activeEmployee.charAt(0)}
                 </div>
                 <div>
@@ -750,7 +750,7 @@ export const ZeiterfassungModule = () => {
                     <select
                       value={activeEmployee}
                       onChange={(e) => setActiveEmployee(e.target.value)}
-                      className="bg-slate-950 border border-emerald-500/40 rounded-xl px-3 py-1.5 text-sm font-black text-white focus:outline-none"
+                      className="bg-slate-950 border border-emerald-500/40 rounded-xl px-3 py-1.5 text-sm font-black text-white focus:outline-none cursor-pointer"
                     >
                       {employeeList.map((emp) => (
                         <option key={emp.id || emp.name} value={emp.name}>
@@ -762,43 +762,9 @@ export const ZeiterfassungModule = () => {
                 </div>
               </div>
 
-              {/* Quick Absence Buttons for Worker */}
-              <div className="flex items-center gap-2 w-full md:w-auto">
-                <button
-                  onClick={() => {
-                    setAbsenceForm({
-                      type: 'Urlaub',
-                      startDate: new Date().toISOString().split('T')[0],
-                      endDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                      days: 5,
-                      notes: 'Erholungsurlaub beantragt',
-                      hasAttest: false
-                    });
-                    setIsAbsenceModalOpen(true);
-                  }}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg shadow-amber-600/20 transition-all"
-                >
-                  <Umbrella className="w-4 h-4" />
-                  <span>Urlaub beantragen</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setAbsenceForm({
-                      type: 'Krankmeldung',
-                      startDate: new Date().toISOString().split('T')[0],
-                      endDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                      days: 3,
-                      notes: 'AU digital übermittelt',
-                      hasAttest: true
-                    });
-                    setIsAbsenceModalOpen(true);
-                  }}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-600/20 transition-all"
-                >
-                  <HeartPulse className="w-4 h-4" />
-                  <span>Krankmeldung (AU)</span>
-                </button>
+              <div className="hidden sm:flex items-center gap-1 text-[11px] text-slate-400 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-800">
+                <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Mitarbeiter-Ansicht aktiv</span>
               </div>
             </div>
           </div>
@@ -1038,6 +1004,45 @@ export const ZeiterfassungModule = () => {
                   ) : (
                     <div className="text-xs text-slate-500 italic p-2 text-center">Keine offenen Anträge</div>
                   )}
+                </div>
+
+                {/* Absence Action Buttons for Worker inside Urlaubs- & Krankheitskonto */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-slate-800">
+                  <button
+                    onClick={() => {
+                      setAbsenceForm({
+                        type: 'Urlaub',
+                        startDate: new Date().toISOString().split('T')[0],
+                        endDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        days: 5,
+                        notes: 'Erholungsurlaub beantragt',
+                        hasAttest: false
+                      });
+                      setIsAbsenceModalOpen(true);
+                    }}
+                    className="py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-amber-600/20 transition-all active:scale-95"
+                  >
+                    <Umbrella className="w-3.5 h-3.5" />
+                    <span>Urlaub beantragen</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setAbsenceForm({
+                        type: 'Krankmeldung',
+                        startDate: new Date().toISOString().split('T')[0],
+                        endDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        days: 3,
+                        notes: 'AU digital übermittelt',
+                        hasAttest: true
+                      });
+                      setIsAbsenceModalOpen(true);
+                    }}
+                    className="py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/20 transition-all active:scale-95"
+                  >
+                    <HeartPulse className="w-3.5 h-3.5" />
+                    <span>Krankmeldung (AU)</span>
+                  </button>
                 </div>
               </div>
 
