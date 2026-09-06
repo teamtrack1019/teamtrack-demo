@@ -5,8 +5,7 @@ import {
   RotateCcw, 
   Sparkles, 
   Building2, 
-  Share2,
-  Layers
+  Share2
 } from 'lucide-react';
 
 export const Header = () => {
@@ -28,13 +27,15 @@ export const Header = () => {
         <div className="flex items-center gap-2 shrink-0">
           <div 
             onClick={() => setActiveModule('overview')}
-            className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group shrink-0"
+            className="flex items-center gap-2 cursor-pointer group shrink-0"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform shrink-0">
-              <Layers className="w-4 h-4 text-white" />
-            </div>
+            <img 
+              src="/logo.jpg" 
+              alt="TeamTrack Logo" 
+              className="w-9 h-9 rounded-xl object-contain bg-white/5 p-0.5 border border-brand-500/30 shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform shrink-0" 
+            />
             <div className="shrink-0">
-              <div className="flex items-center gap-1 leading-none">
+              <div className="flex items-center gap-1.5 leading-none">
                 <span className="font-extrabold text-base sm:text-lg tracking-tight text-white">TeamTrack</span>
                 <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest px-1 py-0.2 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">
                   Demo

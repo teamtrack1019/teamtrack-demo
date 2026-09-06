@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDemo } from '../context/DemoContext';
-import { ShieldCheck, Phone, Mail, MapPin, ExternalLink, Sparkles, Layers } from 'lucide-react';
+import { ShieldCheck, Phone, Mail, MapPin, ExternalLink } from 'lucide-react';
 
 export const Footer = () => {
   const { openUpgradeModal } = useDemo();
@@ -9,12 +9,14 @@ export const Footer = () => {
     <footer className="border-t border-slate-800/80 bg-slate-950/80 mt-16 py-10 px-4 lg:px-8 text-xs text-slate-400">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
         
-        {/* Left info */}
+        {/* Left info with official Logo */}
         <div className="space-y-2 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-2">
-            <div className="w-6 h-6 rounded-lg bg-brand-500 flex items-center justify-center text-white text-[11px] font-black">
-              TT
-            </div>
+          <div className="flex items-center justify-center md:justify-start gap-2.5">
+            <img 
+              src="/logo.jpg" 
+              alt="TeamTrack Logo" 
+              className="w-7 h-7 rounded-lg object-contain bg-white/5 p-0.5 border border-brand-500/20 shadow-md"
+            />
             <span className="font-extrabold text-sm text-white tracking-tight">TeamTrack</span>
             <span className="text-[10px] text-slate-400">Softwareentwicklung & IT-Beratung</span>
           </div>
@@ -55,7 +57,7 @@ export const Footer = () => {
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-slate-400 hover:text-brand-300 transition-colors"
           >
-            <span>team-track.de Hauptseite</span>
+            <span>team-track.de</span>
             <ExternalLink className="w-3 h-3" />
           </a>
 
