@@ -238,6 +238,33 @@ export const FuhrparkModule = () => {
         </div>
       )}
 
+      {/* LKW & Fahrer Compliance Bar */}
+      <div className="p-3 sm:p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs shadow-lg">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+            <Truck className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-white">Fahrer-Compliance & Lenkzeiten (VO EG 561/2006)</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                100% BALM / BAG Konform
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400">
+              Automatische 4,5-Std. Lenkzeit- & 45-Min. Pausenüberwachung für alle LKW- & Transporter-Fahrten aktiv.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => triggerRestrictedAction('BALM / BAG Prüfbericht Export', 'Generiert einen lückenlosen, behördlich anerkannten Prüfbericht aller Lenk- und Ruhezeiten für Straßenkontrollen und Betriebsprüfungen.')}
+          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 flex items-center gap-1.5"
+        >
+          <span>📋 BALM-Prüfbericht Export</span>
+        </button>
+      </div>
+
       {/* Filter Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         {[

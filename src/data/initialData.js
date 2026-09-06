@@ -1,9 +1,11 @@
 export const initialData = {
-  // Mitarbeiter / Team Initialdaten
+  // Mitarbeiter / Team Initialdaten (Multi-Branchen)
   employees: [
     { id: "EMP-01", name: "Max Mustermann", role: "Bauleiter / Meister", hourlyRate: 75.0, phone: "+49 171 1234567" },
     { id: "EMP-02", name: "Sarah Weber", role: "Elektro-Technikerin", hourlyRate: 68.0, phone: "+49 172 2345678" },
-    { id: "EMP-03", name: "Jan Becker", role: "Monteur", hourlyRate: 62.0, phone: "+49 173 3456789" }
+    { id: "EMP-03", name: "Jan Becker", role: "Monteur & Handwerker", hourlyRate: 62.0, phone: "+49 173 3456789" },
+    { id: "EMP-04", name: "Murat Demir", role: "LKW- & Berufskraftfahrer (VO 561/2006)", hourlyRate: 64.0, phone: "+49 174 4567890" },
+    { id: "EMP-05", name: "Elena Rostova", role: "Objektleiterin & Gebäudereinigung", hourlyRate: 58.0, phone: "+49 175 5678901" }
   ],
 
   // Abwesenheiten (Urlaub & Krankmeldungen)

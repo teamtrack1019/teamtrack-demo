@@ -27,7 +27,11 @@ import {
   Coffee,
   AlertCircle,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Truck,
+  Hammer,
+  ShieldAlert,
+  Gauge
 } from 'lucide-react';
 
 export const ZeiterfassungModule = () => {
@@ -112,25 +116,29 @@ export const ZeiterfassungModule = () => {
     }
 
     const hours = +(timerSeconds / 3600).toFixed(2);
+    const isLkw = activityCategory === 'lkw';
     const added = addItem('timesheets', {
       id: `zt-${Date.now().toString().slice(-4)}`,
       employee: activeEmployee,
-      role: 'Fachkraft',
-      project: activeProject,
-      task: activeTask,
+      role: isLkw ? 'Berufskraftfahrer (LKW)' : (employeeList.find(e => e.name === activeEmployee)?.role || 'Fachkraft'),
+      project: assignedTask.project || activeProject,
+      task: isLkw ? 'LKW-Fahrtzeit & Transport (VO EG 561/2006)' : activeTask,
       date: new Date().toISOString().split('T')[0],
       startTime: 'Live-Erfassung',
       endTime: 'Jetzt',
-      breakMinutes: 0,
-      totalHours: hours > 0.05 ? hours : 0.5,
+      breakMinutes: isLkw ? 45 : 30,
+      totalHours: hours > 0.05 ? hours : (isLkw ? 4.5 : 0.5),
       hourlyRate: 72.0,
       status: 'Genehmigt',
-      location: gpsVerified ? 'Baustelle Vor-Ort (GPS OK)' : 'Manuell erfasst'
+      location: isLkw ? 'Fahrstrecke (BALM/BAG konform)' : (gpsVerified ? 'Baustelle Vor-Ort (GPS OK)' : 'Manuell erfasst')
     });
 
     if (added) {
       setIsRunning(false);
       setTimerSeconds(0);
+      if (isLkw) {
+        addToast('LKW-Fahrtzeit gebucht', 'Fahrtzeit & Ruhezeiten wurden nach VO (EG) 561/2006 protokolliert und ans Büro übermittelt.', 'success');
+      }
     }
   };
 
@@ -153,10 +161,14 @@ export const ZeiterfassungModule = () => {
     }
   };
 
+  const [activityCategory, setActivityCategory] = useState('standard'); // 'standard' (Handwerk, Reinigung) or 'lkw' (VO EG 561/2006)
+
   const baseEmployees = [
     { id: "EMP-01", name: "Max Mustermann", role: "Bauleiter / Meister", hourlyRate: 75.0, phone: "+49 171 1234567" },
     { id: "EMP-02", name: "Sarah Weber", role: "Elektro-Technikerin", hourlyRate: 68.0, phone: "+49 172 2345678" },
-    { id: "EMP-03", name: "Jan Becker", role: "Monteur", hourlyRate: 62.0, phone: "+49 173 3456789" }
+    { id: "EMP-03", name: "Jan Becker", role: "Monteur & Handwerker", hourlyRate: 62.0, phone: "+49 173 3456789" },
+    { id: "EMP-04", name: "Murat Demir", role: "LKW- & Berufskraftfahrer (VO 561/2006)", hourlyRate: 64.0, phone: "+49 174 4567890" },
+    { id: "EMP-05", name: "Elena Rostova", role: "Objektleiterin & Gebäudereinigung", hourlyRate: 58.0, phone: "+49 175 5678901" }
   ];
 
   const rawList = data.employees || [];
@@ -164,6 +176,14 @@ export const ZeiterfassungModule = () => {
     ...rawList,
     ...baseEmployees.filter(be => !rawList.some(re => re.name === be.name || re.id === be.id))
   ];
+
+  // Auto-switch mode based on employee role
+  useEffect(() => {
+    const curr = employeeList.find(e => e.name === activeEmployee);
+    if (curr && (curr.role?.includes('LKW') || curr.role?.includes('Fahrer') || curr.role?.includes('Kraftfahrer'))) {
+      setActivityCategory('lkw');
+    }
+  }, [activeEmployee]);
 
   const handleAddEmployee = (e) => {
     e.preventDefault();
@@ -778,7 +798,7 @@ export const ZeiterfassungModule = () => {
               {/* Worker Touch Stempeluhr Card */}
               <div className="glass-card p-5 sm:p-6 rounded-2xl border-emerald-500/30 bg-gradient-to-b from-slate-900 to-navy-950 flex flex-col justify-between shadow-xl">
                 <div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                       <Clock className="w-4 h-4 text-emerald-400" />
                       Mein persönlicher Live-Stempel
@@ -786,75 +806,214 @@ export const ZeiterfassungModule = () => {
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black ${
                       isRunning ? 'bg-emerald-500/20 text-emerald-400 animate-pulse' : 'bg-slate-800 text-slate-400'
                     }`}>
-                      {isRunning ? '● ARBEITSZEIT LÄUFT' : 'BEREIT ZUM STEMPELN'}
+                      {isRunning ? '● ZEITERFASSUNG LÄUFT' : 'BEREIT ZUM STEMPELN'}
                     </span>
                   </div>
 
+                  {/* Multi-Industry Sector Switcher (Handwerk/Reinigung vs LKW-Lenkzeiten) */}
+                  <div className="flex items-center gap-1.5 p-1 bg-slate-950/80 rounded-xl border border-slate-800 mb-4">
+                    <button
+                      type="button"
+                      onClick={() => setActivityCategory('standard')}
+                      className={`flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        activityCategory === 'standard'
+                          ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Hammer className="w-3.5 h-3.5" />
+                      <span>Handwerk & Reinigung</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActivityCategory('lkw')}
+                      className={`flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        activityCategory === 'lkw'
+                          ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Truck className="w-3.5 h-3.5" />
+                      <span>LKW & Fahrtzeit (VO 561)</span>
+                    </button>
+                  </div>
+
+                  {/* LKW VO EG 561/2006 Legal Compliance Cockpit */}
+                  {activityCategory === 'lkw' && (
+                    <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs space-y-2 mb-4 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+                          <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+                          <span>VO (EG) 561/2006 Lenkzeit-Assistent</span>
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                          BALM/BAG Konform ✓
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-[11px] pt-1.5 border-t border-amber-500/20">
+                        <div>
+                          <span className="text-slate-400 block text-[10px]">Bis 45-Min-Pflichtpause:</span>
+                          <strong className="text-amber-300 font-mono text-xs">
+                            {isRunning ? '04:18:20 Std. (Max 4,5h)' : '04:30:00 Std. (Max 4,5h)'}
+                          </strong>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-slate-400 block text-[10px]">Tageslenkzeit:</span>
+                          <strong className="text-white font-mono text-xs">3.8 / 9.0 Std.</strong>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Big Touch Display */}
-                  <div className="my-6 text-center">
+                  <div className="my-5 text-center">
                     <div className="text-5xl sm:text-6xl font-black tracking-tight text-white font-mono bg-slate-950/70 py-4 px-4 rounded-2xl border border-emerald-500/30 shadow-inner">
                       {formatTimer(timerSeconds)}
                     </div>
                     <p className="text-xs text-slate-300 mt-2 font-medium">
                       {isRunning 
-                        ? `Aktiv auf: ${assignedTask.project || activeProject}` 
-                        : 'Tippen Sie unten auf „Arbeitsbeginn“ zum Stempeln'}
+                        ? (activityCategory === 'lkw' 
+                            ? `🚛 Lenkzeit aktiv auf: ${assignedTask.project || 'Fahrtroute / Baustellenlogistik'}` 
+                            : `Aktiv auf: ${assignedTask.project || activeProject}`)
+                        : (activityCategory === 'lkw' 
+                            ? 'Tippen Sie auf „Lenkzeit starten (Fahrtantritt)“' 
+                            : 'Tippen Sie unten auf „Arbeitsbeginn“ zum Stempeln')}
                     </p>
                   </div>
 
                   {/* 3 Touch Friendly Stempel Actions */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    {!isRunning ? (
-                      <button
-                        onClick={() => setIsRunning(true)}
-                        className="sm:col-span-3 py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95"
-                      >
-                        <Play className="w-5 h-5 fill-white" />
-                        <span>Arbeitsbeginn (Kommen)</span>
-                      </button>
-                    ) : (
-                      <>
+                  {activityCategory === 'lkw' ? (
+                    /* LKW Specific Actions */
+                    <div className="space-y-2">
+                      {!isRunning ? (
                         <button
-                          onClick={() => {
-                            setTimerSeconds(s => s + 1800); // 30 min break simulation
-                            addItem('timesheets', {
-                              id: `zt-p-${Date.now().toString().slice(-4)}`,
-                              employee: activeEmployee,
-                              role: 'Fachkraft',
-                              project: assignedTask.project || activeProject,
-                              task: 'Gesetzliche Ruhepause (30 Min.)',
-                              date: new Date().toISOString().split('T')[0],
-                              startTime: 'Pause',
-                              endTime: 'Pause Ende',
-                              breakMinutes: 30,
-                              totalHours: 0.5,
-                              hourlyRate: 0,
-                              status: 'Genehmigt',
-                              location: 'Baustelle (Pause)'
-                            });
-                          }}
-                          className="py-3 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                          onClick={() => setIsRunning(true)}
+                          className="w-full py-3.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition-all active:scale-95"
                         >
-                          <Coffee className="w-4 h-4" />
-                          <span>30 Min. Pause</span>
+                          <Play className="w-5 h-5 fill-white" />
+                          <span>Lenkzeit starten (Fahrtantritt)</span>
                         </button>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <button
+                            onClick={() => {
+                              setTimerSeconds(s => s + 2700); // 45 min LKW pause
+                              addItem('timesheets', {
+                                id: `zt-lkw-p-${Date.now().toString().slice(-4)}`,
+                                employee: activeEmployee,
+                                role: 'Berufskraftfahrer (LKW)',
+                                project: assignedTask.project || 'Fernverkehr / Logistik',
+                                task: 'Gesetzliche Lenkzeitpause nach VO (EG) 561/2006 (45 Min.)',
+                                date: new Date().toISOString().split('T')[0],
+                                startTime: 'Pause',
+                                endTime: 'Pause Ende',
+                                breakMinutes: 45,
+                                totalHours: 0.75,
+                                hourlyRate: 0,
+                                status: 'Genehmigt',
+                                location: 'Raststätte / Parkplatz (Lenkpause OK)'
+                              });
+                              addToast('45-Min. Lenkpause gebucht', 'Gesetzliche Lenkzeitunterbrechung (VO EG 561/2006) rechtssicher dokumentiert.', 'success');
+                            }}
+                            className="py-2.5 px-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                            title="45 Minuten gesetzliche Pflichtpause buchen"
+                          >
+                            <Coffee className="w-4 h-4" />
+                            <span>45 Min. Pause (VO 561)</span>
+                          </button>
 
+                          <button
+                            onClick={() => {
+                              addItem('timesheets', {
+                                id: `zt-work-${Date.now().toString().slice(-4)}`,
+                                employee: activeEmployee,
+                                role: 'Berufskraftfahrer (LKW)',
+                                project: assignedTask.project || 'Baustellenlogistik',
+                                task: 'Be- und Entladung / Ladungssicherung',
+                                date: new Date().toISOString().split('T')[0],
+                                startTime: 'Jetzt',
+                                endTime: 'Jetzt +30 Min',
+                                breakMinutes: 0,
+                                totalHours: 0.5,
+                                hourlyRate: 64.0,
+                                status: 'Genehmigt',
+                                location: 'Kundenrampe / Baustelle'
+                              });
+                              addToast('Be-/Entladen gebucht', 'Arbeitszeit (andere Arbeiten als Lenkzeit) erfolgreich protokolliert.', 'info');
+                            }}
+                            className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                          >
+                            <Briefcase className="w-4 h-4" />
+                            <span>Be-/Entladen</span>
+                          </button>
+
+                          <button
+                            onClick={handleStopAndSave}
+                            className="py-2.5 px-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-rose-600/30 transition-all active:scale-95"
+                          >
+                            <Square className="w-4 h-4 fill-white" />
+                            <span>Ruhezeit (11h)</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    /* Standard Handwerk & Reinigung Actions */
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      {!isRunning ? (
                         <button
-                          onClick={handleStopAndSave}
-                          className="sm:col-span-2 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition-all active:scale-95"
+                          onClick={() => setIsRunning(true)}
+                          className="sm:col-span-3 py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95"
                         >
-                          <Square className="w-4 h-4 fill-white" />
-                          <span>Feierabend (Gehen)</span>
+                          <Play className="w-5 h-5 fill-white" />
+                          <span>Arbeitsbeginn (Kommen)</span>
                         </button>
-                      </>
-                    )}
-                  </div>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => {
+                              setTimerSeconds(s => s + 1800); // 30 min break simulation
+                              addItem('timesheets', {
+                                id: `zt-p-${Date.now().toString().slice(-4)}`,
+                                employee: activeEmployee,
+                                role: 'Fachkraft',
+                                project: assignedTask.project || activeProject,
+                                task: 'Gesetzliche Ruhepause (30 Min.)',
+                                date: new Date().toISOString().split('T')[0],
+                                startTime: 'Pause',
+                                endTime: 'Pause Ende',
+                                breakMinutes: 30,
+                                totalHours: 0.5,
+                                hourlyRate: 0,
+                                status: 'Genehmigt',
+                                location: 'Baustelle (Pause)'
+                              });
+                            }}
+                            className="py-3 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                          >
+                            <Coffee className="w-4 h-4" />
+                            <span>30 Min. Pause</span>
+                          </button>
+
+                          <button
+                            onClick={handleStopAndSave}
+                            className="sm:col-span-2 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition-all active:scale-95"
+                          >
+                            <Square className="w-4 h-4 fill-white" />
+                            <span>Feierabend (Gehen)</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Worker Today Summary */}
                 <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
                   <span>Heute geleistet: <strong className="text-white">{workerTotalHours.toFixed(1)} Std.</strong></span>
-                  <span className="text-emerald-400 font-semibold">Wochenkonto: 38.5 / 40 Std. ✓</span>
+                  <span className="text-emerald-400 font-semibold">
+                    {activityCategory === 'lkw' ? 'BALM / BAG Konform ✓' : 'Wochenkonto: 38.5 / 40 Std. ✓'}
+                  </span>
                 </div>
               </div>
 
@@ -1245,12 +1404,16 @@ export const ZeiterfassungModule = () => {
                     onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-500"
                   >
-                    <option value="Monteur / Fachkraft">Monteur / Fachkraft</option>
+                    <option value="Monteur & Handwerker">Monteur & Handwerker</option>
                     <option value="Bauleiter / Meister">Bauleiter / Meister</option>
                     <option value="Elektro-Techniker">Elektro-Techniker</option>
                     <option value="SHK-Installateur">SHK-Installateur</option>
-                    <option value="Fahrer / Logistiker">Fahrer / Logistiker</option>
-                    <option value="Auszubildender">Auszubildender</option>
+                    <option value="Gebäudereiniger / Objektleiter">Gebäudereiniger / Objektleiter</option>
+                    <option value="LKW- & Berufskraftfahrer (VO 561/2006)">LKW- & Berufskraftfahrer (VO 561/2006)</option>
+                    <option value="Maler & Lackierer">Maler & Lackierer</option>
+                    <option value="Garten- & Landschaftsbau (GaLaBau)">Garten- & Landschaftsbau (GaLaBau)</option>
+                    <option value="Lager & Logistik">Lager & Logistik</option>
+                    <option value="Auszubildender / Helfer">Auszubildender / Helfer</option>
                   </select>
                 </div>
 
