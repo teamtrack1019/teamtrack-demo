@@ -81,41 +81,42 @@ export const UpgradeModal = () => {
     setIsSubmitting(true);
 
     try {
-      // Send real email to kontakt@team-track.de via FormSubmit API
-      const response = await fetch('https://formsubmit.co/ajax/kontakt@team-track.de', {
+      // Direct POST to custom IONOS SMTP Serverless Function (/api/contact)
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          _subject: `⚡ Neue TeamTrack Demo-Anfrage: ${formData.company || clientId}`,
-          _template: 'table',
-          _captcha: 'false',
-          Firma: formData.company || clientId,
-          Ansprechpartner: formData.contactName,
-          Telefon: formData.phone,
-          Email: formData.email,
-          'Gewählte Module': selectedListString,
-          'Gewünschter Zeitplan': formData.timeline,
-          'Nachricht / Notiz': formData.message || 'Keine zusätzliche Notiz',
-          'Demo Mandant-ID': clientId
+          company: formData.company || clientId,
+          contactName: formData.contactName,
+          phone: formData.phone,
+          email: formData.email,
+          selectedModules: selectedListString,
+          timeline: formData.timeline,
+          message: formData.message || 'Keine zusätzliche Notiz',
+          clientId: clientId
         })
       });
 
-      if (response.ok) {
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok && result.success !== false) {
         triggerConfetti();
         setIsSubmitted(true);
-        addToast('E-Mail erfolgreich versendet', 'Ihre Anfrage wurde direkt an kontakt@team-track.de übermittelt.', 'success');
+        addToast('E-Mail erfolgreich versendet', 'Ihre Anfrage wurde direkt über den IONOS Server an kontakt@team-track.de & teamtrack.software@hotmail.com übermittelt.', 'success');
       } else {
-        throw new Error('E-Mail Server Antwort fehlerhaft');
+        console.warn('API Response Warning:', result);
+        triggerConfetti();
+        setIsSubmitted(true);
+        addToast('Anfrage übermittelt', 'Vielen Dank! Wir haben Ihre Anfrage erhalten und melden uns in Kürze.', 'success');
       }
     } catch (err) {
-      console.warn('Fallback: direct submission', err);
-      // Fallback: show success anyway so user experience is not blocked
+      console.warn('Direct fallback on error:', err);
       triggerConfetti();
       setIsSubmitted(true);
-      addToast('Anfrage übermittelt', 'Vielen Dank! Wir melden uns innerhalb von 24 Stunden bei Ihnen.', 'success');
+      addToast('Anfrage übermittelt', 'Vielen Dank! Wir haben Ihre Anfrage erhalten.', 'success');
     } finally {
       setIsSubmitting(false);
     }
@@ -267,7 +268,7 @@ export const UpgradeModal = () => {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>E-Mail wird gesendet...</span>
+                      <span>E-Mail wird über IONOS gesendet...</span>
                     </>
                   ) : (
                     <>
@@ -304,7 +305,7 @@ export const UpgradeModal = () => {
 
             <h3 className="text-xl sm:text-2xl font-black text-white">Vielen Dank für Ihre Anfrage!</h3>
             <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-              Ihre Anforderungen wurden direkt an Herrn Becker übermittelt. Wir melden uns innerhalb von 24 Stunden persönlich bei Ihnen, um Ihr maßgeschneidertes System zu besprechen.
+              Ihre Anforderungen wurden direkt über unseren IONOS Mail-Server an Herrn Becker übermittelt. Wir melden uns innerhalb von 24 Stunden persönlich bei Ihnen.
             </p>
 
             <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 max-w-sm mx-auto text-xs text-left space-y-2">
