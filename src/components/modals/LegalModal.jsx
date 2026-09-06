@@ -19,7 +19,9 @@ import {
   FileCode,
   HardDrive,
   Eye,
-  UserCheck
+  UserCheck,
+  GitBranch,
+  RefreshCw
 } from 'lucide-react';
 
 export const LegalModal = () => {
@@ -242,14 +244,14 @@ export const LegalModal = () => {
                 </p>
               </div>
 
-              {/* 4. Auftragsverarbeitung */}
+              {/* 4. Auftragsverarbeitung & Wartungszugriff */}
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <h4 className="font-bold text-white text-sm flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">4</span>
-                  Auftragsverarbeitung (AVV gemäß Art. 28 DSGVO) für Kunden-Software
+                  Auftragsverarbeitung (AVV gemäß Art. 28 DSGVO) & Fernwartung
                 </h4>
                 <p className="text-slate-300 leading-relaxed">
-                  Wenn TeamTrack für Ihr Unternehmen eine maßgeschneiderte Vollversion (z.B. Mitarbeiter-Zeiterfassung, Disposition, Fuhrpark- und Auftragsverwaltung) implementiert und hostet, schließen wir mit Ihnen einen standardisierten Vertrag zur Auftragsverarbeitung (AV-Vertrag nach Art. 28 Abs. 3 DSGVO) inklusive umfassender Technisch-Organisatorischer Maßnahmen (TOMs nach Art. 32 DSGVO). Ihr Unternehmen bleibt dabei die alleinige verantwortliche Stelle im Sinne des Datenschutzrechts.
+                  Wenn TeamTrack für Ihr Unternehmen eine maßgeschneiderte Vollversion implementiert, hostet oder im Rahmen von Software-Updates wartet, schließen wir mit Ihnen einen standardisierten Vertrag zur Auftragsverarbeitung (AV-Vertrag nach Art. 28 Abs. 3 DSGVO) inklusive umfassender Technisch-Organisatorischer Maßnahmen (TOMs nach Art. 32 DSGVO) sowie Regelungen zum sicheren Fernwartungszugriff. Ihr Unternehmen bleibt dabei die alleinige verantwortliche Stelle im Sinne des Datenschutzrechts.
                 </p>
               </div>
 
@@ -357,14 +359,26 @@ export const LegalModal = () => {
                 </div>
               </div>
 
-              {/* § 3 Leistungsumfang & White-Label */}
+              {/* § 3 Leistungsumfang, White-Label & Infrastruktur / Git / Vercel */}
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <h4 className="font-bold text-white text-sm">§ 3 Leistungsumfang & White-Label Bereitstellung</h4>
-                <p className="text-slate-300 leading-relaxed">
-                  (1) TeamTrack erstellt für Auftraggeber schlüsselfertige Individual-Softwarelösungen auf Basis moderner Web-Technologien. Der genaue Leistungsumfang, die zu programmierenden Module und Schnittstellen ergeben sich aus dem jeweiligen Einzelvertrag bzw. Angebot.<br />
-                  (2) Die Software wird im unternehmenseigenen <strong>White-Label-Design</strong> des Auftraggebers (Firmenlogo, Farbwelt, eigene Firmen-Domain / Subdomain) bereitgestellt.<br />
-                  (3) Nach Abschluss der Implementierung erfolgt die Bereitstellung wahlweise auf zertifizierten deutschen Cloud-Servern oder als On-Premise-Bereitstellung nach schriftlicher Vereinbarung.
-                </p>
+                <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                  <GitBranch className="w-4 h-4 text-brand-400" />
+                  § 3 Leistungsumfang, White-Label, Quellcode-Hosting & CI/CD-Bereitstellung
+                </h4>
+                <div className="text-slate-300 leading-relaxed space-y-2">
+                  <p>
+                    (1) TeamTrack erstellt für Auftraggeber schlüsselfertige Individual-Softwarelösungen auf Basis moderner Web-Technologien. Der genaue Leistungsumfang, die zu programmierenden Module und Schnittstellen ergeben sich aus dem jeweiligen Einzelvertrag bzw. Angebot.
+                  </p>
+                  <p>
+                    (2) <strong>White-Label & Branding:</strong> Die Software wird im unternehmenseigenen Corporate Design des Auftraggebers (Firmenlogo, Farbwelt, eigene Firmen-Domain / Subdomain) bereitgestellt.
+                  </p>
+                  <p>
+                    (3) <strong>Quellcode-Verwaltung & Deployment-Infrastruktur:</strong> Um kontinuierliche Sicherheitsupdates, Performance-Optimierungen, Systemwartungen und zukünftige Funktionserweiterungen auf Kundenwunsch unverzüglich einspielen zu können, verbleibt die technische Administration der Code-Repositories (z.B. GitHub) sowie der Continuous-Deployment-Pipelines (z.B. Vercel, Supabase, Cloud-Hosting) bei TeamTrack. 
+                  </p>
+                  <p>
+                    (4) <strong>Nachträgliche Änderungswünsche (Change Requests):</strong> Wünscht der Auftraggeber zu einem späteren Zeitpunkt zusätzliche Funktionen, Schnittstellen oder Modulanpassungen, werden diese nach gesonderter Abstimmung (auf Festpreis- oder Stundenbasis) über die bestehende Bereitstellungsinfrastruktur direkt in das System des Kunden integriert.
+                  </p>
+                </div>
               </div>
 
               {/* § 4 Preise & Zahlungsbedingungen */}
