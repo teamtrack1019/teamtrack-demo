@@ -50,20 +50,20 @@ export const Footer = () => {
         </div>
 
         {/* Right CTA */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <a
             href="https://team-track.de"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 text-slate-400 hover:text-brand-300 transition-colors"
+            className="flex items-center gap-1.5 text-slate-400 hover:text-brand-300 transition-colors whitespace-nowrap"
           >
             <span>team-track.de</span>
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink className="w-3.5 h-3.5 shrink-0" />
           </a>
 
           <button
             onClick={() => openUpgradeModal('Fußzeile CTA')}
-            className="px-3.5 py-1.5 rounded-lg bg-brand-600/20 hover:bg-brand-600/40 text-brand-300 border border-brand-500/30 font-bold transition-all"
+            className="px-3.5 py-1.5 rounded-lg bg-brand-600/20 hover:bg-brand-600/40 text-brand-300 border border-brand-500/30 font-bold transition-all whitespace-nowrap cursor-pointer"
           >
             Vollversion anfragen
           </button>
