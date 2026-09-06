@@ -233,7 +233,7 @@ export const ZeiterfassungModule = () => {
   const workerAbsences = (data.absences || []).filter(ab => ab.employee === activeEmployee);
   const workerTotalHours = workerTimesheets.reduce((acc, curr) => acc + (curr.totalHours || 0), 0);
 
-  const workflowSteps = [
+  const chefWorkflowSteps = [
     {
       title: '1. Mitarbeiter & Projekt wählen',
       desc: 'Wählen Sie den Mitarbeiter und das Bauvorhaben oder die Kundenbaustelle aus.',
@@ -253,6 +253,29 @@ export const ZeiterfassungModule = () => {
       title: '4. Übergabe zur 1-Klick Rechnung',
       desc: 'Erfasste Stunden stehen sofort im Rechnungsmodul zur automatischen Abrechnung bereit.',
       hint: 'DATEV-Lohnexport bereit'
+    }
+  ];
+
+  const workerWorkflowSteps = [
+    {
+      title: '1. Tagesbaustelle & Route einsehen',
+      desc: 'Öffnen Sie morgens die TeamTrack-App auf dem Smartphone – die zugewiesene Baustelle wird sofort angezeigt.',
+      hint: '1-Klick Google Maps Navigation'
+    },
+    {
+      title: '2. Arbeitsbeginn stempeln (Kommen)',
+      desc: 'Tippen Sie bei Ankunft auf „Arbeitsbeginn“. Das System verifiziert Ihren Standort automatisch per GPS.',
+      hint: 'Sekundengenaue Zeiterfassung'
+    },
+    {
+      title: '3. Pausen & Feierabend buchen',
+      desc: 'Buchen Sie gesetzliche Ruhepausen (z.B. 30 Min.) und stempeln Sie bei Arbeitsende auf „Feierabend“.',
+      hint: 'Direkte Übertragung ans Büro'
+    },
+    {
+      title: '4. Urlaub & Krankmeldung (eAU) senden',
+      desc: 'Stellen Sie Urlaubsanträge oder laden Sie ärztliche AU-Bescheinigungen per Foto direkt in die App hoch.',
+      hint: 'Papierlos & DSGVO-konform'
     }
   ];
 
@@ -350,13 +373,22 @@ export const ZeiterfassungModule = () => {
         </div>
       </div>
 
-      {/* Module Workflow Guide */}
-      <ModuleWorkflowGuide
-        moduleTitle="Zeiterfassung"
-        tagline="Vom Smartphone-Stempeln auf der Baustelle bis zur automatischen Abrechnung"
-        steps={workflowSteps}
-        benefitText="Testen Sie die Live-Stempeluhr links oder erfassen Sie manuell einen Arbeitstag."
-      />
+      {/* Module Workflow Guide (Dynamic for Chef vs Worker) */}
+      {viewPerspective === 'chef' ? (
+        <ModuleWorkflowGuide
+          moduleTitle="Zeiterfassung (Chef & Büro-Ansicht)"
+          tagline="Zentrale Steuerung aller Mitarbeiterzeiten, Stundensätze und DATEV-Lohnexporte"
+          steps={chefWorkflowSteps}
+          benefitText="Testen Sie die Live-Stempeluhr links oder erfassen Sie manuell einen Arbeitstag für Ihr Team."
+        />
+      ) : (
+        <ModuleWorkflowGuide
+          moduleTitle="Mitarbeiter-App (Smartphone PWA)"
+          tagline="So arbeiten Ihre Monteure & Fachkräfte vor Ort auf der Baustelle"
+          steps={workerWorkflowSteps}
+          benefitText="Tippen Sie unten auf „Arbeitsbeginn“ oder testen Sie das Einreichen eines Urlaubsantrags / einer Krankmeldung."
+        />
+      )}
 
       {/* ========================================================================= */}
       {/* PERSPECTIVE 1: CHEF & BÜRO-ANSICHT */}
