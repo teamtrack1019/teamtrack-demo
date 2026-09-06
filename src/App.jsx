@@ -13,6 +13,7 @@ import { RestrictionModal } from './components/modals/RestrictionModal';
 import { InvoicePreviewModal } from './components/modals/InvoicePreviewModal';
 import { ExpiredModal } from './components/modals/ExpiredModal';
 import { ShareLinkModal } from './components/modals/ShareLinkModal';
+import { LegalModal } from './components/modals/LegalModal';
 import { Toasts } from './components/Toasts';
 import { Footer } from './components/Footer';
 
@@ -46,6 +47,7 @@ export default function App() {
         <InvoicePreviewModal />
         <ExpiredModal />
         <ShareLinkModal />
+        <LegalModal />
         <Toasts />
       </div>
     </DemoProvider>

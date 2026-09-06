@@ -71,8 +71,49 @@ export const Footer = () => {
 
       </div>
 
-      <div className="max-w-7xl mx-auto mt-8 pt-4 border-t border-slate-900 text-center text-[10px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
-        <span>© {new Date().getFullYear()} TeamTrack. Alle Rechte vorbehalten. 100% DSGVO-konform.</span>
+      {/* Legal Links Bar */}
+      <div className="max-w-7xl mx-auto mt-6 pt-4 border-t border-slate-900 flex flex-wrap items-center justify-between gap-4 text-[11px]">
+        <div className="flex flex-wrap items-center gap-4 text-slate-300">
+          <button
+            type="button"
+            onClick={() => openLegalModal('impressum')}
+            className="hover:text-brand-400 transition-colors cursor-pointer font-medium"
+          >
+            Impressum (§ 5 DDG)
+          </button>
+          <span className="text-slate-700">•</span>
+          <button
+            type="button"
+            onClick={() => openLegalModal('datenschutz')}
+            className="hover:text-brand-400 transition-colors cursor-pointer font-medium"
+          >
+            Datenschutz (DSGVO)
+          </button>
+          <span className="text-slate-700">•</span>
+          <button
+            type="button"
+            onClick={() => openLegalModal('agb')}
+            className="hover:text-brand-400 transition-colors cursor-pointer font-medium"
+          >
+            AGB & Sandbox-Bedingungen
+          </button>
+          <span className="text-slate-700">•</span>
+          <button
+            type="button"
+            onClick={() => openLegalModal('kontakt')}
+            className="hover:text-brand-400 transition-colors cursor-pointer font-medium"
+          >
+            Kontakt & Beratung
+          </button>
+        </div>
+
+        <div className="text-slate-400 flex items-center gap-2">
+          <span>Inhaberin: Huriye Ünalsoy • 97236 Randersacker</span>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto mt-4 pt-3 border-t border-slate-900/60 text-center text-[10px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <span>© {new Date().getFullYear()} TeamTrack Softwareentwicklung & IT-Beratung. Alle Rechte vorbehalten. 100% DSGVO-konform.</span>
         <span>Demo-Sandbox-Modus • Daten werden isoliert gespeichert</span>
       </div>
     </footer>

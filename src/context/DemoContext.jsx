@@ -18,12 +18,22 @@ export const DemoProvider = ({ children }) => {
   // Active navigation
   const [activeModule, setActiveModule] = useState('overview');
 
-  // Modals state
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [upgradePrefillModule, setUpgradePrefillModule] = useState('');
   const [restrictionModal, setRestrictionModal] = useState({ isOpen: false, title: '', message: '', feature: '' });
   const [previewInvoice, setPreviewInvoice] = useState(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [legalTab, setLegalTab] = useState('impressum'); // 'impressum', 'datenschutz', 'agb', 'kontakt'
+
+  const openLegalModal = (tab = 'impressum') => {
+    setLegalTab(tab);
+    setIsLegalModalOpen(true);
+  };
+
+  const closeLegalModal = () => {
+    setIsLegalModalOpen(false);
+  };
 
   // Toast notifications
   const [toasts, setToasts] = useState([]);
@@ -287,6 +297,12 @@ export const DemoProvider = ({ children }) => {
         openInvoicePreview,
         isShareModalOpen,
         setIsShareModalOpen,
+        isLegalModalOpen,
+        setIsLegalModalOpen,
+        legalTab,
+        setLegalTab,
+        openLegalModal,
+        closeLegalModal,
         toasts,
         addToast,
         triggerConfetti,
