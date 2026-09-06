@@ -3,7 +3,7 @@ import { useDemo } from '../context/DemoContext';
 import { ShieldCheck, Phone, Mail, MapPin, ExternalLink } from 'lucide-react';
 
 export const Footer = () => {
-  const { openUpgradeModal } = useDemo();
+  const { openUpgradeModal, openLegalModal } = useDemo();
 
   return (
     <footer className="border-t border-slate-800/80 bg-slate-950/80 mt-16 py-10 px-4 lg:px-8 text-xs text-slate-400">
