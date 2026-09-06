@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
+import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { 
   Users, 
   Plus, 
@@ -68,6 +69,29 @@ export const CrmModule = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const workflowSteps = [
+    {
+      title: '1. Kunde & Ansprechpartner anlegen',
+      desc: 'Erfassen Sie Firmendaten, Branche, Direktansprechpartner und Kontaktdaten zentral in einer Kartei.',
+      hint: 'DSGVO-konforme Datenhaltung'
+    },
+    {
+      title: '2. Historie & Umsätze verfolgen',
+      desc: 'Sehen Sie sofort alle bisherigen Projekte, offene Rechnungen und aufgelaufene Gesamtumsätze des Kunden.',
+      hint: 'Echtzeit-Umsatzüberblick'
+    },
+    {
+      title: '3. 1-Klick Schnellkontakt & Route',
+      desc: 'Rufen Sie den Kunden direkt aus der App an, senden Sie E-Mails oder öffnen Sie Google Maps zur Anfahrt.',
+      hint: 'Perfekt für Bauleiter unterwegs'
+    },
+    {
+      title: '4. Modulübergreifend verknüpfen',
+      desc: 'Kunden stehen in Zeiterfassung, Rechnungsmodul und Disposition sofort automatisch zur Auswahl bereit.',
+      hint: '100% vernetzter Datenfluss'
+    }
+  ];
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       
@@ -103,6 +127,14 @@ export const CrmModule = () => {
           </button>
         </div>
       </div>
+
+      {/* Module Workflow Guide */}
+      <ModuleWorkflowGuide
+        moduleTitle="Kundenverwaltung (CRM)"
+        tagline="Alle Kundendaten, Ansprechpartner, Projekte und Umsätze an einem zentralen Ort"
+        steps={workflowSteps}
+        benefitText="Klicken Sie auf eine Kundenkartei, um Details einzusehen oder legen Sie einen neuen Kunden an."
+      />
 
       {/* Filter & Search Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 glass-card p-4 rounded-xl">

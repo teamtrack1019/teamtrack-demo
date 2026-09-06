@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDemo } from '../../context/DemoContext';
+import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { 
   Play, 
   Square, 
@@ -121,6 +122,29 @@ export const ZeiterfassungModule = () => {
   const totalHours = (data.timesheets || []).reduce((acc, curr) => acc + (curr.totalHours || 0), 0);
   const totalValue = (data.timesheets || []).reduce((acc, curr) => acc + ((curr.totalHours || 0) * (curr.hourlyRate || 0)), 0);
 
+  const workflowSteps = [
+    {
+      title: '1. Mitarbeiter & Projekt wählen',
+      desc: 'Wählen Sie den ausführenden Monteur und das Bauvorhaben oder die Kundenbaustelle aus.',
+      hint: 'Inklusive Stundensatz-Zuordnung'
+    },
+    {
+      title: '2. Stempeluhr starten (PWA)',
+      desc: 'Mitarbeiter stempeln Arbeitsbeginn per Smartphone direkt auf der Baustelle – sekundengenau.',
+      hint: 'GPS-Standortprüfung aktiv'
+    },
+    {
+      title: '3. Pausen & Feierabend buchen',
+      desc: 'Bei Arbeitsende oder Pause buchen; Zeiten werden automatisch gerundet und kalkuliert.',
+      hint: 'Puantaj & Überstundenprüfung'
+    },
+    {
+      title: '4. Übergabe zur 1-Klick Rechnung',
+      desc: 'Erfasste Stunden stehen sofort im Rechnungsmodul zur automatischen Abrechnung bereit.',
+      hint: 'DATEV-Lohnexport bereit'
+    }
+  ];
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300 w-full overflow-hidden">
       
@@ -157,6 +181,14 @@ export const ZeiterfassungModule = () => {
           </button>
         </div>
       </div>
+
+      {/* Module Workflow Guide */}
+      <ModuleWorkflowGuide
+        moduleTitle="Zeiterfassung"
+        tagline="Vom Smartphone-Stempeln auf der Baustelle bis zur automatischen Abrechnung"
+        steps={workflowSteps}
+        benefitText="Testen Sie die Live-Stempeluhr links oder erfassen Sie manuell einen Arbeitstag."
+      />
 
       {/* Interactive Punch Clock (Stempeluhr) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

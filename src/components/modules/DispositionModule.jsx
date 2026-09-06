@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
+import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { 
   KanbanSquare, 
   Plus, 
@@ -64,6 +65,29 @@ export const DispositionModule = () => {
     updateItem('tasks', taskId, { status: targetStatus });
   };
 
+  const workflowSteps = [
+    {
+      title: '1. Auftrag & Frist anlegen',
+      desc: 'Erstellen Sie Baustellenaufträge mit Kunde, Projektname, Priorität (Dringend/Normal) und Zieldatum.',
+      hint: 'Inkl. Zeitbudget-Schätzung'
+    },
+    {
+      title: '2. Monteuren & Teams zuweisen',
+      desc: 'Teilen Sie Fachkräfte oder Kolonnen per Klick ein, damit jeder Mitarbeiter seinen Tageseinsatz sieht.',
+      hint: 'Vermeidet Doppelbelegungen'
+    },
+    {
+      title: '3. 4-Stufen Kanban steuern',
+      desc: 'Verschieben Sie Aufträge mit den Pfeilen von „Geplant“ über „In Bearbeitung“ bis zur „Qualitätskontrolle“.',
+      hint: '1-Klick Statuswechsel'
+    },
+    {
+      title: '4. Abschluss & Übergabe zur Rechnung',
+      desc: 'Sobald ein Auftrag auf „Abgeschlossen“ steht, wird er sofort für die Rechnungsstellung freigegeben.',
+      hint: 'Lückenloser Projektablauf'
+    }
+  ];
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       
@@ -99,6 +123,14 @@ export const DispositionModule = () => {
           </button>
         </div>
       </div>
+
+      {/* Module Workflow Guide */}
+      <ModuleWorkflowGuide
+        moduleTitle="Auftragsdisposition"
+        tagline="Einsatzplanung, Kolonnenzuweisung und 4-Phasen-Projektfortschritt"
+        steps={workflowSteps}
+        benefitText="Nutzen Sie die Pfeiltasten auf den Auftrags-Karten, um den Status live im Kanban zu verschieben."
+      />
 
       {/* Kanban Board Columns */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">

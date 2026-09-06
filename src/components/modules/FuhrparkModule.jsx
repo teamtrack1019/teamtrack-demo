@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
+import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { 
   Truck, 
   Plus, 
@@ -128,6 +129,29 @@ export const FuhrparkModule = () => {
     return true;
   });
 
+  const workflowSteps = [
+    {
+      title: '1. Fahrzeug & Fahrer anlegen',
+      desc: 'Erfassen Sie Transporter, PKW oder LKW mit Kennzeichen, KM-Stand, Modell und festem Fahrer.',
+      hint: 'Digitale Fahrzeugakte'
+    },
+    {
+      title: '2. Baustellen-Touren zuweisen',
+      desc: 'Weisen Sie jedem Fahrzeug aktuelle Tages-Touren und Baustellen zu, um die Flottenauslastung zu steuern.',
+      hint: 'Live-Status (Bereit / Tour / Werkstatt)'
+    },
+    {
+      title: '3. Automatische TÜV-Überwachung',
+      desc: 'Das System warnt rechtzeitig (rot/gelb), wenn eine Hauptuntersuchung in den nächsten Monaten fällig wird.',
+      hint: '1-Klick HU/TÜV Erneuerung'
+    },
+    {
+      title: '4. Telematik & Tankdaten koppeln',
+      desc: 'In der Vollversion fließen KM-Stände, GPS-Routen und Tankstände vollautomatisch per OBD2-Stecker ein.',
+      hint: 'Fahrtenbuch 100% finanzamtskonform'
+    }
+  ];
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300 w-full overflow-hidden">
       
@@ -164,6 +188,14 @@ export const FuhrparkModule = () => {
           </button>
         </div>
       </div>
+
+      {/* Module Workflow Guide */}
+      <ModuleWorkflowGuide
+        moduleTitle="Fuhrpark & Flotte"
+        tagline="Fahrzeugverwaltung, Tourenplanung und automatische TÜV/HU-Terminüberwachung"
+        steps={workflowSteps}
+        benefitText="Testen Sie die 1-Klick TÜV-Erneuerung direkt in den Fahrzeugkarten oder filtern Sie nach TÜV-Fälligkeit."
+      />
 
       {/* TÜV Smart Alert Widget */}
       {dueTuvVehicles.length > 0 && (

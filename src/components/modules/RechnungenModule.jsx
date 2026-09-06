@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
+import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { 
   Receipt, 
   Plus, 
@@ -115,6 +116,29 @@ export const RechnungenModule = () => {
     return acc + sub * 1.19;
   }, 0);
 
+  const workflowSteps = [
+    {
+      title: '1. Zeiten & Material importieren',
+      desc: 'Wählen Sie einen Kunden oder importieren Sie verifizierte Arbeitszeiten mit dem „1-Klick aus Zeiten“-Button.',
+      hint: 'Nahtlose Übergabe aus Modul 1'
+    },
+    {
+      title: '2. Zahlungsziel & MwSt. prüfen',
+      desc: 'Positionen, Mengen, 19% MwSt. und Fälligkeitsfristen werden automatisch fehlerfrei berechnet.',
+      hint: 'Skonto & Rabatte hinterlegbar'
+    },
+    {
+      title: '3. PDF-Vorschau mit Firmenlogo',
+      desc: 'Klicken Sie auf das Auge-Symbol, um den offiziellen Beleg inklusive Briefkopf und Bankdaten zu prüfen.',
+      hint: 'Rechtssicher nach GoBD'
+    },
+    {
+      title: '4. DATEV-Export & Rechnungsversand',
+      desc: 'Beleg per E-Mail an den Kunden senden und mit einem Klick an Ihren Steuerberater übermitteln.',
+      hint: 'DATEV & SevDesk bereit'
+    }
+  ];
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300 w-full overflow-hidden">
       
@@ -152,6 +176,14 @@ export const RechnungenModule = () => {
           </button>
         </div>
       </div>
+
+      {/* Module Workflow Guide */}
+      <ModuleWorkflowGuide
+        moduleTitle="Rechnungswesen"
+        tagline="Von der Zeiterfassung zur GoBD-konformen PDF-Rechnung in unter 60 Sekunden"
+        steps={workflowSteps}
+        benefitText="Klicken Sie oben auf „1-Klick aus Zeiten“ oder öffnen Sie die PDF-Vorschau eines Belegs."
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
