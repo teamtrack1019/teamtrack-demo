@@ -7,9 +7,10 @@ const DemoContext = createContext();
 const MAX_CREATION_LIMIT = 5; // Demo-Kontingent pro Modul
 
 export const DemoProvider = ({ children }) => {
-  // Parse URL Parameters (?client=FirmaX&days=7)
+  // Parse URL Parameters (?client=FirmaX&days=7&admin=true)
   const [clientId, setClientId] = useState('Standard-Demo');
   const [trialDays, setTrialDays] = useState(7);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [startTime, setStartTime] = useState(Date.now());
   const [remainingTime, setRemainingTime] = useState({ days: 7, hours: 0, minutes: 0, seconds: 0 });
   const [isExpired, setIsExpired] = useState(false);
@@ -52,14 +53,16 @@ export const DemoProvider = ({ children }) => {
     tasks: 0
   });
 
-  // Initialize Client & Trial from URL on mount
+  // Initialize Client, Admin & Trial from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const clientParam = params.get('client') || params.get('firma') || 'Musterkunde';
     const daysParam = parseInt(params.get('days') || params.get('tage') || '7', 10);
+    const adminParam = params.get('admin') === 'true' || params.get('admin') === '1' || window.location.hostname === 'localhost';
     
     setClientId(clientParam);
     setTrialDays([3, 7, 14].includes(daysParam) ? daysParam : 7);
+    setIsAdmin(adminParam);
 
     // Check or init trial start time in localStorage for this client
     const timeKey = `teamtrack_trial_start_${clientParam}`;
@@ -218,6 +221,7 @@ export const DemoProvider = ({ children }) => {
         clientId,
         setClientId,
         trialDays,
+        isAdmin,
         remainingTime,
         isExpired,
         activeModule,

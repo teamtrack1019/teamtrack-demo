@@ -12,6 +12,7 @@ import {
 export const Header = () => {
   const { 
     clientId, 
+    isAdmin,
     remainingTime, 
     resetSandbox, 
     openUpgradeModal, 
@@ -51,7 +52,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Status Center & Actions (Strictly single-row nowrap with fixed height) */}
+        {/* Status Center & Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
           
           {/* Trial Countdown Pill with fixed width digits */}
@@ -63,15 +64,17 @@ export const Header = () => {
             </span>
           </div>
 
-          {/* Link Generator for Multi-Client */}
-          <button
-            onClick={() => setIsShareModalOpen(true)}
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs text-slate-300 hover:text-white transition-all shrink-0"
-            title="Neuen Kunden-Testlink generieren"
-          >
-            <Share2 className="w-3.5 h-3.5 text-brand-400 shrink-0" />
-            <span className="text-[11px] whitespace-nowrap hidden md:inline">Kundenlink</span>
-          </button>
+          {/* Link Generator for Multi-Client (ONLY VISIBLE TO ADMIN) */}
+          {isAdmin && (
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-brand-500/40 text-xs text-brand-300 hover:text-white transition-all shrink-0 animate-in fade-in"
+              title="Admin: Neuen Kunden-Testlink generieren"
+            >
+              <Share2 className="w-3.5 h-3.5 text-brand-400 shrink-0" />
+              <span className="text-[11px] whitespace-nowrap font-semibold">Kundenlink</span>
+            </button>
+          )}
 
           {/* Reset Sandbox */}
           <button
