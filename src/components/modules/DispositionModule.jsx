@@ -305,13 +305,21 @@ export const DispositionModule = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">Zugewiesener Mitarbeiter:</label>
-                  <input
-                    type="text"
-                    required
+                  <select
                     value={newTask.assignedTo}
                     onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
-                  />
+                  >
+                    {(data.employees && data.employees.length > 0 ? data.employees : [
+                      { id: '1', name: 'Max Mustermann' },
+                      { id: '2', name: 'Sarah Weber' },
+                      { id: '3', name: 'Jan Becker' }
+                    ]).map(emp => (
+                      <option key={emp.id || emp.name} value={emp.name}>
+                        {emp.name} ({emp.role || 'Fachkraft'})
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">Priorität:</label>

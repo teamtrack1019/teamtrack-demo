@@ -462,13 +462,22 @@ export const FuhrparkModule = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">Fahrer:</label>
-                  <input
-                    type="text"
-                    required
+                  <select
                     value={newVehicle.driver}
                     onChange={(e) => setNewVehicle({ ...newVehicle, driver: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
-                  />
+                  >
+                    {(data.employees && data.employees.length > 0 ? data.employees : [
+                      { id: '1', name: 'Max Mustermann' },
+                      { id: '2', name: 'Sarah Weber' },
+                      { id: '3', name: 'Jan Becker' }
+                    ]).map(emp => (
+                      <option key={emp.id || emp.name} value={emp.name}>
+                        {emp.name}
+                      </option>
+                    ))}
+                    <option value="Kein Fahrer zugewiesen">Kein Fahrer zugewiesen</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">KM-Stand:</label>

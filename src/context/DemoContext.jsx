@@ -50,7 +50,8 @@ export const DemoProvider = ({ children }) => {
     invoices: 0,
     customers: 0,
     vehicles: 0,
-    tasks: 0
+    tasks: 0,
+    employees: 0
   });
 
   // Initialize Client, Admin & Trial from URL on mount
@@ -134,7 +135,7 @@ export const DemoProvider = ({ children }) => {
   const resetSandbox = () => {
     const fresh = JSON.parse(JSON.stringify(initialData));
     setData(fresh);
-    setCreatedCounts({ timesheets: 0, invoices: 0, customers: 0, vehicles: 0, tasks: 0 });
+    setCreatedCounts({ timesheets: 0, invoices: 0, customers: 0, vehicles: 0, tasks: 0, employees: 0 });
     try {
       localStorage.setItem(storageKey, JSON.stringify(fresh));
     } catch (e) {
@@ -175,25 +176,26 @@ export const DemoProvider = ({ children }) => {
 
   // Generic add with quota check
   const addItem = (moduleType, item) => {
-    if (createdCounts[moduleType] >= MAX_CREATION_LIMIT) {
+    const currentCount = createdCounts[moduleType] || 0;
+    if (currentCount >= MAX_CREATION_LIMIT) {
       triggerRestrictedAction(
         `Maximales Kontingent (${MAX_CREATION_LIMIT} Testeinträge)`,
-        `Sie haben das Demo-Limit für dieses Modul erreicht. In Ihrer eigenen Firmen-Software haben Sie unbegrenztes Kontingent und volle Datenbankanbindung.`
+        `Sie haben das Demo-Limit für diesen Bereich erreicht. In Ihrer eigenen Firmen-Software haben Sie unbegrenztes Kontingent und volle Datenbankanbindung.`
       );
       return false;
     }
 
     setData(prev => ({
       ...prev,
-      [moduleType]: [item, ...prev[moduleType]]
+      [moduleType]: [item, ...(prev[moduleType] || [])]
     }));
 
     setCreatedCounts(prev => ({
       ...prev,
-      [moduleType]: prev[moduleType] + 1
+      [moduleType]: currentCount + 1
     }));
 
-    addToast('Eintrag hinzugefügt', `Neuer Datensatz erfolgreich im Demo-System gespeichert (${createdCounts[moduleType] + 1}/${MAX_CREATION_LIMIT}).`, 'success');
+    addToast('Eintrag hinzugefügt', `Neuer Datensatz erfolgreich im Demo-System gespeichert (${currentCount + 1}/${MAX_CREATION_LIMIT}).`, 'success');
     return true;
   };
 

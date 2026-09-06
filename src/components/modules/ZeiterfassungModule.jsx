@@ -14,9 +14,11 @@ import {
   CheckCircle2, 
   Clock, 
   User, 
+  UserPlus,
   Briefcase, 
   DollarSign,
-  Calendar
+  Calendar,
+  Phone
 } from 'lucide-react';
 
 export const ZeiterfassungModule = () => {
@@ -37,6 +39,15 @@ export const ZeiterfassungModule = () => {
   const [activeEmployee, setActiveEmployee] = useState('Max Mustermann');
   const [activeTask, setActiveTask] = useState('Montage & Installation');
   const [gpsVerified, setGpsVerified] = useState(true);
+
+  // Employee Add Modal
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    name: '',
+    role: 'Monteur / Fachkraft',
+    hourlyRate: 65.0,
+    phone: '+49 170 1234567'
+  });
 
   // Manual Add Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -119,13 +130,49 @@ export const ZeiterfassungModule = () => {
     }
   };
 
+  const employeeList = (data.employees && data.employees.length > 0)
+    ? data.employees
+    : [
+        { id: "EMP-01", name: "Max Mustermann", role: "Bauleiter / Meister", hourlyRate: 75.0, phone: "+49 171 1234567" },
+        { id: "EMP-02", name: "Sarah Weber", role: "Elektro-Technikerin", hourlyRate: 68.0, phone: "+49 172 2345678" },
+        { id: "EMP-03", name: "Jan Becker", role: "Monteur", hourlyRate: 62.0, phone: "+49 173 3456789" }
+      ];
+
+  const handleAddEmployee = (e) => {
+    e.preventDefault();
+    if (!newEmployee.name.trim()) return;
+
+    const id = `EMP-0${employeeList.length + 1}`;
+    const added = addItem('employees', {
+      id,
+      ...newEmployee
+    });
+
+    if (added) {
+      setActiveEmployee(newEmployee.name);
+      setNewEntry(prev => ({
+        ...prev,
+        employee: newEmployee.name,
+        role: newEmployee.role,
+        hourlyRate: newEmployee.hourlyRate
+      }));
+      setNewEmployee({
+        name: '',
+        role: 'Monteur / Fachkraft',
+        hourlyRate: 65.0,
+        phone: '+49 170 1234567'
+      });
+      setIsEmployeeModalOpen(false);
+    }
+  };
+
   const totalHours = (data.timesheets || []).reduce((acc, curr) => acc + (curr.totalHours || 0), 0);
   const totalValue = (data.timesheets || []).reduce((acc, curr) => acc + ((curr.totalHours || 0) * (curr.hourlyRate || 0)), 0);
 
   const workflowSteps = [
     {
       title: '1. Mitarbeiter & Projekt wählen',
-      desc: 'Wählen Sie den ausführenden Monteur und das Bauvorhaben oder die Kundenbaustelle aus.',
+      desc: 'Wählen Sie den Mitarbeiter und das Bauvorhaben oder die Kundenbaustelle aus.',
       hint: 'Inklusive Stundensatz-Zuordnung'
     },
     {
@@ -170,6 +217,15 @@ export const ZeiterfassungModule = () => {
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             <span>Lohnexport</span>
+          </button>
+
+          <button
+            onClick={() => setIsEmployeeModalOpen(true)}
+            className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all w-full sm:w-auto"
+            title="Neuen Mitarbeiter im System anlegen"
+          >
+            <UserPlus className="w-4 h-4 text-brand-400" />
+            <span>+ Mitarbeiter</span>
           </button>
 
           <button
@@ -219,15 +275,35 @@ export const ZeiterfassungModule = () => {
             {/* Controls */}
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1">Mitarbeiter:</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] font-semibold text-slate-400 block">Mitarbeiter:</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsEmployeeModalOpen(true)}
+                    className="text-[10px] text-brand-400 hover:text-brand-300 font-bold flex items-center gap-1"
+                    title="Neuen Mitarbeiter anlegen"
+                  >
+                    <UserPlus className="w-3 h-3" />
+                    <span>+ Neu</span>
+                  </button>
+                </div>
                 <select 
                   value={activeEmployee}
-                  onChange={(e) => setActiveEmployee(e.target.value)}
+                  onChange={(e) => {
+                    if (e.target.value === '__add_new__') {
+                      setIsEmployeeModalOpen(true);
+                    } else {
+                      setActiveEmployee(e.target.value);
+                    }
+                  }}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
                 >
-                  <option value="Max Mustermann">Max Mustermann (Bauleiter)</option>
-                  <option value="Sarah Weber">Sarah Weber (Elektro-Technikerin)</option>
-                  <option value="Jan Becker">Jan Becker (Monteur)</option>
+                  {employeeList.map((emp) => (
+                    <option key={emp.id || emp.name} value={emp.name}>
+                      {emp.name} ({emp.role || 'Mitarbeiter'}) {emp.hourlyRate ? `- ${emp.hourlyRate} €/h` : ''}
+                    </option>
+                  ))}
+                  <option value="__add_new__" className="text-brand-400 font-bold">+ Neuen Mitarbeiter anlegen...</option>
                 </select>
               </div>
 
@@ -432,14 +508,41 @@ export const ZeiterfassungModule = () => {
 
             <form onSubmit={handleManualSubmit} className="mt-4 space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Mitarbeiter:</label>
-                <input
-                  type="text"
-                  required
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-slate-300 font-semibold">Mitarbeiter:</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsEmployeeModalOpen(true)}
+                    className="text-[11px] text-brand-400 hover:text-brand-300 font-bold flex items-center gap-1"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>+ Neuer Mitarbeiter</span>
+                  </button>
+                </div>
+                <select
                   value={newEntry.employee}
-                  onChange={(e) => setNewEntry({ ...newEntry, employee: e.target.value })}
+                  onChange={(e) => {
+                    if (e.target.value === '__add_new__') {
+                      setIsEmployeeModalOpen(true);
+                    } else {
+                      const selected = employeeList.find(emp => emp.name === e.target.value);
+                      setNewEntry({ 
+                        ...newEntry, 
+                        employee: e.target.value,
+                        role: selected?.role || newEntry.role,
+                        hourlyRate: selected?.hourlyRate || newEntry.hourlyRate
+                      });
+                    }
+                  }}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
-                />
+                >
+                  {employeeList.map((emp) => (
+                    <option key={emp.id || emp.name} value={emp.name}>
+                      {emp.name} ({emp.role || 'Mitarbeiter'}) {emp.hourlyRate ? `- ${emp.hourlyRate} €/Std.` : ''}
+                    </option>
+                  ))}
+                  <option value="__add_new__" className="text-brand-400 font-bold">+ Neuer Mitarbeiter anlegen...</option>
+                </select>
               </div>
 
               <div>
@@ -531,6 +634,111 @@ export const ZeiterfassungModule = () => {
                   className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold shadow-lg shadow-brand-500/20"
                 >
                   Eintrag buchen
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Employee Modal */}
+      {isEmployeeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="glass-panel max-w-md w-full p-5 sm:p-6 rounded-3xl border border-white/10 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center border border-brand-500/30">
+                  <UserPlus className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Neuen Mitarbeiter anlegen</h3>
+                  <p className="text-[11px] text-slate-400">Personal-Stammdaten & Stundensatz</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsEmployeeModalOpen(false)}
+                className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded-lg bg-slate-800"
+              >
+                ✕ Schließen
+              </button>
+            </div>
+
+            <form onSubmit={handleAddEmployee} className="mt-4 space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">Vor- & Nachname:</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="z.B. Mehmet Kaya oder Christian Wolf"
+                  value={newEmployee.name}
+                  onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Rolle / Berufsbezeichnung:</label>
+                  <select
+                    value={newEmployee.role}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                  >
+                    <option value="Monteur / Fachkraft">Monteur / Fachkraft</option>
+                    <option value="Bauleiter / Meister">Bauleiter / Meister</option>
+                    <option value="Elektro-Techniker">Elektro-Techniker</option>
+                    <option value="SHK-Installateur">SHK-Installateur</option>
+                    <option value="Fahrer / Logistiker">Fahrer / Logistiker</option>
+                    <option value="Auszubildender">Auszubildender</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Stundensatz (€/h):</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="15"
+                    max="250"
+                    required
+                    value={newEmployee.hourlyRate}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, hourlyRate: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">Telefon / PWA-Zugang (optional):</label>
+                <div className="relative">
+                  <Phone className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="+49 170 1234567"
+                    value={newEmployee.phone}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 text-[11px] text-brand-300 leading-relaxed">
+                ℹ️ Nach dem Anlegen steht der Mitarbeiter sofort in der <strong>Live-Stempeluhr</strong>, in der <strong>Disposition</strong> und im <strong>Fuhrpark</strong> zur Verfügung.
+              </div>
+
+              <div className="pt-4 border-t border-slate-800 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEmployeeModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-semibold"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold shadow-lg shadow-brand-500/20"
+                >
+                  Mitarbeiter speichern
                 </button>
               </div>
             </form>
