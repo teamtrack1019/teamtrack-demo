@@ -1,0 +1,53 @@
+import React from 'react';
+import { DemoProvider, useDemo } from './context/DemoContext';
+import { Header } from './components/Header';
+import { ModuleSelector } from './components/ModuleSelector';
+import { OverviewHub } from './components/modules/OverviewHub';
+import { ZeiterfassungModule } from './components/modules/ZeiterfassungModule';
+import { RechnungenModule } from './components/modules/RechnungenModule';
+import { CrmModule } from './components/modules/CrmModule';
+import { FuhrparkModule } from './components/modules/FuhrparkModule';
+import { DispositionModule } from './components/modules/DispositionModule';
+import { UpgradeModal } from './components/modals/UpgradeModal';
+import { RestrictionModal } from './components/modals/RestrictionModal';
+import { InvoicePreviewModal } from './components/modals/InvoicePreviewModal';
+import { ExpiredModal } from './components/modals/ExpiredModal';
+import { ShareLinkModal } from './components/modals/ShareLinkModal';
+import { Toasts } from './components/Toasts';
+import { Footer } from './components/Footer';
+
+const MainContent = () => {
+  const { activeModule } = useDemo();
+
+  return (
+    <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8 flex-1">
+      {activeModule === 'overview' && <OverviewHub />}
+      {activeModule === 'zeiterfassung' && <ZeiterfassungModule />}
+      {activeModule === 'rechnungen' && <RechnungenModule />}
+      {activeModule === 'crm' && <CrmModule />}
+      {activeModule === 'fuhrpark' && <FuhrparkModule />}
+      {activeModule === 'disposition' && <DispositionModule />}
+    </main>
+  );
+};
+
+export default function App() {
+  return (
+    <DemoProvider>
+      <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 selection:bg-brand-500 selection:text-white">
+        <Header />
+        <ModuleSelector />
+        <MainContent />
+        <Footer />
+        
+        {/* Interactive Modals & System Components */}
+        <UpgradeModal />
+        <RestrictionModal />
+        <InvoicePreviewModal />
+        <ExpiredModal />
+        <ShareLinkModal />
+        <Toasts />
+      </div>
+    </DemoProvider>
+  );
+}

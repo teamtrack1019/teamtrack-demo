@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #060a14;
+    color: #f1f5f9;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(48, 142, 255, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(48, 142, 255, 0.7);
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(18, 28, 51, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(48, 142, 255, 0.35);
+  box-shadow: 0 10px 30px -10px rgba(48, 142, 255, 0.15);
+}
+
+/* Demo Watermark Pattern */
+.watermark-overlay {
+  position: relative;
+  overflow: hidden;
+}
+.watermark-overlay::after {
+  content: "DEMO VERSION • NICHT RECHTSGÜLTIG • TEAM-TRACK.DE";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: rgba(239, 68, 68, 0.14);
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+  z-index: 40;
+}
+
+/* Subtle Pulse & Glow */
+.glow-brand {
+  box-shadow: 0 0 25px rgba(48, 142, 255, 0.25);
+}
