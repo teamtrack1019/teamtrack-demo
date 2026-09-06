@@ -115,12 +115,35 @@ export default async function handler(req, res) {
       </html>
     `;
 
+    const textContent = `
+NEUE ANFRAGE ÜBER DAS TEAMTRACK DEMO-PORTAL
+============================================
+Firma: ${company || 'Nicht angegeben'}
+Ansprechpartner: ${contactName || 'Nicht angegeben'}
+Telefon: ${phone || 'Nicht angegeben'}
+E-Mail: ${email || 'Nicht angegeben'}
+Ausgewählte Module: ${selectedModules || 'Alle Kernmodule'}
+Zeitrahmen: ${timeline || 'Schnellstmöglich'}
+Nachricht: ${message || 'Keine zusätzliche Notiz'}
+Client-ID: ${clientId || 'Demo'}
+--------------------------------------------
+Versendet über IONOS SMTP (smtp.ionos.de)
+    `.trim();
+
+    const recipients = ['kontakt@team-track.de', 'teamtrack.software@hotmail.com'];
+
     const mailOptions = {
       from: '"TeamTrack Demo Portal" <kontakt@team-track.de>',
-      to: 'kontakt@team-track.de, teamtrack.software@hotmail.com',
+      to: recipients,
       replyTo: email || 'kontakt@team-track.de',
       subject: `⚡ Neue WebApp-Anfrage von ${company || contactName || 'Interessent'}`,
-      html: htmlContent
+      text: textContent,
+      html: htmlContent,
+      headers: {
+        'X-Priority': '1 (Highest)',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'High'
+      }
     };
 
     await transporter.sendMail(mailOptions);
