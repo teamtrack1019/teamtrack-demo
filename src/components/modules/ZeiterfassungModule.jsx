@@ -806,9 +806,92 @@ export const ZeiterfassungModule = () => {
           {/* Worker PWA 2-Column Dashboard */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             
-            {/* Left Column: Assigned Today's Job & Baustelle */}
+            {/* Left Column: Worker Live Punch Clock & Assigned Baustelle */}
             <div className="space-y-4">
               
+              {/* Worker Touch Stempeluhr Card */}
+              <div className="glass-card p-5 sm:p-6 rounded-2xl border-emerald-500/30 bg-gradient-to-b from-slate-900 to-navy-950 flex flex-col justify-between shadow-xl">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-emerald-400" />
+                      Mein persönlicher Live-Stempel
+                    </span>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                      isRunning ? 'bg-emerald-500/20 text-emerald-400 animate-pulse' : 'bg-slate-800 text-slate-400'
+                    }`}>
+                      {isRunning ? '● ARBEITSZEIT LÄUFT' : 'BEREIT ZUM STEMPELN'}
+                    </span>
+                  </div>
+
+                  {/* Big Touch Display */}
+                  <div className="my-6 text-center">
+                    <div className="text-5xl sm:text-6xl font-black tracking-tight text-white font-mono bg-slate-950/70 py-4 px-4 rounded-2xl border border-emerald-500/30 shadow-inner">
+                      {formatTimer(timerSeconds)}
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2 font-medium">
+                      {isRunning 
+                        ? `Aktiv auf: ${assignedTask.project || activeProject}` 
+                        : 'Tippen Sie unten auf „Arbeitsbeginn“ zum Stempeln'}
+                    </p>
+                  </div>
+
+                  {/* 3 Touch Friendly Stempel Actions */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {!isRunning ? (
+                      <button
+                        onClick={() => setIsRunning(true)}
+                        className="sm:col-span-3 py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95"
+                      >
+                        <Play className="w-5 h-5 fill-white" />
+                        <span>Arbeitsbeginn (Kommen)</span>
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            setTimerSeconds(s => s + 1800); // 30 min break simulation
+                            addItem('timesheets', {
+                              id: `zt-p-${Date.now().toString().slice(-4)}`,
+                              employee: activeEmployee,
+                              role: 'Fachkraft',
+                              project: assignedTask.project || activeProject,
+                              task: 'Gesetzliche Ruhepause (30 Min.)',
+                              date: new Date().toISOString().split('T')[0],
+                              startTime: 'Pause',
+                              endTime: 'Pause Ende',
+                              breakMinutes: 30,
+                              totalHours: 0.5,
+                              hourlyRate: 0,
+                              status: 'Genehmigt',
+                              location: 'Baustelle (Pause)'
+                            });
+                          }}
+                          className="py-3 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
+                        >
+                          <Coffee className="w-4 h-4" />
+                          <span>30 Min. Pause</span>
+                        </button>
+
+                        <button
+                          onClick={handleStopAndSave}
+                          className="sm:col-span-2 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition-all active:scale-95"
+                        >
+                          <Square className="w-4 h-4 fill-white" />
+                          <span>Feierabend (Gehen)</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Worker Today Summary */}
+                <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                  <span>Heute geleistet: <strong className="text-white">{workerTotalHours.toFixed(1)} Std.</strong></span>
+                  <span className="text-emerald-400 font-semibold">Wochenkonto: 38.5 / 40 Std. ✓</span>
+                </div>
+              </div>
+
               {/* Assigned Project Card */}
               <div className="glass-card p-5 sm:p-6 rounded-2xl border-brand-500/30 space-y-4">
                 <div className="flex items-center justify-between">
@@ -864,8 +947,46 @@ export const ZeiterfassungModule = () => {
                 </div>
               </div>
 
-              {/* Vacation / Absence Balance Card for Worker */}
-              <div className="glass-card p-5 rounded-2xl space-y-3">
+            </div>
+
+            {/* Right Column: Personal Timesheets & Vacation/Absence Balance */}
+            <div className="space-y-4">
+              
+              {/* Personal Timesheets List */}
+              <div className="glass-card p-5 sm:p-6 rounded-2xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                    Meine letzten Stempelzeiten ({activeEmployee})
+                  </h4>
+                  <span className="text-[10px] text-brand-400 font-semibold">
+                    {workerTimesheets.length} Einträge
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {workerTimesheets.length > 0 ? (
+                    workerTimesheets.map(ts => (
+                      <div key={ts.id} className="p-3 rounded-xl bg-slate-900 border border-slate-800/80 flex items-center justify-between text-xs">
+                        <div>
+                          <div className="font-bold text-white">{ts.project}</div>
+                          <div className="text-[11px] text-slate-400">{ts.task} • {ts.date}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-black text-emerald-400">{ts.totalHours} Std.</div>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
+                            {ts.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-xs text-slate-500 italic p-3 text-center">Noch keine Zeiten für diesen Mitarbeiter gebucht.</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Vacation / Absence Balance Card for Worker (At the bottom) */}
+              <div className="glass-card p-5 sm:p-6 rounded-2xl space-y-3 border-amber-500/20">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                     <Umbrella className="w-3.5 h-3.5 text-amber-400" />
@@ -916,127 +1037,6 @@ export const ZeiterfassungModule = () => {
                     ))
                   ) : (
                     <div className="text-xs text-slate-500 italic p-2 text-center">Keine offenen Anträge</div>
-                  )}
-                </div>
-              </div>
-
-            </div>
-
-            {/* Right Column: Worker Touch Punch Clock & Personal Timesheets */}
-            <div className="space-y-4">
-              
-              {/* Worker Touch Stempeluhr Card */}
-              <div className="glass-card p-5 sm:p-6 rounded-2xl border-emerald-500/30 bg-gradient-to-b from-slate-900 to-navy-950 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-emerald-400" />
-                      Mein persönlicher Live-Stempel
-                    </span>
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black ${
-                      isRunning ? 'bg-emerald-500/20 text-emerald-400 animate-pulse' : 'bg-slate-800 text-slate-400'
-                    }`}>
-                      {isRunning ? '● ARBEITSZEIT LÄUFT' : 'BEREIT ZUM STEMPELN'}
-                    </span>
-                  </div>
-
-                  {/* Big Touch Display */}
-                  <div className="my-6 text-center">
-                    <div className="text-5xl sm:text-6xl font-black tracking-tight text-white font-mono bg-slate-950/70 py-4 px-4 rounded-2xl border border-emerald-500/30 shadow-inner">
-                      {formatTimer(timerSeconds)}
-                    </div>
-                    <p className="text-xs text-slate-300 mt-2 font-medium">
-                      {isRunning 
-                        ? `Aktiv auf: ${assignedTask.project || activeProject}` 
-                        : 'Tippen Sie unten auf „Arbeitsbeginn“ zum Stempeln'}
-                    </p>
-                  </div>
-
-                  {/* 3 Touch Friendly Stempel Actions */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    {!isRunning ? (
-                      <button
-                        onClick={() => setIsRunning(true)}
-                        className="sm:col-span-3 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95"
-                      >
-                        <Play className="w-5 h-5 fill-white" />
-                        <span>Arbeitsbeginn (Kommen)</span>
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => {
-                            setTimerSeconds(s => s + 1800); // 30 min break simulation
-                            addItem('timesheets', {
-                              id: `zt-p-${Date.now().toString().slice(-4)}`,
-                              employee: activeEmployee,
-                              role: 'Fachkraft',
-                              project: assignedTask.project || activeProject,
-                              task: 'Gesetzliche Ruhepause (30 Min.)',
-                              date: new Date().toISOString().split('T')[0],
-                              startTime: 'Pause',
-                              endTime: 'Pause Ende',
-                              breakMinutes: 30,
-                              totalHours: 0.5,
-                              hourlyRate: 0,
-                              status: 'Genehmigt',
-                              location: 'Baustelle (Pause)'
-                            });
-                          }}
-                          className="py-3 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
-                        >
-                          <Coffee className="w-4 h-4" />
-                          <span>30 Min. Pause</span>
-                        </button>
-
-                        <button
-                          onClick={handleStopAndSave}
-                          className="sm:col-span-2 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition-all active:scale-95"
-                        >
-                          <Square className="w-4 h-4 fill-white" />
-                          <span>Feierabend (Gehen)</span>
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Worker Today Summary */}
-                <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                  <span>Heute geleistet: <strong className="text-white">{workerTotalHours.toFixed(1)} Std.</strong></span>
-                  <span className="text-emerald-400 font-semibold">Wochenkonto: 38.5 / 40 Std. ✓</span>
-                </div>
-              </div>
-
-              {/* Personal Timesheets List */}
-              <div className="glass-card p-5 rounded-2xl space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                    Meine letzten Stempelzeiten ({activeEmployee})
-                  </h4>
-                  <span className="text-[10px] text-brand-400 font-semibold">
-                    {workerTimesheets.length} Einträge
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {workerTimesheets.length > 0 ? (
-                    workerTimesheets.map(ts => (
-                      <div key={ts.id} className="p-3 rounded-xl bg-slate-900 border border-slate-800/80 flex items-center justify-between text-xs">
-                        <div>
-                          <div className="font-bold text-white">{ts.project}</div>
-                          <div className="text-[11px] text-slate-400">{ts.task} • {ts.date}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-black text-emerald-400">{ts.totalHours} Std.</div>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
-                            {ts.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-xs text-slate-500 italic p-3 text-center">Noch keine Zeiten für diesen Mitarbeiter gebucht.</div>
                   )}
                 </div>
               </div>
