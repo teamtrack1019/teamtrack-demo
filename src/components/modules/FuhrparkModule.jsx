@@ -14,7 +14,11 @@ import {
   Navigation,
   Trash2,
   Sparkles,
-  Radio
+  Radio,
+  BellRing,
+  ShieldAlert,
+  RotateCw,
+  Clock
 } from 'lucide-react';
 
 export const FuhrparkModule = () => {
@@ -26,11 +30,12 @@ export const FuhrparkModule = () => {
     triggerRestrictedAction, 
     openUpgradeModal,
     maxCreationLimit,
-    createdCounts 
+    createdCounts,
+    addToast
   } = useDemo();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [filter, setFilter] = useState('all'); // all, tuv_due, on_tour, workshop
 
   const [newVehicle, setNewVehicle] = useState({
     plate: 'WÜ-TT 105',
@@ -41,9 +46,59 @@ export const FuhrparkModule = () => {
     currentLocation: 'Betriebshof Würzburg',
     mileage: 34500,
     fuelPercent: 85,
-    nextInspection: '12/2026',
+    nextInspection: '09/2026', // Format MM/YYYY
     activeTour: 'Bereit für Disposition'
   });
+
+  // Calculate TÜV status helper
+  const getTuvStatus = (inspectionDateStr) => {
+    if (!inspectionDateStr) return { level: 'ok', text: 'TÜV gültig', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
+    
+    const parts = inspectionDateStr.split('/');
+    if (parts.length !== 2) return { level: 'ok', text: 'TÜV gültig', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
+
+    const month = parseInt(parts[0], 10);
+    const year = parseInt(parts[1], 10);
+
+    // Reference date is Sep 2026
+    const currentYear = 2026;
+    const currentMonth = 9;
+
+    const diffMonths = (year - currentYear) * 12 + (month - currentMonth);
+
+    if (diffMonths <= 0) {
+      return {
+        level: 'urgent',
+        isDue: true,
+        text: '🚨 TÜV JETZT FÄLLIG!',
+        badgeText: 'TÜV fällig (Diesen Monat)',
+        color: 'text-rose-400 bg-rose-500/15 border-rose-500/40 animate-pulse font-black'
+      };
+    } else if (diffMonths <= 3) {
+      return {
+        level: 'warning',
+        isDue: true,
+        text: `⏳ TÜV in ${diffMonths} Mon. (${inspectionDateStr})`,
+        badgeText: `TÜV in ${diffMonths} Monaten`,
+        color: 'text-amber-400 bg-amber-500/15 border-amber-500/30 font-bold'
+      };
+    } else {
+      return {
+        level: 'ok',
+        isDue: false,
+        text: `✓ TÜV bis ${inspectionDateStr}`,
+        badgeText: `TÜV bis ${inspectionDateStr}`,
+        color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+      };
+    }
+  };
+
+  const handleRenewTuv = (vehicle) => {
+    const nextYear = 2028;
+    const newDate = `09/${nextYear}`;
+    updateItem('vehicles', vehicle.id, { nextInspection: newDate });
+    addToast('TÜV erfolgreich erneuert', `Hauptuntersuchung für Fahrzeug ${vehicle.plate} wurde um 2 Jahre bis ${newDate} verlängert.`, 'success');
+  };
 
   const handleAddVehicle = (e) => {
     e.preventDefault();
@@ -62,36 +117,47 @@ export const FuhrparkModule = () => {
     updateItem('vehicles', vehicleId, { status: newStatus });
   };
 
+  // Vehicles with TÜV due in 0-3 months
+  const dueTuvVehicles = (data.vehicles || []).filter(v => getTuvStatus(v.nextInspection).isDue);
+
+  const filteredVehicles = (data.vehicles || []).filter(v => {
+    if (filter === 'all') return true;
+    if (filter === 'tuv_due') return getTuvStatus(v.nextInspection).isDue;
+    if (filter === 'on_tour') return v.status === 'Auf Tour';
+    if (filter === 'workshop') return v.status === 'In Werkstatt';
+    return true;
+  });
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300 w-full overflow-hidden">
       
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 glass-panel p-6 rounded-2xl">
-        <div>
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 glass-panel p-4 sm:p-6 rounded-2xl w-full">
+        <div className="w-full lg:w-auto">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-400">Modul 4</span>
             <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
               Limit: {createdCounts.vehicles}/{maxCreationLimit} Fahrzeuge
             </span>
           </div>
-          <h2 className="text-2xl font-black text-white mt-1">Fuhrpark, Touren & Fahrzeugverwaltung</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-white mt-1">Fuhrpark, Touren & TÜV-Überwachung</h2>
           <p className="text-xs text-slate-400 mt-1">
-            Transporter, LKWs und Service-Flotte in Echtzeit verwalten. Inklusive Tourenzuweisung, KM-Ständen und digitalem Fahrtenbuch.
+            Fahrzeuge, KM-Stände und Inspektionsfristen überwachen. Mit automatischer TÜV-Fälligkeitserkennung und Warnsystem.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           <button
-            onClick={() => triggerRestrictedAction('OBD2 / Can-Bus Live GPS Hardware-Kopplung', 'In der Vollversion wird TeamTrack direkt mit Ihren Fahrzeug-OBD2-Steckern / Telematik-Boxen gekoppelt, um Live-KM, Tankstand und GPS vollautomatisch abzurufen.')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all"
+            onClick={() => triggerRestrictedAction('OBD2 & Live Telematik', 'In der Vollversion liest TeamTrack KM-Stände, Reifendruck, Fehlercodes und Tankfüllungen live über die Bordelektronik (OBD2/CAN-Bus) aus.')}
+            className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all w-full sm:w-auto"
           >
             <Radio className="w-4 h-4 text-amber-400 animate-pulse" />
-            <span>Live-Telematik (Demo-Simulation)</span>
+            <span>Live-Telematik</span>
           </button>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg shadow-amber-500/20 transition-all"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg shadow-amber-500/20 transition-all w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             <span>Fahrzeug anlegen</span>
@@ -99,10 +165,74 @@ export const FuhrparkModule = () => {
         </div>
       </div>
 
+      {/* TÜV Smart Alert Widget */}
+      {dueTuvVehicles.length > 0 && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-rose-950/40 via-amber-950/30 to-slate-900 border border-rose-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/30 mt-0.5">
+              <BellRing className="w-5 h-5 animate-bounce" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider text-rose-400">TÜV-Fälligkeitsalarm</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
+                  {dueTuvVehicles.length} Fahrzeuge betroffen
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Bei folgenden Fahrzeugen steht die Hauptuntersuchung an: <strong className="text-white">{dueTuvVehicles.map(v => `${v.plate} (${v.nextInspection})`).join(', ')}</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button
+              onClick={() => setFilter(filter === 'tuv_due' ? 'all' : 'tuv_due')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                filter === 'tuv_due'
+                  ? 'bg-rose-600 text-white'
+                  : 'bg-slate-800 text-rose-300 hover:bg-slate-700 border border-rose-500/30'
+              }`}
+            >
+              {filter === 'tuv_due' ? 'Alle anzeigen' : 'Nur fällige filtern'}
+            </button>
+            <button
+              onClick={() => triggerRestrictedAction('Automatische TÜV SMS/E-Mail Benachrichtigung', 'In Ihrer Vollversion erhalten Fuhrparkleiter und Fahrer 60 & 30 Tage vor Ablauf automatisch eine Erinnerung per WhatsApp/SMS/E-Mail.')}
+              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 whitespace-nowrap"
+            >
+              Auto-Erinnerung
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        {[
+          { id: 'all', label: `Alle (${data.vehicles?.length || 0})` },
+          { id: 'tuv_due', label: `⚠️ TÜV fällig (${dueTuvVehicles.length})` },
+          { id: 'on_tour', label: 'Auf Tour' },
+          { id: 'workshop', label: 'In Werkstatt' }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setFilter(tab.id)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              filter === tab.id
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                : 'bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Vehicle Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {(data.vehicles || []).map((v) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+        {filteredVehicles.map((v) => {
           const isElectric = v.model.includes('Elektro') || v.model.includes('ID.');
+          const tuvInfo = getTuvStatus(v.nextInspection);
           
           const statusBadges = {
             'Auf Tour': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
@@ -113,105 +243,126 @@ export const FuhrparkModule = () => {
           return (
             <div
               key={v.id}
-              className="glass-card p-6 rounded-2xl border-slate-800 hover:border-amber-500/30 transition-all flex flex-col justify-between"
+              className={`glass-card p-4 sm:p-6 rounded-2xl border transition-all flex flex-col justify-between ${
+                tuvInfo.level === 'urgent' ? 'border-rose-500/40 bg-gradient-to-b from-slate-900 via-rose-950/10 to-slate-950' : 'border-slate-800 hover:border-amber-500/30'
+              }`}
             >
               <div>
-                <div className="flex items-start justify-between gap-3 mb-4">
+                {/* TÜV Due Warning Strip */}
+                {tuvInfo.isDue && (
+                  <div className={`mb-3 px-3 py-1.5 rounded-xl border flex items-center justify-between text-xs ${tuvInfo.color}`}>
+                    <div className="flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{tuvInfo.text}</span>
+                    </div>
+                    <button
+                      onClick={() => handleRenewTuv(v)}
+                      className="px-2 py-0.5 rounded bg-slate-950/80 hover:bg-white hover:text-slate-900 text-[10px] font-bold transition-colors"
+                      title="TÜV Prüfung als durchgeführt markieren (+2 Jahre)"
+                    >
+                      +2 J. Erneuern
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex items-start justify-between gap-2 mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
-                      <Truck className="w-6 h-6" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                      <Truck className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm font-black text-white px-2 py-0.5 rounded bg-slate-900 border border-slate-700">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-mono text-xs sm:text-sm font-black text-white px-2 py-0.5 rounded bg-slate-900 border border-slate-700">
                           {v.plate}
                         </span>
                         <span className="text-[10px] text-slate-400 font-semibold">{v.type}</span>
                       </div>
-                      <h3 className="text-base font-bold text-slate-200 mt-1">{v.model}</h3>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-200 mt-1 leading-snug">{v.model}</h3>
                     </div>
                   </div>
 
                   <select
                     value={v.status}
                     onChange={(e) => handleStatusChange(v.id, e.target.value)}
-                    className={`text-[11px] font-bold px-2.5 py-1 rounded-full border bg-slate-900 cursor-pointer focus:outline-none ${
+                    className={`text-[10px] sm:text-[11px] font-bold px-2 py-1 rounded-full border bg-slate-900 cursor-pointer focus:outline-none shrink-0 ${
                       statusBadges[v.status] || statusBadges['Einsatzbereit']
                     }`}
                   >
-                    <option value="Einsatzbereit">● Einsatzbereit</option>
+                    <option value="Einsatzbereit">● Bereit</option>
                     <option value="Auf Tour">● Auf Tour</option>
-                    <option value="In Werkstatt">● In Werkstatt</option>
+                    <option value="In Werkstatt">● Werkstatt</option>
                   </select>
                 </div>
 
                 {/* Tour & Location Box */}
                 <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-xs space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400 font-medium flex items-center gap-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-400 font-medium flex items-center gap-1.5 shrink-0">
                       <Navigation className="w-3.5 h-3.5 text-brand-400" />
                       Aktuelle Tour:
                     </span>
-                    <span className="font-bold text-white text-right truncate max-w-[200px]">{v.activeTour}</span>
+                    <span className="font-bold text-white text-right truncate">{v.activeTour}</span>
                   </div>
                   <div className="flex items-center justify-between text-slate-300">
-                    <span className="text-slate-400 flex items-center gap-1.5">
+                    <span className="text-slate-400 flex items-center gap-1.5 shrink-0">
                       <MapPin className="w-3.5 h-3.5 text-emerald-400" />
                       Standort:
                     </span>
-                    <span>{v.currentLocation}</span>
+                    <span className="truncate">{v.currentLocation}</span>
                   </div>
                 </div>
 
-                {/* Metrics */}
-                <div className="grid grid-cols-3 gap-3 my-4">
-                  <div className="p-2.5 rounded-xl bg-slate-900/50 border border-slate-800/80">
-                    <span className="text-[10px] text-slate-400 font-medium block flex items-center gap-1">
+                {/* Metrics with TÜV Badge */}
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 my-3 sm:my-4">
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-slate-900/50 border border-slate-800/80">
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium block flex items-center gap-1">
                       <Gauge className="w-3 h-3 text-slate-400" /> KM-Stand
                     </span>
-                    <span className="text-xs font-bold text-white mt-1 block">
+                    <span className="text-[11px] sm:text-xs font-bold text-white mt-1 block truncate">
                       {v.mileage.toLocaleString('de-DE')} km
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-slate-900/50 border border-slate-800/80">
-                    <span className="text-[10px] text-slate-400 font-medium block flex items-center gap-1">
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-slate-900/50 border border-slate-800/80">
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium block flex items-center gap-1">
                       {isElectric ? <BatteryCharging className="w-3 h-3 text-emerald-400" /> : <Fuel className="w-3 h-3 text-amber-400" />}
                       {isElectric ? 'Akku' : 'Tank'}
                     </span>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-1.5 mt-1">
                       <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
                         <div 
                           className={`h-full rounded-full ${v.fuelPercent > 30 ? 'bg-emerald-400' : 'bg-rose-400'}`}
                           style={{ width: `${v.fuelPercent}%` }}
                         ></div>
                       </div>
-                      <span className="text-xs font-bold text-white">{v.fuelPercent}%</span>
+                      <span className="text-[11px] font-bold text-white">{v.fuelPercent}%</span>
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-slate-900/50 border border-slate-800/80">
-                    <span className="text-[10px] text-slate-400 font-medium block flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-slate-400" /> Nächster TÜV
+                  <div className={`p-2 sm:p-2.5 rounded-xl border ${tuvInfo.level === 'urgent' ? 'bg-rose-500/10 border-rose-500/30' : 'bg-slate-900/50 border-slate-800/80'}`}>
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium block flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-slate-400" /> TÜV / HU
                     </span>
-                    <span className="text-xs font-bold text-slate-200 mt-1 block">{v.nextInspection}</span>
+                    <span className={`text-[11px] sm:text-xs font-black mt-1 block truncate ${tuvInfo.level === 'urgent' ? 'text-rose-400' : tuvInfo.level === 'warning' ? 'text-amber-400' : 'text-slate-200'}`}>
+                      {v.nextInspection}
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* Driver & Action */}
-              <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-slate-300">
-                  <User className="w-3.5 h-3.5 text-brand-400" />
-                  <span>Fahrer: <strong className="text-white">{v.driver}</strong></span>
+              <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs gap-2">
+                <div className="flex items-center gap-1.5 text-slate-300 truncate">
+                  <User className="w-3.5 h-3.5 text-brand-400 shrink-0" />
+                  <span className="truncate">Fahrer: <strong className="text-white">{v.driver}</strong></span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     onClick={() => triggerRestrictedAction('Live GPS-Kartenansicht', 'In Ihrer Vollversion sehen Sie alle Firmenfahrzeuge live auf einer interaktiven Deutschland-Karte mit Routenverfolgung.')}
-                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold"
+                    className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold"
                   >
-                    GPS Karte
+                    GPS
                   </button>
 
                   <button
@@ -229,10 +380,10 @@ export const FuhrparkModule = () => {
 
       {/* New Vehicle Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="glass-panel max-w-lg w-full p-6 rounded-3xl border border-white/10 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="glass-panel max-w-lg w-full p-4 sm:p-6 rounded-3xl border border-white/10 shadow-2xl max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <h3 className="text-lg font-bold text-white">Neues Fahrzeug anlegen</h3>
+              <h3 className="text-base sm:text-lg font-bold text-white">Neues Fahrzeug anlegen</h3>
               <button 
                 onClick={() => setIsModalOpen(false)}
                 className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded-lg bg-slate-800"
@@ -242,7 +393,7 @@ export const FuhrparkModule = () => {
             </div>
 
             <form onSubmit={handleAddVehicle} className="mt-4 space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">Kennzeichen:</label>
                   <input
@@ -276,9 +427,9 @@ export const FuhrparkModule = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Zugewiesener Fahrer:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Fahrer:</label>
                   <input
                     type="text"
                     required
@@ -288,13 +439,24 @@ export const FuhrparkModule = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Kilometerstand:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">KM-Stand:</label>
                   <input
                     type="number"
                     required
                     value={newVehicle.mileage}
                     onChange={(e) => setNewVehicle({ ...newVehicle, mileage: parseInt(e.target.value, 10) || 0 })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Nächster TÜV (MM/JJJJ):</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="09/2026"
+                    value={newVehicle.nextInspection}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, nextInspection: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono"
                   />
                 </div>
               </div>
