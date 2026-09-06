@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { 
   ShieldCheck, 
@@ -14,7 +14,12 @@ import {
   Lock,
   Building,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Scale,
+  FileCode,
+  HardDrive,
+  Eye,
+  UserCheck
 } from 'lucide-react';
 
 export const LegalModal = () => {
@@ -34,7 +39,7 @@ export const LegalModal = () => {
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black text-white">
-                Rechtliche Angaben & Datenschutz
+                Rechtliche Angaben, AGB & Datenschutz
               </h3>
               <p className="text-[11px] text-slate-400">
                 TeamTrack Softwareentwicklung & IT-Beratung • 97236 Randersacker
@@ -55,7 +60,7 @@ export const LegalModal = () => {
           <button
             type="button"
             onClick={() => setLegalTab('impressum')}
-            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
               legalTab === 'impressum'
                 ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20 font-black'
                 : 'bg-slate-800 text-slate-400 hover:text-white'
@@ -68,33 +73,33 @@ export const LegalModal = () => {
           <button
             type="button"
             onClick={() => setLegalTab('datenschutz')}
-            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
               legalTab === 'datenschutz'
                 ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20 font-black'
                 : 'bg-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <Shield className="w-3.5 h-3.5" />
-            <span>Datenschutzerklärung (DSGVO)</span>
+            <span>Datenschutzerklärung (DSGVO / TDDDG)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setLegalTab('agb')}
-            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
               legalTab === 'agb'
                 ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20 font-black'
                 : 'bg-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>AGB & Sandbox-Nutzung</span>
+            <span>AGB & Demo-Bedingungen</span>
           </button>
 
           <button
             type="button"
             onClick={() => setLegalTab('kontakt')}
-            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
               legalTab === 'kontakt'
                 ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20 font-black'
                 : 'bg-slate-800 text-slate-400 hover:text-white'
@@ -150,17 +155,25 @@ export const LegalModal = () => {
 
               <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
                 <h4 className="font-bold text-white text-sm">Steuerliche Angaben & Berufsbezeichnung</h4>
-                <p className="text-xs text-slate-400">
-                  Umsatzsteuer: Gemäß § 19 UStG (Kleinunternehmerregelung) wird keine Umsatzsteuer berechnet bzw. Umsatzsteuer-ID nach Zuteilung.<br />
-                  Berufsbezeichnung: Freiberufliche Softwareentwicklung & IT-Beratung (verliehen in der Bundesrepublik Deutschland).
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  <strong>Umsatzsteuer:</strong> Gemäß § 19 UStG (Kleinunternehmerregelung) wird keine Umsatzsteuer berechnet bzw. Umsatzsteuer-Identifikationsnummer nach Zuteilung.<br />
+                  <strong>Berufsbezeichnung:</strong> Freiberufliche Softwareentwicklung & IT-Beratung (verliehen in der Bundesrepublik Deutschland).
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
                 <h4 className="font-bold text-white text-sm">EU-Streitschlichtung & Verbraucherstreitbeilegung</h4>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" className="text-brand-400 hover:underline">https://ec.europa.eu/consumers/odr/</a>.<br />
-                  Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG).
+                  Unsere E-Mail-Adresse lautet: <span className="text-slate-200 font-mono">kontakt@team-track.de</span>.<br />
+                  Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG), da unser Angebot sich ausschließlich an Gewerbetreibende und Unternehmen (B2B) richtet.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm">Haftung für Inhalte & Externe Links</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
                 </p>
               </div>
             </div>
@@ -168,110 +181,249 @@ export const LegalModal = () => {
 
           {/* TAB 2: DATENSCHUTZERKLÄRUNG */}
           {legalTab === 'datenschutz' && (
-            <div className="space-y-5 animate-in fade-in duration-150">
+            <div className="space-y-6 animate-in fade-in duration-150 text-xs">
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-3">
                 <Lock className="w-5 h-5 text-emerald-400 shrink-0" />
                 <div>
-                  <h4 className="font-bold text-white text-sm">Datenschutzerklärung nach DSGVO & BDSG</h4>
-                  <p className="text-xs text-emerald-300">100% DSGVO-konform • Deutsche Serverstandorte • Keine Werbe-Cookies</p>
+                  <h4 className="font-bold text-white text-sm">Ausführliche Datenschutzerklärung nach EU-DSGVO, BDSG & TDDDG</h4>
+                  <p className="text-xs text-emerald-300">Rechtssicher • Deutsche Server • Keine Werbe-Tracker • Privacy by Design</p>
                 </div>
               </div>
 
-              <div className="space-y-4 text-xs">
-                <div>
-                  <h4 className="font-bold text-white text-sm mb-1">1. Verantwortliche Stelle (Art. 4 Nr. 7 DSGVO)</h4>
-                  <p className="text-slate-300">
-                    TeamTrack Softwareentwicklung & IT-Beratung<br />
-                    Inhaberin: Huriye Ünalsoy<br />
-                    Balthasar-Neumann-Straße 38, 97236 Randersacker, Deutschland<br />
-                    E-Mail: kontakt@team-track.de • Telefon: +49 172 6125371
-                  </p>
-                </div>
+              {/* 1. Verantwortlicher */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">1</span>
+                  Verantwortliche Stelle (Art. 4 Nr. 7 DSGVO)
+                </h4>
+                <p className="text-slate-300">
+                  Verantwortlich für die Datenverarbeitung auf dieser Website und der interaktiven Demo-Plattform ist:<br />
+                  <strong className="text-white">TeamTrack Softwareentwicklung & IT-Beratung</strong><br />
+                  Inhaberin: <strong>Huriye Ünalsoy</strong><br />
+                  Balthasar-Neumann-Straße 38, 97236 Randersacker, Deutschland<br />
+                  Telefon: <a href="tel:+491726125371" className="text-brand-300 font-mono">+49 172 6125371</a> • E-Mail: <a href="mailto:kontakt@team-track.de" className="text-emerald-300 hover:underline">kontakt@team-track.de</a>
+                </p>
+              </div>
 
-                <div>
-                  <h4 className="font-bold text-white text-sm mb-1">2. Datenerfassung auf dieser Demo-Plattform</h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    <strong>Server-Log-Dateien (Art. 6 Abs. 1 lit. f DSGVO):</strong> Bei Aufruf der Plattform erhebt der Hosting-Provider technisch erforderliche Verbindungsdaten (anonymisierte IP-Adresse, Zugriffszeit, Browsertyp), um die Stabilität und Abwehr von Cyberangriffen zu gewährleisten.<br /><br />
-                    <strong>Kontakt- & Upgradeformular (Art. 6 Abs. 1 lit. b/f DSGVO):</strong> Wenn Sie über das Anfrageformular ein Angebot oder eine Vollversion anfordern, werden Ihre übermittelten Daten (Firma, Ansprechpartner, Telefon, E-Mail, Modulwünsche) verschlüsselt über unseren IONOS SMTP-Server übermittelt und ausschließlich zur Bearbeitung Ihrer Anfrage verarbeitet.<br /><br />
-                    <strong>Keine Werbe-Cookies / Kein Drittanbieter-Tracking:</strong> Diese Website setzt keine zustimmungspflichtigen Tracking- oder Werbe-Cookies ein. Es werden lediglich technisch notwendige Session-Zustände (z.B. Test-Sandbox Daten im LocalStorage Ihres Browsers) lokal gespeichert (§ 25 Abs. 2 TDDDG).
-                  </p>
+              {/* 2. Datenerfassung */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">2</span>
+                  Datenerfassung auf dieser Demo- und Sandbox-Plattform
+                </h4>
+                <div className="space-y-3 text-slate-300 leading-relaxed">
+                  <div>
+                    <strong className="text-white block mb-0.5">a) Technische Server-Log-Dateien (Art. 6 Abs. 1 lit. f DSGVO):</strong>
+                    Beim Aufrufen unserer Plattform erfasst der Hosting-Provider automatisch Informationen, die Ihr Browser übermittelt (Browsertyp/-version, Betriebssystem, Referrer URL, Hostname des zugreifenden Rechners, Uhrzeit der Serveranfrage, anonymisierte IP-Adresse). Die Speicherung erfolgt zur Gewährleistung des sicheren und störungsfreien Serverbetriebs und zur Gefahrenabwehr bei Cyber-Angriffen.
+                  </div>
+                  <div>
+                    <strong className="text-white block mb-0.5">b) Sandbox-Nutzung & Lokaler Speicher (HTML5 LocalStorage gem. § 25 Abs. 2 Nr. 2 TDDDG):</strong>
+                    Diese Demo-Plattform speichert Ihre Test-Eingaben (z.B. Test-Stempelungen, angelegte Test-Kunden oder Fahrzeuge) <strong>ausschließlich lokal im Speicher Ihres eigenen Endgerätes (LocalStorage)</strong>. Diese Daten werden zu keinem Zeitpunkt an unsere Server oder an fremde Dritte übermittelt.
+                  </div>
+                  <div>
+                    <strong className="text-white block mb-0.5">c) Kontakt- & Upgrade-Anfragen (Art. 6 Abs. 1 lit. b und f DSGVO):</strong>
+                    Wenn Sie das Kontakt- oder Vollversion-Anfrageformular ausfüllen, werden Ihre freiwillig gemachten Angaben (Firmenname, Ansprechpartner, Telefonnummer, E-Mail-Adresse sowie gewünschter Modulumfang) per verschlüsselter Verbindung über unseren deutschen Mailserver an uns übermittelt. Diese Daten verarbeiten und speichern wir ausschließlich zur Bearbeitung Ihrer Anfrage und zur Angebotserstellung. Eine Weitergabe an Dritte erfolgt nicht.
+                  </div>
+                  <div>
+                    <strong className="text-white block mb-0.5">d) Kein Einsatz von Werbe- oder Tracking-Cookies:</strong>
+                    Wir verzichten bewusst auf den Einsatz von Werbe-Trackern, Social-Media-Pixeln oder invasiven Analyse-Tools (wie Google Analytics oder Meta Pixel). Es werden keine Profile über Ihr Nutzungsverhalten erstellt.
+                  </div>
                 </div>
+              </div>
 
-                <div>
-                  <h4 className="font-bold text-white text-sm mb-1">3. Auftragsverarbeitung (AVV gem. Art. 28 DSGVO) bei Vollversionen</h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    Sofern TeamTrack für Kunden maßgeschneiderte WebApps (Zeiterfassung, CRM, Fuhrpark, Disposition) bereitstellt, agiert TeamTrack als Auftragsverarbeiter gemäß Art. 28 DSGVO. Hierzu wird ein standardisierter, rechtssicherer AV-Vertrag geschlossen. Der Auftraggeber verbleibt als alleinige verantwortliche Stelle im Sinne des Datenschutzrechts.
-                  </p>
-                </div>
+              {/* 3. Speicherdauer & Löschung */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">3</span>
+                  Speicherdauer und Datenlöschung
+                </h4>
+                <p className="text-slate-300 leading-relaxed">
+                  Ihre übermittelten Anfragedaten werden gelöscht, sobald der Zweck der Speicherung entfällt (z.B. nach abgeschlossener Bearbeitung Ihrer Anfrage oder wenn kein Vertrag zustande kommt), sofern dem keine gesetzlichen Aufbewahrungsfristen (z.B. nach HGB oder AO) entgegenstehen. Lokale Sandbox-Daten können Sie jederzeit selbst über die Browser-Einstellungen („Browserdaten / Cache löschen“) entfernen.
+                </p>
+              </div>
 
-                <div>
-                  <h4 className="font-bold text-white text-sm mb-1">4. Technische & Organisatorische Maßnahmen (TOMs gem. Art. 32 DSGVO)</h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    • Lückenlose Transportverschlüsselung (TLS 1.3 / SSL)<br />
-                    • Strikte Mandantentrennung & isolierte Datenschemata<br />
-                    • Tägliche verschlüsselte Sicherungskopien in ISO 27001 zertifizierten deutschen Rechenzentren (Frankfurt am Main).
-                  </p>
-                </div>
+              {/* 4. Auftragsverarbeitung */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">4</span>
+                  Auftragsverarbeitung (AVV gemäß Art. 28 DSGVO) für Kunden-Software
+                </h4>
+                <p className="text-slate-300 leading-relaxed">
+                  Wenn TeamTrack für Ihr Unternehmen eine maßgeschneiderte Vollversion (z.B. Mitarbeiter-Zeiterfassung, Disposition, Fuhrpark- und Auftragsverwaltung) implementiert und hostet, schließen wir mit Ihnen einen standardisierten Vertrag zur Auftragsverarbeitung (AV-Vertrag nach Art. 28 Abs. 3 DSGVO) inklusive umfassender Technisch-Organisatorischer Maßnahmen (TOMs nach Art. 32 DSGVO). Ihr Unternehmen bleibt dabei die alleinige verantwortliche Stelle im Sinne des Datenschutzrechts.
+                </p>
+              </div>
 
-                <div>
-                  <h4 className="font-bold text-white text-sm mb-1">5. Betroffenenrechte & Aufsichtsbehörde</h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    Sie haben jederzeit das Recht auf unentgeltliche Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO) und Löschung (Art. 17 DSGVO).<br />
-                    Zuständige Aufsichtsbehörde: <strong>Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)</strong>, Promenade 18, 91522 Ansbach • Web: www.baylda.bayern.de
-                  </p>
+              {/* 5. Betroffenenrechte */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">5</span>
+                  Ihre Rechte als betroffene Person nach der DSGVO
+                </h4>
+                <p className="text-slate-300 leading-relaxed">
+                  Sie haben nach der DSGVO folgende unentgeltliche Rechte gegenüber der verantwortlichen Stelle:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px]">
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+                    <strong className="text-white block mb-0.5">• Art. 15 DSGVO (Auskunftsrecht):</strong>
+                    Recht auf Auskunft über Ihre von uns verarbeiteten personenbezogenen Daten.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+                    <strong className="text-white block mb-0.5">• Art. 16 DSGVO (Berichtigung):</strong>
+                    Recht auf unverzügliche Berichtigung unrichtiger Daten.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+                    <strong className="text-white block mb-0.5">• Art. 17 DSGVO (Löschung):</strong>
+                    Recht auf Löschung („Recht auf Vergessenwerden“).
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+                    <strong className="text-white block mb-0.5">• Art. 18 DSGVO (Einschränkung):</strong>
+                    Recht auf Einschränkung der Verarbeitung.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+                    <strong className="text-white block mb-0.5">• Art. 20 DSGVO (Datenübertragbarkeit):</strong>
+                    Recht auf Erhalt Ihrer Daten in strukturiertem, maschinenlesbarem Format.
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+                    <strong className="text-white block mb-0.5">• Art. 21 DSGVO (Widerspruchsrecht):</strong>
+                    Recht auf jederzeitigen Widerspruch gegen die Verarbeitung.
+                  </div>
                 </div>
+              </div>
+
+              {/* 6. Aufsichtsbehörde */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">6</span>
+                  Zuständige Datenschutz-Aufsichtsbehörde
+                </h4>
+                <p className="text-slate-300 leading-relaxed">
+                  Im Falle datenschutzrechtlicher Verstöße steht dem Betroffenen ein Beschwerderecht bei der zuständigen Aufsichtsbehörde zu (Art. 77 DSGVO). Die für uns örtlich zuständige Aufsichtsbehörde ist:<br />
+                  <strong className="text-white">Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)</strong><br />
+                  Promenade 18, 91522 Ansbach, Deutschland<br />
+                  Postfach 1349, 91504 Ansbach • Telefon: +49 (0) 981 180093-0 • Website: <a href="https://www.baylda.bayern.de" target="_blank" rel="noopener noreferrer" className="text-brand-400 hover:underline">www.baylda.bayern.de</a>
+                </p>
+              </div>
+
+              {/* 7. TLS Verschlüsselung */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">7</span>
+                  SSL- bzw. TLS-Verschlüsselung
+                </h4>
+                <p className="text-slate-300 leading-relaxed">
+                  Diese Seite nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte eine lückenlose 256-Bit SSL-/TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers von „http://“ auf „https://“ wechselt und an dem Schloss-Symbol in Ihrer Browserzeile.
+                </p>
               </div>
             </div>
           )}
 
           {/* TAB 3: AGB & SANDBOX-NUTZUNGSBEDINGUNGEN */}
           {legalTab === 'agb' && (
-            <div className="space-y-5 animate-in fade-in duration-150">
+            <div className="space-y-6 animate-in fade-in duration-150 text-xs">
               <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-3">
                 <FileText className="w-5 h-5 text-amber-400 shrink-0" />
                 <div>
-                  <h4 className="font-bold text-white text-sm">Allgemeine Geschäfts- & Demo-Nutzungsbedingungen (B2B)</h4>
-                  <p className="text-xs text-amber-300">Gültig für Individual-Software, IT-Beratung und diese interaktive Sandbox-Umgebung</p>
+                  <h4 className="font-bold text-white text-sm">Allgemeine Geschäfts- und Demo-Nutzungsbedingungen (B2B)</h4>
+                  <p className="text-xs text-amber-300">Gültig für Individual-Softwareentwicklung, IT-Dienstleistungen und diese interaktive Sandbox</p>
                 </div>
               </div>
 
-              <div className="space-y-4 text-xs">
-                <div>
-                  <h4 className="font-bold text-white text-sm mb-1">§ 1 Geltungsbereich & B2B-Vertragspartner</h4>
-                  <p className="text-slate-300">
-                    Diese Bedingungen gelten ausschließlich gegenüber Unternehmern (§ 14 BGB) und gewerblichen Kunden. Vertragspartner ist TeamTrack Softwareentwicklung & IT-Beratung, Inhaberin: Huriye Ünalsoy, 97236 Randersacker.
-                  </p>
-                </div>
+              {/* § 1 Geltungsbereich */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm">§ 1 Geltungsbereich und Vertragspartner</h4>
+                <p className="text-slate-300 leading-relaxed">
+                  (1) Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle gegenwärtigen und zukünftigen Verträge, Lieferungen und sonstigen Leistungen zwischen <strong>TeamTrack Softwareentwicklung & IT-Beratung, Inhaberin: Huriye Ünalsoy, Balthasar-Neumann-Straße 38, 97236 Randersacker</strong> (nachfolgend „TeamTrack“ oder „Anbieter“) und ihren gewerblichen Kunden (nachfolgend „Auftraggeber“ oder „Kunde“).<br />
+                  (2) Das Leistungsangebot von TeamTrack richtet sich <strong>ausschließlich an Unternehmer im Sinne des § 14 BGB</strong>, juristische Personen des öffentlichen Rechts oder öffentlich-rechtliche Sondervermögen. Verträge mit Verbrauchern (§ 13 BGB) werden nicht geschlossen.<br />
+                  (3) Abweichende oder entgegenstehende Bedingungen des Auftraggebers werden nicht anerkannt, es sei denn, TeamTrack stimmt ihrer Geltung ausdrücklich schriftlich zu.
+                </p>
+              </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-900 border border-brand-500/30">
-                  <h4 className="font-bold text-brand-300 text-sm mb-1">§ 2 Besondere Nutzungsbedingungen für diese Demo- & Sandbox-Plattform</h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    (1) Diese interaktive Web-Umgebung dient ausschließlich zu Demonstrations-, Test- und Evaluierungszwecken der Software-Funktionen von TeamTrack.<br />
-                    (2) Sämtliche in der Demo standardmäßig angezeigten Kunden, Projekte, Fahrzeuge, Mitarbeiter, Zeiten und Beträge sind <strong>frei erfundene Beispieldaten</strong>.<br />
-                    (3) Vom Nutzer eingegebene Testdaten werden clientseitig im Browser (LocalStorage) isoliert gespeichert. TeamTrack übernimmt keine Gewähr für die dauerhafte Speicherung oder Verfügbarkeit von Testdaten im Demo-Modus.
+              {/* § 2 Demo- & Sandbox-Bedingungen */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-brand-500/40 space-y-2">
+                <h4 className="font-bold text-brand-300 text-sm flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-brand-400" />
+                  § 2 Besondere Bestimmungen für die interaktive Demo- & Sandbox-Plattform
+                </h4>
+                <div className="text-slate-300 leading-relaxed space-y-2">
+                  <p>
+                    (1) Die unter <em>team-track.de</em> bzw. verlinkten Subdomains bereitgestellte Web-Applikation ist eine <strong>kostenlose, unverbindliche Demonstrations- und Test-Sandbox</strong>. Sie dient ausschließlich dazu, Interessenten vor einer Beauftragung die Benutzeroberfläche, Ergonomie und Funktionsweise der Softwaremodule (u.a. Zeiterfassung, Fuhrpark, Auftragsverwaltung) zu demonstrieren.
+                  </p>
+                  <p>
+                    (2) <strong>Fiktive Beispieldaten:</strong> Sämtliche in der Demo enthaltenen Vorlagen (z.B. Mitarbeiter-Namen wie „Max Mustermann“, „Can Demir“, Kunden wie „Müller Logistik GmbH“, Fahrzeug-Kennzeichen, Stundensätze, Arbeitszeiten und GPS-Orte) sind <strong>vollständig frei erfundene Musterdaten</strong>. Etwaige Ähnlichkeiten mit real existierenden Personen, Unternehmen oder Vorgängen sind rein zufällig.
+                  </p>
+                  <p>
+                    (3) <strong>Lokale Speicherung im Browser:</strong> Wenn Sie in der Demo-Umgebung neue Daten erfassen, Stempelungen durchführen oder Daten ändern, werden diese Daten <strong>ausschließlich lokal im LocalStorage Ihres Browsers</strong> verarbeitet. Es findet kein serverseitiges Speichern von Echtdaten statt. TeamTrack übernimmt keine Gewährleistung für den Erhalt oder die Wiederherstellung von Test-Eingaben.
                   </p>
                 </div>
+              </div>
 
-                <div>
-                  <h4 className="font-bold text-white text-sm mb-1">§ 3 Leistungsumfang & White-Label-Bereitstellung</h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    Bei Beauftragung einer Vollversion wird die Software exakt nach den betrieblichen Anforderungen des Auftraggebers programmiert und im White-Label-Design (Firmenlogo, Farben, Domain) schlüsselfertig übergeben.
-                  </p>
-                </div>
+              {/* § 3 Leistungsumfang & White-Label */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm">§ 3 Leistungsumfang & White-Label Bereitstellung</h4>
+                <p className="text-slate-300 leading-relaxed">
+                  (1) TeamTrack erstellt für Auftraggeber schlüsselfertige Individual-Softwarelösungen auf Basis moderner Web-Technologien. Der genaue Leistungsumfang, die zu programmierenden Module und Schnittstellen ergeben sich aus dem jeweiligen Einzelvertrag bzw. Angebot.<br />
+                  (2) Die Software wird im unternehmenseigenen <strong>White-Label-Design</strong> des Auftraggebers (Firmenlogo, Farbwelt, eigene Firmen-Domain / Subdomain) bereitgestellt.<br />
+                  (3) Nach Abschluss der Implementierung erfolgt die Bereitstellung wahlweise auf zertifizierten deutschen Cloud-Servern oder als On-Premise-Bereitstellung nach schriftlicher Vereinbarung.
+                </p>
+              </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-                  <h4 className="font-bold text-white text-sm mb-1">§ 4 Gesetzliche Einhaltungspflichten & Haftungsausschluss (ArbZG, FPersV, VO EG 561/2006)</h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    Die bereitgestellten Software-Module (z.B. mobile Zeiterfassung, Pausenprüfungen, LKW-Lenkzeitenassistent nach VO EG 561/2006, TÜV-Warnsystem) stellen <strong>rein technische Hilfsmittel</strong> zur betrieblichen Unterstützung dar. Die alleinige rechtliche und tatsächliche Verantwortung für die Einhaltung sämtlicher gesetzlicher Arbeits-, Lenk- und Ruhezeitvorschriften (ArbZG, FPersV), arbeitsschutzrechtlicher Fürsorgepflichten und versicherungsrechtlicher Obliegenheiten verbleibt uneingeschränkt beim Auftraggeber (Arbeitgeber / Unternehmer). TeamTrack übernimmt keine Haftung für behördliche Bußgelder oder Schäden infolge fehlerhafter Dateneingaben oder unterlassener betrieblicher Kontrollen seitens des Nutzers.
-                  </p>
-                </div>
+              {/* § 4 Preise & Zahlungsbedingungen */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm">§ 4 Preise, Zahlungsbedingungen & Kleinunternehmerstatus</h4>
+                <p className="text-slate-300 leading-relaxed">
+                  (1) Es gelten die im individuellen Angebot vereinbarten Festpreise oder Vergütungssätze.<br />
+                  (2) Gemäß § 19 UStG (Kleinunternehmerregelung) wird keine Umsatzsteuer berechnet, solange die gesetzlichen Umsatzgrenzen nicht überschritten sind. Andernfalls verstehen sich alle Preise rein netto zuzüglich der jeweils geltenden gesetzlichen Mehrwertsteuer.<br />
+                  (3) Rechnungen sind sofort nach Rechnungsstellung ohne Abzug zur Zahlung fällig, sofern nicht schriftlich andere Zahlungsziele vereinbart wurden.
+                </p>
+              </div>
 
-                <div>
-                  <h4 className="font-bold text-white text-sm mb-1">§ 5 Urheberrecht, Datenschutz & Gerichtsstand</h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    Nach vollständiger Vergütung erhält der Auftraggeber das vereinbarte Nutzungsrecht für seinen Geschäftsbetrieb. Es gilt deutsches Recht. Gerichtsstand ist <strong>Würzburg</strong>.
+              {/* § 5 Gesetzliche Vorschriften & Haftungsausschluss */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/40 space-y-2">
+                <h4 className="font-bold text-amber-300 text-sm flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-400" />
+                  § 5 Gesetzliche Aufzeichnungs- und Einhaltungspflichten (ArbZG, MiLoG, FPersV, VO EG 561/2006)
+                </h4>
+                <div className="text-slate-300 leading-relaxed space-y-2">
+                  <p>
+                    (1) Die von TeamTrack angebotenen und in dieser Demo simulierten Module (wie mobile Arbeitszeiterfassung, automatische Pausenberechnung, Nachtzuschläge, LKW-Lenkzeitenassistent nach VO (EG) Nr. 561/2006 sowie TÜV- und UVV-Prüfungsfristen) stellen <strong>rein technische Hilfs- und Dokumentationswerkzeuge</strong> dar.
+                  </p>
+                  <p>
+                    (2) <strong>Verantwortung des Arbeitgebers:</strong> Die alleinige rechtliche, organisatorische und tatsächliche Verantwortung für die Einhaltung aller einschlägigen gesetzlichen Bestimmungen – insbesondere des <em>Arbeitszeitgesetzes (ArbZG)</em>, des <em>Mindestlohngesetzes (MiLoG)</em>, des <em>Fahrpersonalgesetzes (FPersG)</em>, der <em>Fahrpersonalverordnung (FPersV)</em> sowie der <em>Verordnung (EG) Nr. 561/2006 über Lenk- und Ruhezeiten</em> – verbleibt uneingeschränkt beim Auftraggeber (Arbeitgeber / Unternehmer).
+                  </p>
+                  <p>
+                    (3) <strong>Haftungsausschluss für Bußgelder & Kontrollen:</strong> TeamTrack haftet unter keinen Umständen für behördliche Bußgelder, Strafen, Nachforderungen der Sozialversicherungsträger oder Prüfungen durch BALM/BAG, Gewerbeaufsichtsämter oder Zollbehörden, die auf fehlerhaften, unvollständigen oder manipulierten Eingaben der Mitarbeiter oder auf unterlassenen Kontrollpflichten des Arbeitgebers beruhen.
                   </p>
                 </div>
+              </div>
+
+              {/* § 6 Urheberrecht & Nutzungsrechte */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm">§ 6 Urheberrecht, Lizenz und Nutzungsrechte</h4>
+                <p className="text-slate-300 leading-relaxed">
+                  (1) Sämtliche Urheberrechte an den Softwaremodulen, Layouts, Datenbankstrukturen und Quellcodes verbleiben bei TeamTrack.<br />
+                  (2) Mit vollständiger Bezahlung der vereinbarten Vergütung erhält der Auftraggeber das einfache, zeitlich unbeschränkte und nicht ausschließliche Recht, die individualisierte Software für seinen eigenen internen Geschäftsbetrieb zu nutzen.<br />
+                  (3) Eine Weiterveräußerung, Vermietung, Unterlizenzierung oder Veröffentlichung des Quellcodes an unberechtigte Dritte ist ohne vorherige schriftliche Zustimmung von TeamTrack untersagt.
+                </p>
+              </div>
+
+              {/* § 7 Haftungsbeschränkung */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm">§ 7 Haftungsbeschränkung</h4>
+                <p className="text-slate-300 leading-relaxed">
+                  (1) TeamTrack haftet unbeschränkt bei Vorsatz, grober Fahrlässigkeit sowie bei Verletzung von Leben, Körper oder Gesundheit.<br />
+                  (2) Bei leichter Fahrlässigkeit haftet TeamTrack nur bei Verletzung wesentlicher Vertragspflichten (Kardinalpflichten), deren Erfüllung die ordnungsgemäße Durchführung des Vertrages überhaupt erst ermöglicht. In diesem Fall ist die Haftung auf den bei Vertragsschluss vorhersehbaren, vertragstypischen Schaden begrenzt.<br />
+                  (3) Eine Haftung für mittelbare Schäden, entgangenen Gewinn oder Betriebsunterbrechungen ist ausgeschlossen, soweit gesetzlich zulässig.
+                </p>
+              </div>
+
+              {/* § 8 Schlussbestimmungen */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <h4 className="font-bold text-white text-sm">§ 8 Schlussbestimmungen, Anwendbares Recht und Gerichtsstand</h4>
+                <p className="text-slate-300 leading-relaxed">
+                  (1) Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts (CISG).<br />
+                  (2) Ausschließlicher Gerichtsstand für alle Streitigkeiten aus oder im Zusammenhang mit diesem Vertrag ist <strong>Würzburg</strong>, sofern der Auftraggeber Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen ist.<br />
+                  (3) Sollten einzelne Bestimmungen dieses Vertrages ganz oder teilweise unwirksam sein oder werden, so wird die Wirksamkeit der übrigen Bestimmungen hierdurch nicht berührt (Salvatorische Klausel).
+                </p>
               </div>
             </div>
           )}
@@ -341,7 +493,7 @@ export const LegalModal = () => {
                   href="https://wa.me/491726125371"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 transition-all"
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
                 >
                   <span>📲 Direkt per WhatsApp schreiben</span>
                 </a>
@@ -353,7 +505,7 @@ export const LegalModal = () => {
 
         {/* Modal Footer */}
         <div className="px-5 sm:px-8 py-3.5 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between text-xs text-slate-400 shrink-0">
-          <span className="text-[11px]">Stand: September 2026 • 100% DSGVO-konform</span>
+          <span className="text-[11px]">Stand: September 2026 • 100% DSGVO- & B2B-konform</span>
           <button
             onClick={closeLegalModal}
             className="px-5 py-2 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white transition-all cursor-pointer"
