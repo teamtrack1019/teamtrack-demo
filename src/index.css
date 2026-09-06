@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+  }
   body {
     background-color: #060a14;
     color: #f1f5f9;
@@ -27,7 +31,7 @@
 
 /* Glassmorphism Classes */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -65,9 +69,4 @@
   white-space: nowrap;
   user-select: none;
   z-index: 40;
-}
-
-/* Subtle Pulse & Glow */
-.glow-brand {
-  box-shadow: 0 0 25px rgba(48, 142, 255, 0.25);
 }
