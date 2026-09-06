@@ -11,10 +11,8 @@ import {
   Trash2, 
   Eye, 
   Sparkles,
-  ArrowUpRight,
-  CreditCard,
   Building,
-  ShieldAlert
+  Calendar
 } from 'lucide-react';
 
 export const RechnungenModule = () => {
@@ -118,80 +116,80 @@ export const RechnungenModule = () => {
   }, 0);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300 w-full overflow-hidden">
       
-      {/* Header Bar */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 glass-panel p-6 rounded-2xl">
-        <div>
+      {/* Header Bar (Stacking on mobile, side-by-side on desktop) */}
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 glass-panel p-4 sm:p-6 rounded-2xl w-full">
+        <div className="w-full lg:w-auto">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Modul 2</span>
             <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
               Limit: {createdCounts.invoices}/{maxCreationLimit} Belege
             </span>
           </div>
-          <h2 className="text-2xl font-black text-white mt-1">1-Klick Rechnungen & Angebote</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-white mt-1">1-Klick Rechnungen & Angebote</h2>
           <p className="text-xs text-slate-400 mt-1">
             Zeiten & Material mit einem Klick in rechtssichere PDF-Rechnungen umwandeln. Inklusive MwSt.-Berechnung und DATEV-Schnittstelle.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           <button
             onClick={handleAutoGenerateFromTimesheets}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all"
+            className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all w-full sm:w-auto"
             title="1-Klick Rechnung aus Zeiterfassung erstellen"
           >
             <Sparkles className="w-4 h-4 text-brand-400" />
-            <span>1-Klick aus Zeiterfassung</span>
+            <span>1-Klick aus Zeiten</span>
           </button>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-500/20 transition-all"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-500/20 transition-all w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
-            <span>Neue Rechnung erstellen</span>
+            <span>Rechnung erstellen</span>
           </button>
         </div>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <div className="glass-card p-4 rounded-xl">
           <span className="text-xs text-slate-400 font-medium">Gesamtfakturierung</span>
-          <div className="text-2xl font-black text-white mt-1">
+          <div className="text-xl sm:text-2xl font-black text-white mt-1">
             {totalSum.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
           </div>
-          <span className="text-[11px] text-slate-400 mt-1 block">Inkl. 19% gesetzlicher MwSt.</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 block">Inkl. 19% MwSt.</span>
         </div>
 
         <div className="glass-card p-4 rounded-xl border-amber-500/20">
           <span className="text-xs text-slate-400 font-medium">Offene Forderungen</span>
-          <div className="text-2xl font-black text-amber-400 mt-1">
+          <div className="text-xl sm:text-2xl font-black text-amber-400 mt-1">
             {openSum.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
           </div>
-          <span className="text-[11px] text-amber-400/80 mt-1 block">Fälligkeitsüberwachung aktiv</span>
+          <span className="text-[10px] sm:text-[11px] text-amber-400/80 mt-0.5 block">Fälligkeitsüberwachung aktiv</span>
         </div>
 
         <div className="glass-card p-4 rounded-xl flex items-center justify-between">
           <div>
             <span className="text-xs text-slate-400 font-medium">Schnittstellen</span>
-            <div className="text-sm font-bold text-white mt-1">DATEV & SevDesk</div>
-            <span className="text-[11px] text-emerald-400 font-semibold mt-1 block">100% Exportbereit</span>
+            <div className="text-sm font-bold text-white mt-0.5">DATEV & SevDesk</div>
+            <span className="text-[10px] sm:text-[11px] text-emerald-400 font-semibold mt-0.5 block">100% Exportbereit</span>
           </div>
           <button
             onClick={() => triggerRestrictedAction('DATEV Schnittstellen-Sync', 'In Ihrer Vollversion synchronisiert TeamTrack Rechnungen automatisch mit Ihrem Steuerberater (DATEV Belegtransfer).')}
-            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 font-medium"
+            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 font-medium shrink-0"
           >
-            DATEV Export
+            DATEV
           </button>
         </div>
       </div>
 
       {/* Invoice List & Filter Tabs */}
-      <div className="glass-card p-6 rounded-2xl">
+      <div className="glass-card p-4 sm:p-6 rounded-2xl w-full">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => setFilter('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -218,12 +216,71 @@ export const RechnungenModule = () => {
             </button>
           </div>
 
-          <span className="text-xs text-slate-400">
-            Klicken Sie auf <span className="text-brand-400 font-bold">"Vorschau (PDF)"</span> für den Musterbeleg mit Demo-Wasserzeichen.
+          <span className="text-[11px] text-slate-400">
+            Tippen Sie auf <strong className="text-brand-400">"PDF"</strong> für Beleg mit Demo-Wasserzeichen.
           </span>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        {/* MOBILE VIEW: Compact Card List (No horizontal overflow!) */}
+        <div className="lg:hidden mt-4 space-y-3">
+          {filteredInvoices.map((inv) => {
+            const subtotal = inv.items.reduce((s, it) => s + (it.qty * it.price), 0);
+            const gross = subtotal * 1.19;
+
+            return (
+              <div key={inv.id} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono font-bold text-brand-400 text-xs">{inv.id}</span>
+                  <button
+                    onClick={() => updateItem('invoices', inv.id, { status: inv.status === 'Bezahlt' ? 'Offen' : 'Bezahlt' })}
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                      inv.status === 'Bezahlt'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                    }`}
+                  >
+                    {inv.status}
+                  </button>
+                </div>
+
+                <div>
+                  <div className="font-bold text-white text-xs">{inv.customer}</div>
+                  <div className="text-[11px] text-slate-400">{inv.contact}</div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-slate-500" />
+                    <span>{inv.date}</span>
+                  </div>
+                  <div className="font-bold text-white text-xs">
+                    {gross.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+                  <button
+                    onClick={() => openInvoicePreview(inv)}
+                    className="flex-1 py-1.5 rounded-lg bg-brand-600/20 hover:bg-brand-600 text-brand-300 hover:text-white border border-brand-500/30 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>PDF Vorschau</span>
+                  </button>
+
+                  <button
+                    onClick={() => deleteItem('invoices', inv.id)}
+                    className="p-1.5 rounded-lg bg-slate-800 text-slate-500 hover:text-rose-400"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* DESKTOP VIEW: Full Wide Table */}
+        <div className="hidden lg:block mt-4 overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="text-slate-400 border-b border-slate-800/80">
@@ -310,10 +367,10 @@ export const RechnungenModule = () => {
 
       {/* Manual Invoice Creation Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="glass-panel max-w-2xl w-full p-6 rounded-3xl border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="glass-panel max-w-2xl w-full p-4 sm:p-6 rounded-3xl border border-white/10 shadow-2xl max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <h3 className="text-lg font-bold text-white">Neue Rechnung / Angebot erstellen</h3>
+              <h3 className="text-base sm:text-lg font-bold text-white">Neue Rechnung erstellen</h3>
               <button 
                 onClick={() => setIsModalOpen(false)}
                 className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded-lg bg-slate-800"
@@ -323,7 +380,7 @@ export const RechnungenModule = () => {
             </div>
 
             <form onSubmit={handleCreateInvoice} className="mt-4 space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">Kundenname / Firma:</label>
                   <input
@@ -389,14 +446,14 @@ export const RechnungenModule = () => {
                     onClick={handleAddItemRow}
                     className="text-brand-400 hover:text-brand-300 text-xs font-semibold flex items-center gap-1"
                   >
-                    + Position hinzufügen
+                    + Position
                   </button>
                 </div>
 
                 <div className="space-y-2">
                   {newInvoice.items.map((item, idx) => (
-                    <div key={idx} className="grid grid-cols-12 gap-2 items-center bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
-                      <div className="col-span-6">
+                    <div key={idx} className="flex flex-col sm:grid sm:grid-cols-12 gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                      <div className="sm:col-span-6">
                         <input
                           type="text"
                           required
@@ -406,7 +463,7 @@ export const RechnungenModule = () => {
                           className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white"
                         />
                       </div>
-                      <div className="col-span-2">
+                      <div className="flex items-center gap-2 sm:col-span-5">
                         <input
                           type="number"
                           step="0.1"
@@ -414,10 +471,8 @@ export const RechnungenModule = () => {
                           placeholder="Menge"
                           value={item.qty}
                           onChange={(e) => handleUpdateItemRow(idx, 'qty', parseFloat(e.target.value) || 0)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white text-right"
+                          className="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white text-right"
                         />
-                      </div>
-                      <div className="col-span-3">
                         <input
                           type="number"
                           step="0.01"
@@ -425,16 +480,16 @@ export const RechnungenModule = () => {
                           placeholder="Einzelpreis €"
                           value={item.price}
                           onChange={(e) => handleUpdateItemRow(idx, 'price', parseFloat(e.target.value) || 0)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white text-right"
+                          className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white text-right"
                         />
                       </div>
-                      <div className="col-span-1 text-center">
+                      <div className="sm:col-span-1 text-right sm:text-center">
                         <button
                           type="button"
                           onClick={() => handleRemoveItemRow(idx)}
-                          className="text-rose-400 hover:text-rose-300 font-bold"
+                          className="text-rose-400 hover:text-rose-300 font-bold p-1"
                         >
-                          ✕
+                          ✕ Entfernen
                         </button>
                       </div>
                     </div>

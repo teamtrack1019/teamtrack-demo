@@ -20,7 +20,7 @@ const MainContent = () => {
   const { activeModule } = useDemo();
 
   return (
-    <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8 flex-1">
+    <main className="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1 overflow-hidden">
       {activeModule === 'overview' && <OverviewHub />}
       {activeModule === 'zeiterfassung' && <ZeiterfassungModule />}
       {activeModule === 'rechnungen' && <RechnungenModule />}
@@ -34,7 +34,7 @@ const MainContent = () => {
 export default function App() {
   return (
     <DemoProvider>
-      <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 selection:bg-brand-500 selection:text-white">
+      <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 selection:bg-brand-500 selection:text-white w-full max-w-full overflow-x-hidden">
         <Header />
         <ModuleSelector />
         <MainContent />
