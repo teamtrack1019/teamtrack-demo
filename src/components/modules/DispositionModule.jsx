@@ -258,21 +258,25 @@ export const DispositionModule = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="glass-panel max-w-lg w-full p-6 rounded-3xl border border-white/10 shadow-2xl">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <h3 className="text-lg font-bold text-white">Neuen Auftrag / Aufgabe planen</h3>
+              <div>
+                <h3 className="text-lg font-bold text-white">Neuen Auftrag anlegen / Yeni Görev Ekle</h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">Disposition für Kanban & Auftragsverwaltung</p>
+              </div>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded-lg bg-slate-800"
+                className="text-slate-400 hover:text-white text-xs px-2.5 py-1 rounded-lg bg-slate-800"
               >
-                ✕ Schließen
+                ✕ Schließen / Kapat
               </button>
             </div>
 
             <form onSubmit={handleAddTask} className="mt-4 space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Auftragsbezeichnung:</label>
+                <label className="block text-slate-300 font-semibold mb-1">Auftragsbezeichnung / Görev & İş Tanımı *</label>
                 <input
                   type="text"
                   required
+                  placeholder="z.B. Elektro-Hauptverteilung installieren / Örn: Görev Tanımı"
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
@@ -281,20 +285,22 @@ export const DispositionModule = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Kunde:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Kunde / Müşteri *</label>
                   <input
                     type="text"
                     required
+                    placeholder="z.B. Müller Bau GmbH"
                     value={newTask.customer}
                     onChange={(e) => setNewTask({ ...newTask, customer: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Projekt / Baustelle:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Projekt / Baustelle / Şantiye Yeri *</label>
                   <input
                     type="text"
                     required
+                    placeholder="z.B. Neubau Wohnpark"
                     value={newTask.project}
                     onChange={(e) => setNewTask({ ...newTask, project: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
@@ -304,7 +310,7 @@ export const DispositionModule = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Zugewiesener Mitarbeiter:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Zuständiger Mitarbeiter / Görevli Personel *</label>
                   <select
                     value={newTask.assignedTo}
                     onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}
@@ -325,22 +331,22 @@ export const DispositionModule = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Priorität:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Priorität / Öncelik</label>
                   <select
                     value={newTask.priority}
                     onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   >
-                    <option value="Hoch">Hoch</option>
-                    <option value="Mittel">Mittel</option>
-                    <option value="Niedrig">Niedrig</option>
+                    <option value="Hoch">Hoch / Yüksek Öncelik</option>
+                    <option value="Mittel">Mittel / Orta Öncelik</option>
+                    <option value="Niedrig">Niedrig / Normal</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Frist / Deadline:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Frist / Termin / Bitiş Tarihi *</label>
                   <input
                     type="date"
                     required
@@ -350,7 +356,7 @@ export const DispositionModule = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Geschätzte Dauer (Std.):</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Geschätzte Dauer / Tahmini Süre (Saat)</label>
                   <input
                     type="number"
                     value={newTask.estimatedHours}
@@ -366,13 +372,13 @@ export const DispositionModule = () => {
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-semibold"
                 >
-                  Abbrechen
+                  Abbrechen / İptal
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold shadow-lg shadow-rose-500/20"
                 >
-                  Auftrag anlegen
+                  Auftrag anlegen / Görev Oluştur
                 </button>
               </div>
             </form>

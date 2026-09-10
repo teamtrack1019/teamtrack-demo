@@ -256,21 +256,25 @@ export const CrmModule = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="glass-panel max-w-lg w-full p-6 rounded-3xl border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <h3 className="text-lg font-bold text-white">Neuen Kunden anlegen</h3>
+              <div>
+                <h3 className="text-lg font-bold text-white">Neuen Kunden anlegen / Yeni Müşteri Ekle</h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">Stammdaten & Kontakt für Kundenverwaltung</p>
+              </div>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded-lg bg-slate-800"
+                className="text-slate-400 hover:text-white text-xs px-2.5 py-1 rounded-lg bg-slate-800"
               >
-                ✕ Schließen
+                ✕ Schließen / Kapat
               </button>
             </div>
 
             <form onSubmit={handleAddCustomer} className="mt-4 space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Firmenname:</label>
+                <label className="block text-slate-300 font-semibold mb-1">Firmenname / Şirket Adı *</label>
                 <input
                   type="text"
                   required
+                  placeholder="z.B. Müller Bau GmbH / Örn: Şirket Adı"
                   value={newCustomer.company}
                   onChange={(e) => setNewCustomer({ ...newCustomer, company: e.target.value })}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
@@ -279,34 +283,36 @@ export const CrmModule = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Branche:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Branche / Sektör *</label>
                   <input
                     type="text"
                     required
+                    placeholder="z.B. Handwerk & Bau"
                     value={newCustomer.industry}
                     onChange={(e) => setNewCustomer({ ...newCustomer, industry: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Status:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Status / Müşteri Durumu</label>
                   <select
                     value={newCustomer.status}
                     onChange={(e) => setNewCustomer({ ...newCustomer, status: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   >
-                    <option value="Aktiv">Aktiv</option>
-                    <option value="VIP">VIP</option>
-                    <option value="Interessent">Interessent</option>
+                    <option value="Aktiv">Aktiv / Aktif Müşteri</option>
+                    <option value="VIP">VIP Müşteri</option>
+                    <option value="Interessent">Interessent / Aday Müşteri</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Ansprechpartner & Position:</label>
+                <label className="block text-slate-300 font-semibold mb-1">Ansprechpartner & Position / Yetkili Kişi *</label>
                 <input
                   type="text"
                   required
+                  placeholder="Herr / Frau Name (Pozisyon)"
                   value={newCustomer.contactPerson}
                   onChange={(e) => setNewCustomer({ ...newCustomer, contactPerson: e.target.value })}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
@@ -315,20 +321,22 @@ export const CrmModule = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Telefon:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Telefon / Mobil *</label>
                   <input
                     type="text"
                     required
+                    placeholder="+49 170 1234567"
                     value={newCustomer.phone}
                     onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">E-Mail:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">E-Mail / E-Posta *</label>
                   <input
                     type="email"
                     required
+                    placeholder="info@firma.de"
                     value={newCustomer.email}
                     onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
@@ -338,20 +346,22 @@ export const CrmModule = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Straße & Nr.:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Straße & Nr. / Cadde & No *</label>
                   <input
                     type="text"
                     required
+                    placeholder="Musterstr. 10"
                     value={newCustomer.street}
                     onChange={(e) => setNewCustomer({ ...newCustomer, street: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">PLZ & Ort:</label>
+                  <label className="block text-slate-300 font-semibold mb-1">PLZ & Ort / Posta Kodu & Şehir *</label>
                   <input
                     type="text"
                     required
+                    placeholder="10115 Berlin"
                     value={newCustomer.city}
                     onChange={(e) => setNewCustomer({ ...newCustomer, city: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
@@ -360,9 +370,10 @@ export const CrmModule = () => {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Notiz / Besonderheiten:</label>
+                <label className="block text-slate-300 font-semibold mb-1">Notizen & Wünsche / Müşteri Notları</label>
                 <textarea
                   rows="2"
+                  placeholder="Notizen zum Kunden, Wünsche und Anforderungen..."
                   value={newCustomer.notes}
                   onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
@@ -375,13 +386,13 @@ export const CrmModule = () => {
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-semibold"
                 >
-                  Abbrechen
+                  Abbrechen / İptal
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold shadow-lg shadow-violet-500/20"
                 >
-                  Kunde speichern
+                  Kunde anlegen / Müşteri Kaydet
                 </button>
               </div>
             </form>
