@@ -2007,6 +2007,186 @@
     </div>
   </div>
 
+  <!-- MODAL: CLEANPRO VOLLVERSION ANFRAGE (UPGRADE MODAL) -->
+  <div id="cleanProUpgradeModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-emerald-500/30 text-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 custom-shadow relative max-h-[92vh] overflow-y-auto">
+      
+      <!-- Close Button -->
+      <button onclick="closeCleanProUpgradeModal()" class="absolute top-4 right-4 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all z-20">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Form View -->
+      <div id="cleanProUpgradeFormView">
+        <div class="pr-8">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i>
+            CleanPro Gebäudereinigung Vollversion
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-white">
+            Ihre maßgeschneiderte Reinigungs-Software einrichten lassen
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">
+            Wählen Sie Ihre gewünschten Module für Ihren Reinigungsbetrieb. Wir konfigurieren die CleanPro Suite exakt für Ihre Objekte, Mitarbeiter und Abrechnung.
+          </p>
+        </div>
+
+        <form onsubmit="handleCleanProUpgradeSubmit(event)" class="mt-5 space-y-4 text-xs">
+          
+          <!-- Module Checklist -->
+          <div>
+            <label class="block text-slate-300 font-bold mb-2">
+              Gewünschte Module für Ihr Unternehmen auswählen:
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border bg-emerald-600/20 border-emerald-500/50 text-white font-bold cursor-pointer">
+                <input type="checkbox" name="cleanModule" value="Hotel- & Objektverwaltung" checked class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
+                <span class="text-[11px] sm:text-xs">🏨 Hotel- & Objektverwaltung (Zimmerpreise)</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border bg-emerald-600/20 border-emerald-500/50 text-white font-bold cursor-pointer">
+                <input type="checkbox" name="cleanModule" value="Dienstplaner & Zimmererfassung" checked class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
+                <span class="text-[11px] sm:text-xs">📅 Tägliche Erfassung & Dienstplaner (PDF)</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border bg-emerald-600/20 border-emerald-500/50 text-white font-bold cursor-pointer">
+                <input type="checkbox" name="cleanModule" value="Lohnabrechnung (§ 3b EStG Zuschläge)" checked class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
+                <span class="text-[11px] sm:text-xs">💰 Lohnabrechnung & § 3b EStG Zuschläge</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border bg-emerald-600/20 border-emerald-500/50 text-white font-bold cursor-pointer">
+                <input type="checkbox" name="cleanModule" value="Digitale Kundenabnahme & Unterschrift" checked class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
+                <span class="text-[11px] sm:text-xs">✍️ Digitale Kundenabnahme & Unterschrift</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border bg-emerald-600/20 border-emerald-500/50 text-white font-bold cursor-pointer">
+                <input type="checkbox" name="cleanModule" value="Express-Preiskalkulator" checked class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
+                <span class="text-[11px] sm:text-xs">🧮 Express-Preiskalkulator für Sofortangebote</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border bg-emerald-600/20 border-emerald-500/50 text-white font-bold cursor-pointer">
+                <input type="checkbox" name="cleanModule" value="Eigenes Firmen-Branding" checked class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
+                <span class="text-[11px] sm:text-xs">✨ 100% Eigenes CleanPro Firmen-Branding</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Contact Inputs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Firma / Betriebsname:</label>
+              <input
+                type="text"
+                id="cleanUpgradeCompany"
+                required
+                placeholder="z.B. Schmidt Gebäudereinigung GmbH"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder:text-slate-500"
+              />
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Ihr Name / Ansprechpartner:</label>
+              <input
+                type="text"
+                id="cleanUpgradeName"
+                required
+                placeholder="z.B. Thomas Schmidt"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder:text-slate-500"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Telefon / Mobilnummer:</label>
+              <input
+                type="tel"
+                id="cleanUpgradePhone"
+                required
+                placeholder="+49 172 ..."
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder:text-slate-500"
+              />
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">E-Mail-Adresse:</label>
+              <input
+                type="email"
+                id="cleanUpgradeEmail"
+                required
+                placeholder="info@schmidt-reinigung.de"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder:text-slate-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Nachricht / Spezifische Wünsche (optional):</label>
+            <textarea
+              id="cleanUpgradeMessage"
+              rows="2"
+              placeholder="z.B. Anzahl Hotels, Anzahl Mitarbeiter oder gewünschte Schnittstellen..."
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder:text-slate-500"
+            ></textarea>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="pt-2 flex flex-col sm:flex-row items-center gap-3">
+            <button
+              type="submit"
+              id="cleanUpgradeSubmitBtn"
+              class="w-full sm:flex-1 py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all"
+            >
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span>Unverbindliches Festpreis-Angebot anfordern</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="sendCleanProWhatsApp()"
+              class="w-full sm:w-auto py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shrink-0"
+            >
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+              <span>WhatsApp Direkt</span>
+            </button>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+            <span class="flex items-center gap-1 text-emerald-400 font-semibold">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 100% Kostenlose Erstberatung
+            </span>
+            <span>TeamTrack Würzburg</span>
+          </div>
+        </form>
+      </div>
+
+      <!-- Success View -->
+      <div id="cleanProUpgradeSuccessView" class="hidden py-6 sm:py-8 text-center space-y-4">
+        <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/10">
+          <i data-lucide="check-circle-2" class="w-10 h-10 stroke-[2.5]"></i>
+        </div>
+
+        <h3 class="text-xl sm:text-2xl font-black text-white">Vielen Dank für Ihre Anfrage!</h3>
+        <p class="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+          Ihre Anforderungen für die CleanPro Gebäudereinigung wurden erfolgreich an uns übermittelt. Wir melden uns innerhalb von 24 Stunden persönlich bei Ihnen.
+        </p>
+
+        <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 max-w-sm mx-auto text-xs text-left space-y-2">
+          <div class="font-semibold text-slate-200">Ihr direkter Entwickler-Kontakt:</div>
+          <div class="text-slate-400 flex items-center gap-2">
+            <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>+49 172 6125371 (Direktanruf oder WhatsApp)</span>
+          </div>
+          <div class="text-slate-400 flex items-center gap-2">
+            <i data-lucide="mail" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>kontakt@team-track.de</span>
+          </div>
+        </div>
+
+        <button
+          onclick="closeCleanProUpgradeModal()"
+          class="mt-4 px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-all"
+        >
+          Zurück zur Demo-Umgebung
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-6">
