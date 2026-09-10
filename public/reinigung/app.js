@@ -2545,3 +2545,82 @@ function closePdfPreviewModal() {
   if (modal) modal.classList.add('hidden');
 }
 
+// ==================== MOBILE NAVIGATION TOGGLE ====================
+
+function toggleMobileNav() {
+  const dropdown = document.getElementById('mobileNavDropdown');
+  if (!dropdown) return;
+  const isHidden = dropdown.classList.contains('hidden');
+  if (isHidden) {
+    dropdown.classList.remove('hidden');
+  } else {
+    dropdown.classList.add('hidden');
+  }
+}
+
+// ==================== TRIAL & CLIENT URL PARAMETER INIT ====================
+
+function initCleanProTrialParams() {
+  const params = new URLSearchParams(window.location.search);
+  const clientParam = params.get('client') || params.get('firma');
+  const daysParam = parseInt(params.get('days') || params.get('tage') || '7', 10);
+  const isAdmin = params.get('admin') === 'true' || params.get('admin') === '1' || window.location.hostname === 'localhost';
+
+  const pill = document.getElementById('cleanProTrialPill');
+  const clientNameEl = document.getElementById('cleanProClientName');
+  const timerDisplay = document.getElementById('cleanProTimerDisplay');
+
+  if (!pill) return;
+
+  if (clientParam || isAdmin) {
+    pill.classList.remove('hidden');
+    pill.classList.add('flex');
+
+    if (clientNameEl) {
+      clientNameEl.textContent = clientParam ? `Mandant: ${clientParam}` : 'Admin-Modus';
+    }
+
+    if (isAdmin) {
+      if (timerDisplay) {
+        timerDisplay.textContent = '∞ Unbegrenzt';
+        timerDisplay.className = 'font-bold text-emerald-300';
+      }
+    } else {
+      const storageKey = `cleanpro_trial_start_${clientParam || 'default'}`;
+      let startTime = localStorage.getItem(storageKey);
+      if (!startTime) {
+        startTime = Date.now().toString();
+        localStorage.setItem(storageKey, startTime);
+      }
+      const startMs = parseInt(startTime, 10);
+      const totalMs = daysParam * 24 * 60 * 60 * 1000;
+
+      const updateTimer = () => {
+        const remaining = totalMs - (Date.now() - startMs);
+        if (remaining <= 0) {
+          if (timerDisplay) timerDisplay.textContent = '0T 00:00:00';
+        } else {
+          const d = Math.floor(remaining / (1000 * 60 * 60 * 24));
+          const h = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+          const m = Math.floor((remaining / 1000 / 60) % 60);
+          const s = Math.floor((remaining / 1000) % 60);
+          if (timerDisplay) {
+            timerDisplay.textContent = `${d}T ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+          }
+        }
+      };
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    }
+  }
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', () => {
+  initCleanProTrialParams();
+});
+setTimeout(() => {
+  initCleanProTrialParams();
+}, 200);
+
+

@@ -35,9 +35,17 @@
     }
   </script>
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    html, body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden !important;
+      max-width: 100vw;
+      width: 100%;
+    }
+    *, *:before, *:after {
+      box-sizing: border-box;
+    }
     .glass-nav {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
@@ -46,60 +54,100 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col overflow-x-hidden w-full max-w-full">
 
   <!-- TOP HEADER / NAVBAR -->
   <header class="sticky top-0 z-50 glass-nav border-b border-slate-200/80 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-20">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 sm:h-20 gap-2">
+        
         <!-- Logo -->
-        <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('landing')">
-          <div class="w-11 h-11 bg-gradient-to-tr from-emerald-600 to-teal-400 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-            <i data-lucide="sparkles" class="w-6 h-6"></i>
+        <div class="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onclick="switchView('landing')">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-emerald-600 to-teal-400 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 shrink-0">
+            <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6"></i>
           </div>
           <div>
-            <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">CleanPro</span>
-            <span class="text-xs font-semibold px-2 py-0.5 ml-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Reinigungsfirma</span>
+            <span class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">CleanPro</span>
+            <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 ml-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 hidden xs:inline-block">Reinigungsfirma</span>
           </div>
         </div>
 
-        <!-- Navigation Links -->
-        <nav class="hidden xl:flex items-center gap-6 2xl:gap-8 text-sm font-medium text-slate-600 mr-6">
+        <!-- Navigation Links (Desktop) -->
+        <nav class="hidden xl:flex items-center gap-6 2xl:gap-8 text-sm font-medium text-slate-600 mr-2">
           <a href="#services" class="hover:text-emerald-600 transition-colors" data-i18n="nav_services">Dienstleistungen</a>
           <a href="#calculator" class="hover:text-emerald-600 transition-colors" data-i18n="nav_calc">Preiskalkulator</a>
           <a href="#about" class="hover:text-emerald-600 transition-colors" data-i18n="nav_about">Über Uns</a>
           <a href="#contact" class="hover:text-emerald-600 transition-colors" data-i18n="nav_contact">Kontakt</a>
         </nav>
 
-        <div class="hidden xl:block h-6 w-px bg-slate-200 mr-2"></div>
+        <!-- Action Buttons & Badges -->
+        <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          
+          <!-- Client & Trial Countdown Badge (Dynamic) -->
+          <div id="cleanProTrialPill" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold shadow-sm">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+            <span id="cleanProClientName" class="hidden md:inline font-normal text-slate-300 border-r border-slate-700 pr-1.5">Mandant</span>
+            <span id="cleanProTimerDisplay" class="font-mono text-white">7T 23:59:59</span>
+          </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center gap-2.5">
           <!-- Active User / Role Badge -->
-          <button onclick="openRoleModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all border border-slate-700 shadow-sm" title="Rolle & Benutzer wechseln">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="headerRoleBadge">Super-Admin</span>
-            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+          <button onclick="openRoleModal()" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all border border-slate-700 shadow-sm shrink-0" title="Rolle & Benutzer wechseln">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+            <span id="headerRoleBadge" class="truncate max-w-[90px] sm:max-w-none">Super-Admin</span>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0"></i>
           </button>
 
-          <!-- Mitarbeiterverwaltung Button -->
-          <button onclick="switchView('mitarbeiter')" class="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all border border-emerald-200">
+          <!-- Mitarbeiterverwaltung Button (Desktop & Tablet) -->
+          <button onclick="switchView('mitarbeiter')" class="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all border border-emerald-200 shrink-0">
             <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i>
             <span>Mitarbeiter</span>
           </button>
 
-          <!-- Admin Portal Switch Button -->
-          <button onclick="switchView('admin')" class="hidden md:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-300/70">
+          <!-- Admin Portal Switch Button (Desktop & Tablet) -->
+          <button onclick="switchView('admin')" class="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-300/70 shrink-0">
             <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-700"></i>
             <span>Admin Panel</span>
           </button>
 
-          <!-- Hotel & HR Module Button -->
-          <button onclick="switchView('hotel')" class="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all shadow-sm">
-            <i data-lucide="building" class="w-4 h-4 text-emerald-100"></i>
+          <!-- Hotel & HR Module Button (Desktop & Tablet) -->
+          <button onclick="switchView('hotel')" class="hidden sm:flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all shadow-sm shrink-0">
+            <i data-lucide="building" class="w-3.5 h-3.5 text-emerald-100"></i>
             <span>Hotel & Nuxt-Dashboard</span>
           </button>
+
+          <!-- Mobile Hamburger Menu Button (Mobile only) -->
+          <button id="mobileNavToggle" onclick="toggleMobileNav()" class="xl:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-all shrink-0" title="Menü öffnen">
+            <i data-lucide="menu" id="mobileNavIcon" class="w-5 h-5"></i>
+          </button>
+
         </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation Menu -->
+    <div id="mobileNavDropdown" class="hidden xl:hidden bg-white/95 border-b border-slate-200 px-4 py-4 space-y-3 shadow-xl backdrop-blur-lg animate-in slide-in-from-top-2 duration-200">
+      <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+        <button onclick="switchView('hotel'); toggleMobileNav();" class="p-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center gap-2 shadow-sm text-left">
+          <i data-lucide="building" class="w-4 h-4"></i> Hotel-Dashboard
+        </button>
+        <button onclick="switchView('mitarbeiter'); toggleMobileNav();" class="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-2 text-left">
+          <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i> Mitarbeiter
+        </button>
+        <button onclick="switchView('admin'); toggleMobileNav();" class="p-2.5 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-2 text-left">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Panel
+        </button>
+        <button onclick="switchView('landing'); toggleMobileNav();" class="p-2.5 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-2 text-left">
+          <i data-lucide="home" class="w-4 h-4"></i> Startseite / Buchung
+        </button>
+      </div>
+      <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-3 text-xs font-medium text-slate-600">
+        <a href="#services" onclick="toggleMobileNav()" class="hover:text-emerald-600">Dienstleistungen</a>
+        <a href="#calculator" onclick="toggleMobileNav()" class="hover:text-emerald-600">Preiskalkulator</a>
+        <a href="#about" onclick="toggleMobileNav()" class="hover:text-emerald-600">Über Uns</a>
+        <a href="#contact" onclick="toggleMobileNav()" class="hover:text-emerald-600">Kontakt</a>
+      </div>
+    </div>
+  </header>
       </div>
     </div>
   </header>

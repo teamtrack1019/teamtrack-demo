@@ -34,24 +34,41 @@ const MainContent = () => {
   );
 };
 
+const AppContent = () => {
+  const { activeModule } = useDemo();
+
+  // If in dedicated Reinigung module, render CleanPro exclusively with its original header
+  if (activeModule === 'reinigung') {
+    return (
+      <div className="min-h-screen w-full bg-slate-50 overflow-x-hidden">
+        <ReinigungModule />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 selection:bg-brand-500 selection:text-white w-full max-w-full overflow-x-hidden">
+      <Header />
+      <ModuleSelector />
+      <MainContent />
+      <Footer />
+      
+      {/* Interactive Modals & System Components */}
+      <UpgradeModal />
+      <RestrictionModal />
+      <InvoicePreviewModal />
+      <ExpiredModal />
+      <ShareLinkModal />
+      <LegalModal />
+      <Toasts />
+    </div>
+  );
+};
+
 export default function App() {
   return (
     <DemoProvider>
-      <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 selection:bg-brand-500 selection:text-white w-full max-w-full overflow-x-hidden">
-        <Header />
-        <ModuleSelector />
-        <MainContent />
-        <Footer />
-        
-        {/* Interactive Modals & System Components */}
-        <UpgradeModal />
-        <RestrictionModal />
-        <InvoicePreviewModal />
-        <ExpiredModal />
-        <ShareLinkModal />
-        <LegalModal />
-        <Toasts />
-      </div>
+      <AppContent />
     </DemoProvider>
   );
 }
