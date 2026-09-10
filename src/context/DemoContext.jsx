@@ -15,8 +15,25 @@ export const DemoProvider = ({ children }) => {
   const [remainingTime, setRemainingTime] = useState({ days: 7, hours: 0, minutes: 0, seconds: 0 });
   const [isExpired, setIsExpired] = useState(false);
 
-  // Active navigation
-  const [activeModule, setActiveModule] = useState('overview');
+  // Active navigation with Browser & Mouse History Support
+  const [activeModule, setActiveModuleState] = useState('overview');
+
+  const setActiveModule = (newModule, pushHistory = true) => {
+    setActiveModuleState(newModule);
+    try {
+      const url = new URL(window.location.href);
+      if (newModule === 'overview') {
+        url.searchParams.delete('module');
+      } else {
+        url.searchParams.set('module', newModule);
+      }
+      if (pushHistory) {
+        window.history.pushState({ module: newModule }, '', url.toString());
+      }
+    } catch (e) {
+      console.error('History pushState error:', e);
+    }
+  };
 
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [upgradePrefillModule, setUpgradePrefillModule] = useState('');
@@ -29,6 +46,9 @@ export const DemoProvider = ({ children }) => {
   const openLegalModal = (tab = 'impressum') => {
     setLegalTab(tab);
     setIsLegalModalOpen(true);
+    try {
+      window.history.pushState({ modal: 'legal', module: activeModule }, '', window.location.href);
+    } catch (e) {}
   };
 
   const closeLegalModal = () => {
@@ -40,6 +60,58 @@ export const DemoProvider = ({ children }) => {
 
   // Client Isolated Storage Key
   const storageKey = `teamtrack_sandbox_${clientId.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+
+  // Listen to browser Back/Forward (popstate) and Mouse Back buttons
+  useEffect(() => {
+    const handlePopState = (event) => {
+      // 1. If any modal is open, close it first
+      if (isUpgradeModalOpen) {
+        setIsUpgradeModalOpen(false);
+        return;
+      }
+      if (isLegalModalOpen) {
+        setIsLegalModalOpen(false);
+        return;
+      }
+      if (isShareModalOpen) {
+        setIsShareModalOpen(false);
+        return;
+      }
+      if (previewInvoice) {
+        setPreviewInvoice(null);
+        return;
+      }
+      if (restrictionModal.isOpen) {
+        setRestrictionModal({ isOpen: false, title: '', message: '', feature: '' });
+        return;
+      }
+
+      // 2. Otherwise navigate to the previous module from URL or history state
+      const params = new URLSearchParams(window.location.search);
+      const modFromUrl = params.get('module') || params.get('modul') || (event.state && event.state.module) || 'overview';
+      if (['overview', 'zeiterfassung', 'rechnungen', 'crm', 'fuhrpark', 'disposition', 'reinigung'].includes(modFromUrl.toLowerCase())) {
+        setActiveModuleState(modFromUrl.toLowerCase());
+      }
+    };
+
+    const handleMouseUp = (e) => {
+      // Button 3 is standard mouse Back side-button, Button 4 is Forward
+      if (e.button === 3) {
+        e.preventDefault();
+        window.history.back();
+      } else if (e.button === 4) {
+        e.preventDefault();
+        window.history.forward();
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isUpgradeModalOpen, isLegalModalOpen, isShareModalOpen, previewInvoice, restrictionModal]);
 
   // State for all 5 modules
   const [data, setData] = useState(() => {
@@ -120,9 +192,13 @@ export const DemoProvider = ({ children }) => {
 
     // Initial module selection from URL (?module=reinigung)
     const moduleParam = params.get('module') || params.get('modul');
-    if (moduleParam && ['overview', 'zeiterfassung', 'rechnungen', 'crm', 'fuhrpark', 'disposition', 'reinigung'].includes(moduleParam.toLowerCase())) {
-      setActiveModule(moduleParam.toLowerCase());
-    }
+    const initialMod = (moduleParam && ['overview', 'zeiterfassung', 'rechnungen', 'crm', 'fuhrpark', 'disposition', 'reinigung'].includes(moduleParam.toLowerCase()))
+      ? moduleParam.toLowerCase()
+      : 'overview';
+    setActiveModuleState(initialMod);
+    try {
+      window.history.replaceState({ module: initialMod }, '', window.location.href);
+    } catch (e) {}
 
     // Is this a dedicated customer link specifically for cleaning?
     const isDedicated = !adminState && (moduleParam?.toLowerCase() === 'reinigung' || params.get('only') === 'reinigung');
@@ -247,11 +323,17 @@ export const DemoProvider = ({ children }) => {
   const openUpgradeModal = (moduleName = '') => {
     setUpgradePrefillModule(moduleName);
     setIsUpgradeModalOpen(true);
+    try {
+      window.history.pushState({ modal: 'upgrade', module: activeModule }, '', window.location.href);
+    } catch (e) {}
   };
 
   // Open invoice PDF preview
   const openInvoicePreview = (invoice) => {
     setPreviewInvoice(invoice);
+    try {
+      window.history.pushState({ modal: 'invoice', module: activeModule }, '', window.location.href);
+    } catch (e) {}
   };
 
   // Celebrate with confetti on inquiry
