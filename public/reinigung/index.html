@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CleanPro - Professionelle Reinigungsdienste & Verwaltung</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .custom-shadow {
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.02);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP HEADER / NAVBAR -->
+  <header class="sticky top-0 z-50 glass-nav border-b border-slate-200/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('landing')">
+          <div class="w-11 h-11 bg-gradient-to-tr from-emerald-600 to-teal-400 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+            <i data-lucide="sparkles" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">CleanPro</span>
+            <span class="text-xs font-semibold px-2 py-0.5 ml-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Reinigungsfirma</span>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="hidden xl:flex items-center gap-6 2xl:gap-8 text-sm font-medium text-slate-600 mr-6">
+          <a href="#services" class="hover:text-emerald-600 transition-colors" data-i18n="nav_services">Dienstleistungen</a>
+          <a href="#calculator" class="hover:text-emerald-600 transition-colors" data-i18n="nav_calc">Preiskalkulator</a>
+          <a href="#about" class="hover:text-emerald-600 transition-colors" data-i18n="nav_about">Über Uns</a>
+          <a href="#contact" class="hover:text-emerald-600 transition-colors" data-i18n="nav_contact">Kontakt</a>
+        </nav>
+
+        <div class="hidden xl:block h-6 w-px bg-slate-200 mr-2"></div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2.5">
+          <!-- Active User / Role Badge -->
+          <button onclick="openRoleModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all border border-slate-700 shadow-sm" title="Rolle & Benutzer wechseln">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="headerRoleBadge">Super-Admin</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+          </button>
+
+          <!-- Mitarbeiterverwaltung Button -->
+          <button onclick="switchView('mitarbeiter')" class="hidden sm:flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all border border-emerald-200">
+            <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i>
+            <span>Mitarbeiter</span>
+          </button>
+
+          <!-- Admin Portal Switch Button -->
+          <button onclick="switchView('admin')" class="hidden md:flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-300/70">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-700"></i>
+            <span>Admin Panel</span>
+          </button>
+
+          <!-- Hotel & HR Module Button -->
+          <button onclick="switchView('hotel')" class="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all shadow-sm">
+            <i data-lucide="building" class="w-4 h-4 text-emerald-100"></i>
+            <span>Hotel & Nuxt-Dashboard</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== VIEW 1: PUBLIC LANDING & BOOKING ==================== -->
+  <main id="publicView" class="flex-grow">
+    
+    <!-- Hero Section -->
+    <section class="relative pt-12 pb-20 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-emerald-50/30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+              <span data-i18n="hero_badge">100% Kundenzufriedenheit & Zertifizierte Qualität</span>
+            </div>
+            
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
+              <span data-i18n="hero_title_1">Makellose Sauberkeit für</span><br>
+              <span class="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent" data-i18n="hero_title_2">Ihr Zuhause & Büro</span>
+            </h1>
+            
+            <p class="text-lg text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed" data-i18n="hero_desc">
+              Professionelle Reinigungsdienste mit ökologischen Reinigungsmitteln, geschultem Personal und flexiblen Terminoptionen. Sofort online Preis berechnen und buchen!
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
+              <button onclick="scrollToBooking()" class="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5">
+                <i data-lucide="calculator" class="w-5 h-5"></i>
+                <span data-i18n="hero_cta_1">Preis Berechnen & Buchen</span>
+              </button>
+              <a href="#services" class="px-8 py-4 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-xl border border-slate-300 shadow-sm flex items-center justify-center gap-2 transition-all">
+                <span data-i18n="hero_cta_2">Unsere Leistungen</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+
+            <!-- Trust stats -->
+            <div class="grid grid-cols-3 gap-6 pt-6 border-t border-slate-200/80">
+              <div>
+                <p class="text-2xl sm:text-3xl font-extrabold text-slate-900">4.9 / 5</p>
+                <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-amber-400"></i> Google Bewertungen</p>
+              </div>
+              <div>
+                <p class="text-2xl sm:text-3xl font-extrabold text-slate-900">1.200+</p>
+                <p class="text-xs text-slate-500 mt-0.5" data-i18n="stat_cleans">Erfolgreiche Einsätze</p>
+              </div>
+              <div>
+                <p class="text-2xl sm:text-3xl font-extrabold text-emerald-600">100%</p>
+                <p class="text-xs text-slate-500 mt-0.5" data-i18n="stat_guarantee">Zufriedenheitsgarantie</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Floating Card Preview -->
+          <div class="lg:col-span-5 relative">
+            <div class="bg-white p-6 sm:p-8 rounded-3xl custom-shadow border border-slate-100 relative">
+              <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-slate-900" data-i18n="quick_calc_title">Express-Kalkulator</h3>
+                    <p class="text-xs text-slate-500" data-i18n="quick_calc_sub">In 30 Sekunden zum Festpreis</p>
+                  </div>
+                </div>
+                <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg">Live</span>
+              </div>
+
+              <!-- Mini Quick Form -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_service_type">Reinigungsart</label>
+                  <select id="quickService" onchange="calculatePrice()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500">
+                    <option value="wohnung">🏠 Wohnungsreinigung</option>
+                    <option value="buero">🏢 Büro- & Gewerbereinigung</option>
+                    <option value="bau">🔨 Bau- & Endreinigung</option>
+                    <option value="fenster">🪟 Fenster- & Glasreinigung</option>
+                    <option value="umzug">📦 Umzugsreinigung</option>
+                  </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_sqm">Fläche (m²)</label>
+                    <input type="number" id="quickSqm" value="80" min="20" max="1000" oninput="calculatePrice()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_frequency">Häufigkeit</label>
+                    <select id="quickFreq" onchange="calculatePrice()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500">
+                      <option value="einmalig">Einmalig (Standard)</option>
+                      <option value="woechentlich">Wöchentlich (-15% Rabatt)</option>
+                      <option value="zweiwoechentlich">Alle 2 Wochen (-10%)</option>
+                      <option value="monatlich">Monatlich (-5%)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Live Estimated Box -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-2xl border border-emerald-100 flex items-center justify-between mt-4">
+                  <div>
+                    <span class="text-xs text-emerald-800 font-semibold" data-i18n="lbl_estimated_price">Geschätzter Gesamtpreis</span>
+                    <p class="text-2xl font-extrabold text-emerald-700" id="quickPriceDisplay">€ 149,00</p>
+                  </div>
+                  <button onclick="scrollToBooking()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition-all">
+                    <span data-i18n="btn_select">Auswählen</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <h2 class="text-xs font-bold tracking-widest text-emerald-600 uppercase" data-i18n="services_sub">Unsere Dienstleistungen</h2>
+          <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2" data-i18n="services_title">Für jeden Bedarf die passende Reinigung</p>
+          <p class="text-slate-600 mt-4 text-base" data-i18n="services_desc">Von privaten Haushalten bis zu gewerblichen Großflächen bieten wir zertifizierte Sauberkeit mit Zufriedenheitsgarantie.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          <!-- Service 1 -->
+          <div class="p-8 rounded-3xl bg-slate-50 hover:bg-emerald-50/40 border border-slate-200/80 hover:border-emerald-200 transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="home" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3" data-i18n="srv_home_title">Wohnungsreinigung</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6" data-i18n="srv_home_desc">Regelmäßige oder einmalige Grundreinigung aller Zimmer, Küche, Bad, Böden und Oberflächen.</p>
+            <ul class="space-y-2 text-xs font-medium text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Staubwischen & Saugen</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Bad & WC Desinfektion</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Küchenoberflächen & Spüle</li>
+            </ul>
+            <button onclick="prefillService('wohnung')" class="w-full py-2.5 bg-white group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-bold rounded-xl border border-slate-300 group-hover:border-transparent transition-all">
+              Jetzt Buchen
+            </button>
+          </div>
+
+          <!-- Service 2 -->
+          <div class="p-8 rounded-3xl bg-slate-50 hover:bg-emerald-50/40 border border-slate-200/80 hover:border-emerald-200 transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="building-2" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3" data-i18n="srv_office_title">Büro- & Praxisreinigung</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6" data-i18n="srv_office_desc">Hygienische Arbeitsplatzreinigung, Konferenzräume, Küchen, Sanitäranlagen und Müllentsorgung.</p>
+            <ul class="space-y-2 text-xs font-medium text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Schreibtische & Bildschirme</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Flexible Arbeitszeiten (vor/nach Büro)</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Monatliche Rechnungsstellung</li>
+            </ul>
+            <button onclick="prefillService('buero')" class="w-full py-2.5 bg-white group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-bold rounded-xl border border-slate-300 group-hover:border-transparent transition-all">
+              Jetzt Buchen
+            </button>
+          </div>
+
+          <!-- Service 3 -->
+          <div class="p-8 rounded-3xl bg-slate-50 hover:bg-emerald-50/40 border border-slate-200/80 hover:border-emerald-200 transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="hammer" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3" data-i18n="srv_bau_title">Baureinigung</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6" data-i18n="srv_bau_desc">Baugrobreinigung und Baufeinreinigung nach Neubau oder Sanierung bezugsfertig vorbereitet.</p>
+            <ul class="space-y-2 text-xs font-medium text-slate-600 mb-6">
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Baustaub- & Mörtelentfernung</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Farb- & Zementschleierentfernung</li>
+              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Bezugsfertige Übergabe</li>
+            </ul>
+            <button onclick="prefillService('bau')" class="w-full py-2.5 bg-white group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-bold rounded-xl border border-slate-300 group-hover:border-transparent transition-all">
+              Jetzt Buchen
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking & Detail Calculator Section -->
+    <section id="calculator" class="py-20 bg-slate-100/70 border-t border-slate-200">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <h2 class="text-xs font-bold tracking-widest text-emerald-600 uppercase" data-i18n="calc_sub">Online Buchung</h2>
+          <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2" data-i18n="calc_title">Wunschtermin & Festpreis Buchen</p>
+          <p class="text-slate-600 mt-3 text-sm" data-i18n="calc_desc">Wählen Sie Ihre Details, berechnen Sie den Live-Preis und sichern Sie sich Ihren Reinigungstermin.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl custom-shadow border border-slate-200/80 p-6 sm:p-10">
+          <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-8">
+            
+            <!-- Step 1: Services Selection -->
+            <div>
+              <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">1</span>
+                <span data-i18n="step1_title">Reinigungsart & Umfang</span>
+              </h3>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <label class="cursor-pointer border-2 border-emerald-500 bg-emerald-50/50 p-4 rounded-2xl flex flex-col items-center text-center transition-all service-card" onclick="selectServiceCard('wohnung', this)">
+                  <input type="radio" name="mainService" value="wohnung" checked class="hidden">
+                  <i data-lucide="home" class="w-8 h-8 text-emerald-600 mb-2"></i>
+                  <span class="font-bold text-sm text-slate-900">Wohnung</span>
+                  <span class="text-xs text-slate-500 mt-1">Ab € 1.50 / m²</span>
+                </label>
+
+                <label class="cursor-pointer border-2 border-slate-200 hover:border-slate-300 p-4 rounded-2xl flex flex-col items-center text-center transition-all service-card" onclick="selectServiceCard('buero', this)">
+                  <input type="radio" name="mainService" value="buero" class="hidden">
+                  <i data-lucide="building" class="w-8 h-8 text-slate-600 mb-2"></i>
+                  <span class="font-bold text-sm text-slate-900">Büro / Gewerbe</span>
+                  <span class="text-xs text-slate-500 mt-1">Ab € 1.80 / m²</span>
+                </label>
+
+                <label class="cursor-pointer border-2 border-slate-200 hover:border-slate-300 p-4 rounded-2xl flex flex-col items-center text-center transition-all service-card" onclick="selectServiceCard('bau', this)">
+                  <input type="radio" name="mainService" value="bau" class="hidden">
+                  <i data-lucide="hammer" class="w-8 h-8 text-slate-600 mb-2"></i>
+                  <span class="font-bold text-sm text-slate-900">Bau / Umzug</span>
+                  <span class="text-xs text-slate-500 mt-1">Ab € 2.50 / m²</span>
+                </label>
+              </div>
+
+              <!-- Sliders and Inputs -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-200/60">
+                <div>
+                  <div class="flex justify-between text-sm font-semibold mb-2">
+                    <span data-i18n="lbl_area">Fläche in Quadratmeter:</span>
+                    <span class="text-emerald-700 font-bold" id="sqmValueText">80 m²</span>
+                  </div>
+                  <input type="range" id="calcSqm" min="20" max="400" value="80" step="5" oninput="updateFullPrice()" class="w-full accent-emerald-600 cursor-pointer">
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-sm font-semibold mb-2">
+                    <span data-i18n="lbl_rooms">Zimmeranzahl:</span>
+                    <span class="text-emerald-700 font-bold" id="roomsValueText">3 Zimmer</span>
+                  </div>
+                  <input type="range" id="calcRooms" min="1" max="10" value="3" oninput="updateFullPrice()" class="w-full accent-emerald-600 cursor-pointer">
+                </div>
+              </div>
+            </div>
+
+            <!-- Extras Selection -->
+            <div>
+              <h4 class="text-sm font-bold text-slate-900 mb-3" data-i18n="lbl_extras">Zusatzleistungen (Extras):</h4>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 text-xs font-semibold">
+                  <input type="checkbox" id="extraFenster" onchange="updateFullPrice()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
+                  <span>🪟 Fenster (+€45)</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 text-xs font-semibold">
+                  <input type="checkbox" id="extraOfen" onchange="updateFullPrice()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
+                  <span>🍳 Backofen (+€35)</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 text-xs font-semibold">
+                  <input type="checkbox" id="extraKuehlschrank" onchange="updateFullPrice()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
+                  <span>❄️ Kühlschrank (+€25)</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 text-xs font-semibold">
+                  <input type="checkbox" id="extraBalkon" onchange="updateFullPrice()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
+                  <span>🌿 Balkon (+€30)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 2: Date & Contact -->
+            <div class="pt-4 border-t border-slate-200">
+              <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">2</span>
+                <span data-i18n="step2_title">Termin & Kontaktdaten</span>
+              </h3>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_name">Vollständiger Name *</label>
+                  <input type="text" id="custName" required placeholder="Max Mustermann" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_email">E-Mail Adresse *</label>
+                  <input type="email" id="custEmail" required placeholder="max@example.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_phone">Telefonnummer *</label>
+                  <input type="tel" id="custPhone" required placeholder="+49 170 1234567" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_address">Adresse / Ort *</label>
+                  <input type="text" id="custAddress" required placeholder="Musterstr. 12, 80331 München" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_date">Wunschdatum *</label>
+                  <input type="date" id="custDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_time">Uhrzeit *</label>
+                  <select id="custTime" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
+                    <option value="08:00">08:00 Uhr</option>
+                    <option value="10:00" selected>10:00 Uhr</option>
+                    <option value="13:00">13:00 Uhr</option>
+                    <option value="15:00">15:00 Uhr</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Price Summary & Submit -->
+            <div class="bg-gradient-to-tr from-slate-900 to-slate-800 text-white p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div>
+                <span class="text-xs text-slate-400 font-medium tracking-wide uppercase" data-i18n="lbl_total_festpreis">Berechneter Festpreis (inkl. MwSt.)</span>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <span class="text-4xl font-extrabold text-emerald-400" id="finalTotalDisplay">€ 149,00</span>
+                  <span class="text-xs text-slate-400">/ Keine versteckten Kosten</span>
+                </div>
+              </div>
+
+              <button type="submit" class="w-full sm:w-auto px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5">
+                <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                <span data-i18n="btn_submit_booking">Jetzt Verbindlich Buchen</span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl max-w-md w-full p-8 text-center custom-shadow transform transition-all">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-slate-900 mb-2" data-i18n="modal_success_title">Buchung Erfolgreich!</h3>
+        <p class="text-sm text-slate-600 mb-6" data-i18n="modal_success_desc">Vielen Dank! Ihre Buchungsanfrage wurde erfolgreich gespeichert. Sie erhalten in Kürze eine Bestätigung.</p>
+        <div class="bg-slate-50 p-4 rounded-xl text-xs text-left font-mono text-slate-700 mb-6 space-y-1" id="modalSummaryContent">
+          <!-- Summary inserted by JS -->
+        </div>
+        <div class="flex gap-3">
+          <button onclick="closeSuccessModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm">Schließen</button>
+          <button onclick="switchView('admin'); closeSuccessModal();" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1.5">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Im Admin ansehen
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== VIEW 2: MITARBEITERVERWALTUNG (VOLLSTÄNDIGES PERSONALMODUL) ==================== -->
+  <main id="mitarbeiterView" class="hidden flex-grow bg-slate-100/90 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top Bar -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-2xl font-extrabold text-slate-900">Personal- & Mitarbeiterverwaltung</h1>
+            <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-md flex items-center gap-1">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Aktiv
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Vollständige Verwaltung von Reinigungskräften, Objektleitern, Arbeitsverträgen & Zeiterfassung</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="openEmployeeModal()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-emerald-600/20 transition-all">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Neuer Mitarbeiter
+          </button>
+          <button onclick="openTimeModal()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all">
+            <i data-lucide="clock" class="w-4 h-4 text-emerald-400"></i> Zeiterfassung
+          </button>
+          <button onclick="exportEmployeesCSV()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-2 border border-slate-300">
+            <i data-lucide="download" class="w-4 h-4"></i> CSV Export
+          </button>
+          <button onclick="switchView('landing')" class="px-3.5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 flex items-center gap-1.5">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Zurück
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Metrics -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between border-l-4 border-l-emerald-500">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase">Gesamtpersonal</span>
+            <p class="text-2xl font-extrabold text-slate-900 mt-1" id="empStatTotal">0</p>
+            <span class="text-[11px] text-slate-400">Fest & Minijob</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between border-l-4 border-l-blue-500">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase">Im Aktiven Dienst</span>
+            <p class="text-2xl font-extrabold text-blue-600 mt-1" id="empStatActive">0</p>
+            <span class="text-[11px] text-blue-600 font-medium">Einsatzbereit</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <i data-lucide="user-check" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between border-l-4 border-l-amber-500">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase">Urlaub / Krank</span>
+            <p class="text-2xl font-extrabold text-amber-600 mt-1" id="empStatAway">0</p>
+            <span class="text-[11px] text-amber-600 font-medium">Abwesend</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <i data-lucide="user-x" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between border-l-4 border-l-purple-500">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase">Monatliche Lohnsumme</span>
+            <p class="text-2xl font-extrabold text-purple-600 mt-1" id="empStatPayroll">€ 0,00</p>
+            <span class="text-[11px] text-slate-400">Brutto Basis</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <i data-lucide="wallet" class="w-6 h-6"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Switcher for Mitarbeiterbereich -->
+      <div class="flex items-center gap-2 mb-6">
+        <button onclick="switchEmpSubTab('list')" id="btn-emp-sub-list" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm flex items-center gap-2">
+          <i data-lucide="list" class="w-4 h-4"></i> Mitarbeiterliste & Stammdaten
+        </button>
+        <button onclick="switchEmpSubTab('timesheet')" id="btn-emp-sub-timesheet" class="px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-2">
+          <i data-lucide="clock" class="w-4 h-4"></i> Zeiterfassung & Einsätze
+        </button>
+      </div>
+
+      <!-- SUB-TAB 1: MITARBEITERLISTE -->
+      <div id="emp-subtab-list" class="space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          
+          <!-- Filter Header -->
+          <div class="p-6 border-b border-slate-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Mitarbeiterübersicht & Personalakten</h3>
+              <p class="text-xs text-slate-500">Alle registrierten Mitarbeiter, Qualifikationen und Einsatzorte im Überblick</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+              <input type="text" id="empSearchInput" oninput="renderEmployeesTable()" placeholder="Name, Personal-ID, Objekt suchen..." class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 w-full sm:w-60 focus:ring-2 focus:ring-emerald-500">
+              
+              <select id="empTypeFilter" onchange="renderEmployeesTable()" class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-semibold text-slate-700">
+                <option value="all">Alle Anstellungsarten</option>
+                <option value="Vollzeit">Vollzeit (40h)</option>
+                <option value="Teilzeit">Teilzeit</option>
+                <option value="Minijob">Minijob (538€)</option>
+                <option value="Subunternehmer">Subunternehmer</option>
+              </select>
+
+              <select id="empStatusFilter" onchange="renderEmployeesTable()" class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-semibold text-slate-700">
+                <option value="all">Alle Status</option>
+                <option value="Aktiv">Aktiv</option>
+                <option value="Urlaub">Im Urlaub</option>
+                <option value="Krank">Krankgemeldet</option>
+                <option value="Inaktiv">Inaktiv / Ausgeschieden</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Employees Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-4">Mitarbeiter / ID</th>
+                  <th class="p-4">Funktion / Rolle</th>
+                  <th class="p-4">Anstellung & Zeiten</th>
+                  <th class="p-4">Zugewiesenes Objekt</th>
+                  <th class="p-4">Stundenlohn / Gehalt</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 text-right">Aktionen</th>
+                </tr>
+              </thead>
+              <tbody id="employeesTableBody" class="divide-y divide-slate-100">
+                <!-- Dynamically populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="empEmptyState" class="p-12 text-center text-slate-400 hidden">
+            <i data-lucide="user-x" class="w-12 h-12 mx-auto mb-3 opacity-40"></i>
+            <p class="font-semibold text-slate-700">Keine Mitarbeiter gefunden.</p>
+            <p class="text-xs mt-1">Klicken Sie oben auf "+ Neuer Mitarbeiter", um Personal hinzuzufügen.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 2: ZEITERFASSUNG -->
+      <div id="emp-subtab-timesheet" class="hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 sm:p-8">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Einsatz- & Zeiterfassungsprotokoll</h3>
+              <p class="text-xs text-slate-500">Erfasste Arbeitszeiten, Sonderreinigungsstunden und Einsatzorte</p>
+            </div>
+            <button onclick="openTimeModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow">
+              <i data-lucide="plus" class="w-4 h-4"></i> Neue Stunden erfassen
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-3.5">Datum</th>
+                  <th class="p-3.5">Mitarbeiter</th>
+                  <th class="p-3.5">Objekt / Einsatzort</th>
+                  <th class="p-3.5">Reguläre Stunden</th>
+                  <th class="p-3.5">Überstunden</th>
+                  <th class="p-3.5">Tätigkeit / Notiz</th>
+                </tr>
+              </thead>
+              <tbody id="timesheetsTableBody" class="divide-y divide-slate-100">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL: MITARBEITER ANLEGEN / BEARBEITEN -->
+  <div id="employeeModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 custom-shadow my-8 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 mb-6 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+            <i data-lucide="user-cog" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-lg" id="empModalTitle">Neuen Mitarbeiter anlegen</h3>
+            <p class="text-xs text-slate-500">Persönliche Angaben, Vergütung und Objektzuweisung</p>
+          </div>
+        </div>
+        <button onclick="closeEmployeeModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="employeeForm" onsubmit="saveEmployee(event)" class="space-y-4">
+        <input type="hidden" id="empModalId">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Vorname *</label>
+            <input type="text" id="empFirstName" required placeholder="Max" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nachname *</label>
+            <input type="text" id="empLastName" required placeholder="Mustermann" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Personalnummer *</label>
+            <input type="text" id="empNumber" required placeholder="EMP-1050" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Position / Rolle *</label>
+            <select id="empRole" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+              <option value="Reinigungskraft">Reinigungskraft</option>
+              <option value="Zimmermädchen">Zimmermädchen / Roomboy</option>
+              <option value="Spezialreiniger">Spezial- & Glasreiniger</option>
+              <option value="Vorarbeiter">Vorarbeiter / Vorarbeiterin</option>
+              <option value="Objektleiter">Objektleiter / Objektleiterin</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Anstellungsart *</label>
+            <select id="empType" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+              <option value="Vollzeit">Vollzeit (40 Std.)</option>
+              <option value="Teilzeit">Teilzeit (20-30 Std.)</option>
+              <option value="Minijob">Minijob (538 €)</option>
+              <option value="Subunternehmer">Subunternehmer</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Zugewiesenes Objekt / Einsatzort *</label>
+            <select id="empLocation" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+              <option value="Grand Hotel Central Berlin">Grand Hotel Central Berlin</option>
+              <option value="Plaza Hotel Hamburg">Plaza Hotel Hamburg</option>
+              <option value="Maritim Resort München">Maritim Resort München</option>
+              <option value="Bürokomplex Süd">Bürokomplex Süd (Gewerbe)</option>
+              <option value="Mobile Touren">Mobile Reinigungstouren (Privat & Umzug)</option>
+              <option value="Zentrale">Zentrale & Verwaltung</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Status *</label>
+            <select id="empStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+              <option value="Aktiv">Aktiv im Dienst</option>
+              <option value="Urlaub">Im Urlaub</option>
+              <option value="Krank">Krankgemeldet</option>
+              <option value="Inaktiv">Inaktiv / Ausgeschieden</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Stundenlohn (€/h) oder Monatslohn (€)</label>
+            <input type="text" id="empWage" placeholder="15.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Eintrittsdatum</label>
+            <input type="date" id="empStartDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Telefonnummer</label>
+            <input type="tel" id="empPhone" placeholder="+49 170 1234567" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">E-Mail Adresse</label>
+            <input type="email" id="empEmail" placeholder="mitarbeiter@cleanpro.de" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Qualifikationen / Notizen</label>
+          <input type="text" id="empNotes" placeholder="z.B. Führerschein Klasse B, Desinfektionsschein, Ersthelfer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeEmployeeModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Abbrechen</button>
+          <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow">
+            <i data-lucide="save" class="w-4 h-4"></i> Mitarbeiter Speichern
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ZEITERFASSUNG -->
+  <div id="timeModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 custom-shadow">
+      <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-200">
+        <h3 class="font-bold text-slate-900 text-lg">Arbeitszeit & Stunden erfassen</h3>
+        <button onclick="closeTimeModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="timeForm" onsubmit="saveTimeEntry(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Mitarbeiter wählen *</label>
+          <select id="timeEmpSelect" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Datum *</label>
+            <input type="date" id="timeDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Objekt / Einsatzort</label>
+            <select id="timeLocation" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+              <option value="Grand Hotel Central Berlin">Grand Hotel Central Berlin</option>
+              <option value="Plaza Hotel Hamburg">Plaza Hotel Hamburg</option>
+              <option value="Maritim Resort München">Maritim Resort München</option>
+              <option value="Bürokomplex Süd">Bürokomplex Süd</option>
+              <option value="Mobile Tour">Mobile Tour</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Arbeitsstunden (Std.) *</label>
+            <input type="number" step="0.5" id="timeHours" value="8" required min="0.5" max="24" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Überstunden (Std.)</label>
+            <input type="number" step="0.5" id="timeOvertime" value="0" min="0" max="10" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Tätigkeitsbeschreibung / Notiz</label>
+          <input type="text" id="timeNote" placeholder="z.B. Etagenreinigung 3. OG, Fensterreinigung" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeTimeModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Abbrechen</button>
+          <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow">
+            <i data-lucide="check" class="w-4 h-4"></i> Eintrag Speichern
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 3: ADMIN MANAGEMENT DASHBOARD ==================== -->
+  <main id="adminView" class="hidden flex-grow bg-slate-100/90 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Admin Top Bar -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-2xl font-extrabold text-slate-900">CleanPro Verwaltungszentrale</h1>
+            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-md">Live DB</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Echtzeit Buchungen, Kundenverwaltung & Personaleinsatz</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="switchView('mitarbeiter')" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl flex items-center gap-2 border border-emerald-200">
+            <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i> Zur Mitarbeiterverwaltung
+          </button>
+          <button onclick="exportBookingsCSV()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-2 border border-slate-300">
+            <i data-lucide="download" class="w-4 h-4"></i> CSV Export
+          </button>
+          <button onclick="switchView('landing')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Zurück zur Website
+          </button>
+        </div>
+      </div>
+
+      <!-- Key Metrics Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase">Gesamtbuchungen</span>
+            <p class="text-2xl font-extrabold text-slate-900 mt-1" id="statTotalBookings">0</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i data-lucide="calendar" class="w-6 h-6"></i></div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase">Offene Aufträge</span>
+            <p class="text-2xl font-extrabold text-amber-600 mt-1" id="statPendingBookings">0</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="clock" class="w-6 h-6"></i></div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase">Gesamtumsatz</span>
+            <p class="text-2xl font-extrabold text-emerald-600 mt-1" id="statRevenue">€ 0,00</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="euro" class="w-6 h-6"></i></div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:bg-purple-50/50 transition-all" onclick="switchView('mitarbeiter')">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase">Personalstamm</span>
+            <p class="text-2xl font-extrabold text-purple-600 mt-1" id="adminActiveEmpStat">8 Mitarbeiter</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"><i data-lucide="users" class="w-6 h-6"></i></div>
+        </div>
+      </div>
+
+      <!-- Bookings Table Section -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+        <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div class="flex items-center gap-3">
+            <h3 class="font-bold text-slate-900 text-lg">Auftragsliste & Buchungen</h3>
+            <span class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 rounded-full" id="bookingsCountBadge">0 Einträge</span>
+          </div>
+
+          <!-- Filters -->
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <input type="text" id="tableSearch" oninput="renderAdminTable()" placeholder="Kunde, Ort oder Tel suchen..." class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-full sm:w-64 focus:ring-2 focus:ring-emerald-500">
+            <select id="statusFilter" onchange="renderAdminTable()" class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-semibold text-slate-700">
+              <option value="all">Alle Status</option>
+              <option value="pending">Ausstehend</option>
+              <option value="confirmed">Bestätigt</option>
+              <option value="completed">Abgeschlossen</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Responsive Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="p-4">Kunde / Kontakt</th>
+                <th class="p-4">Service & Details</th>
+                <th class="p-4">Termin</th>
+                <th class="p-4">Betrag</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-right">Aktionen</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody" class="divide-y divide-slate-100">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="emptyTableState" class="p-12 text-center text-slate-400 hidden">
+          <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-40"></i>
+          <p class="font-semibold">Noch keine Buchungen vorhanden.</p>
+          <p class="text-xs mt-1">Über das Buchungsformular auf der Startseite können neue Termine gebucht werden.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================== VIEW 4: HOTELREINIGUNG & NUXT ENTERPRISE DASHBOARD ==================== -->
+  <main id="hotelView" class="hidden flex-grow bg-slate-100/90 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl mb-8 border border-slate-800">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-full flex items-center gap-1.5">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i> Nuxt/Tailwind Enterprise Architecture
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-xs border border-slate-700" id="currentRoleDisplay">Rolle: Super-Admin</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold flex items-center gap-3">
+              <i data-lucide="building-2" class="w-8 h-8 text-emerald-400"></i>
+              Hotelreinigung & Digitales Dashboard
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-300 mt-2 max-w-3xl">
+              Vollständige Stammdaten, Dienstplaner, Lohnabrechnungen mit Sonn-/Feiertagszuschlägen, digitale Leistungsbestätigung mit Unterschrift, Urlaubsfreigaben und Audit-Log.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button onclick="openRoleModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all">
+              <i data-lucide="user-check" class="w-4 h-4"></i> Rolle wechseln
+            </button>
+            <button onclick="switchView('mitarbeiter')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Personal
+            </button>
+            <button onclick="switchView('admin')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-2">
+              <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i> Admin
+            </button>
+            <button onclick="switchView('landing')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl flex items-center gap-2">
+              <i data-lucide="external-link" class="w-4 h-4"></i> Zurück
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Nav Buttons (10 Spezial-Module) -->
+        <div class="flex items-center gap-2 overflow-x-auto mt-6 pt-6 border-t border-slate-800/90 no-scrollbar">
+          <button onclick="switchHotelTab('overview')" id="btn-hotel-tab-overview" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-500 text-white flex items-center gap-1.5 transition-all whitespace-nowrap">
+            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> Übersicht & KPI-Diagramm
+          </button>
+          <button onclick="switchHotelTab('daily')" id="btn-hotel-tab-daily" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap">
+            <i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i> Tägliche Erfassung
+          </button>
+          <button onclick="switchHotelTab('roster')" id="btn-hotel-tab-roster" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap">
+            <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-emerald-400"></i> Dienstplan & Schichten
+          </button>
+          <button onclick="switchHotelTab('payroll')" id="btn-hotel-tab-payroll" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap role-admin-only">
+            <i data-lucide="calculator" class="w-3.5 h-3.5 text-amber-400"></i> Lohn & Abrechnung
+          </button>
+          <button onclick="switchHotelTab('master')" id="btn-hotel-tab-master" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap role-admin-only">
+            <i data-lucide="database" class="w-3.5 h-3.5"></i> Hotels & Preise
+          </button>
+          <button onclick="switchHotelTab('subcontractor')" id="btn-hotel-tab-subcontractor" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap role-admin-only">
+            <i data-lucide="truck" class="w-3.5 h-3.5"></i> Subunternehmer
+          </button>
+          <button onclick="switchHotelTab('leave')" id="btn-hotel-tab-leave" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap">
+            <i data-lucide="plane" class="w-3.5 h-3.5 text-blue-400"></i> Urlaubsanträge
+          </button>
+          <button onclick="switchHotelTab('service_confirm')" id="btn-hotel-tab-service_confirm" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap">
+            <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-purple-400"></i> Digitale Abnahme
+          </button>
+          <button onclick="switchHotelTab('hr')" id="btn-hotel-tab-hr" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i> HR-Verträge (PDF)
+          </button>
+          <button onclick="switchHotelTab('tickets')" id="btn-hotel-tab-tickets" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap">
+            <i data-lucide="ticket" class="w-3.5 h-3.5"></i> Ticket-System
+          </button>
+          <button onclick="switchHotelTab('audit')" id="btn-hotel-tab-audit" class="hotel-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all whitespace-nowrap role-admin-only">
+            <i data-lucide="history" class="w-3.5 h-3.5 text-slate-400"></i> Audit-Log
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: ÜBERSICHT & BALKENDIAGRAMM DER LETZTEN MONATE -->
+      <div id="hotel-tab-overview" class="hotel-tab-content space-y-6">
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+            <span class="text-xs font-bold text-slate-500 uppercase">Aktive Hotel-Objekte</span>
+            <p class="text-2xl font-extrabold text-slate-900 mt-1" id="kpiHotelCount">3 Hotels</p>
+            <span class="text-xs font-medium text-emerald-600">✓ 100% operative Abdeckung</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
+            <span class="text-xs font-bold text-slate-500 uppercase">Gereinigte Zimmer heute</span>
+            <p class="text-2xl font-extrabold text-slate-900 mt-1">142 Zimmer</p>
+            <span class="text-xs font-medium text-blue-600">EZ: 45 | DZ: 82 | Suite: 15</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+            <span class="text-xs font-bold text-slate-500 uppercase">Offene HR/Material Tickets</span>
+            <p class="text-2xl font-extrabold text-slate-900 mt-1" id="kpiTicketCount">2 Anträge</p>
+            <span class="text-xs font-medium text-amber-600">1 Neueinstellung, 1 Material</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
+            <span class="text-xs font-bold text-slate-500 uppercase">Monatsumsatz Gesamt</span>
+            <p class="text-2xl font-extrabold text-purple-600 mt-1 price-sensitive" id="kpiRevenueTotal">€ 37.670,90</p>
+            <span class="text-xs font-medium text-purple-600">Inkl. Feiertagszuschläge</span>
+          </div>
+        </div>
+
+        <!-- Balkendiagramm der letzten Monate -->
+        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Balkendiagramm: Umsatz- & Zimmerentwicklung der letzten 6 Monate</h3>
+              <p class="text-xs text-slate-500">Vergleich der Reinigungsleistung und Abrechnungssummen (April - September 2026)</p>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-semibold">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Zimmeranzahl</span>
+              <span class="flex items-center gap-1.5" id="chartRevenueLegend"><span class="w-3 h-3 rounded bg-blue-600 inline-block"></span> <span class="price-sensitive">Umsatz (€)</span></span>
+            </div>
+          </div>
+
+          <!-- CSS Bar Chart Component with Rich Interactive Tooltips -->
+          <div class="grid grid-cols-6 gap-3 sm:gap-6 pt-12 pb-4 border-b border-slate-200 items-end h-64">
+            <!-- Apr -->
+            <div class="flex flex-col items-center gap-2 h-full justify-end group relative cursor-pointer">
+              <!-- Tooltip Popup -->
+              <div class="absolute -top-14 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-20 bg-slate-900 text-white text-[11px] px-3 py-2 rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap flex flex-col items-center gap-0.5">
+                <span class="font-bold text-slate-300">April 2026</span>
+                <div class="flex items-center gap-2 font-semibold">
+                  <span class="text-emerald-400">890 Zimmer</span>
+                  <span class="text-slate-500">|</span>
+                  <span class="text-blue-400 chart-tooltip-rev" data-amount="€ 24.500">€ 24.500</span>
+                </div>
+                <div class="w-2 h-2 bg-slate-900 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-slate-700"></div>
+              </div>
+
+              <div class="w-full flex items-end justify-center gap-1.5 h-44">
+                <div class="w-1/2 bg-emerald-400 rounded-t-lg transition-all group-hover:bg-emerald-500 transform group-hover:scale-y-105 origin-bottom shadow-sm" style="height: 65%;"></div>
+                <div class="w-1/2 bg-blue-500 rounded-t-lg transition-all group-hover:bg-blue-600 transform group-hover:scale-y-105 origin-bottom chart-bar-revenue shadow-sm" style="height: 60%;"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Apr 26</span>
+            </div>
+
+            <!-- Mai -->
+            <div class="flex flex-col items-center gap-2 h-full justify-end group relative cursor-pointer">
+              <!-- Tooltip Popup -->
+              <div class="absolute -top-14 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-20 bg-slate-900 text-white text-[11px] px-3 py-2 rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap flex flex-col items-center gap-0.5">
+                <span class="font-bold text-slate-300">Mai 2026</span>
+                <div class="flex items-center gap-2 font-semibold">
+                  <span class="text-emerald-400">1.020 Zimmer</span>
+                  <span class="text-slate-500">|</span>
+                  <span class="text-blue-400 chart-tooltip-rev" data-amount="€ 28.100">€ 28.100</span>
+                </div>
+                <div class="w-2 h-2 bg-slate-900 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-slate-700"></div>
+              </div>
+
+              <div class="w-full flex items-end justify-center gap-1.5 h-44">
+                <div class="w-1/2 bg-emerald-400 rounded-t-lg transition-all group-hover:bg-emerald-500 transform group-hover:scale-y-105 origin-bottom shadow-sm" style="height: 72%;"></div>
+                <div class="w-1/2 bg-blue-500 rounded-t-lg transition-all group-hover:bg-blue-600 transform group-hover:scale-y-105 origin-bottom chart-bar-revenue shadow-sm" style="height: 70%;"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Mai 26</span>
+            </div>
+
+            <!-- Jun -->
+            <div class="flex flex-col items-center gap-2 h-full justify-end group relative cursor-pointer">
+              <!-- Tooltip Popup -->
+              <div class="absolute -top-14 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-20 bg-slate-900 text-white text-[11px] px-3 py-2 rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap flex flex-col items-center gap-0.5">
+                <span class="font-bold text-slate-300">Juni 2026</span>
+                <div class="flex items-center gap-2 font-semibold">
+                  <span class="text-emerald-400">1.150 Zimmer</span>
+                  <span class="text-slate-500">|</span>
+                  <span class="text-blue-400 chart-tooltip-rev" data-amount="€ 31.400">€ 31.400</span>
+                </div>
+                <div class="w-2 h-2 bg-slate-900 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-slate-700"></div>
+              </div>
+
+              <div class="w-full flex items-end justify-center gap-1.5 h-44">
+                <div class="w-1/2 bg-emerald-400 rounded-t-lg transition-all group-hover:bg-emerald-500 transform group-hover:scale-y-105 origin-bottom shadow-sm" style="height: 80%;"></div>
+                <div class="w-1/2 bg-blue-500 rounded-t-lg transition-all group-hover:bg-blue-600 transform group-hover:scale-y-105 origin-bottom chart-bar-revenue shadow-sm" style="height: 78%;"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Jun 26</span>
+            </div>
+
+            <!-- Jul -->
+            <div class="flex flex-col items-center gap-2 h-full justify-end group relative cursor-pointer">
+              <!-- Tooltip Popup -->
+              <div class="absolute -top-14 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-20 bg-slate-900 text-white text-[11px] px-3 py-2 rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap flex flex-col items-center gap-0.5">
+                <span class="font-bold text-slate-300">Juli 2026</span>
+                <div class="flex items-center gap-2 font-semibold">
+                  <span class="text-emerald-400">1.280 Zimmer</span>
+                  <span class="text-slate-500">|</span>
+                  <span class="text-blue-400 chart-tooltip-rev" data-amount="€ 35.200">€ 35.200</span>
+                </div>
+                <div class="w-2 h-2 bg-slate-900 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-slate-700"></div>
+              </div>
+
+              <div class="w-full flex items-end justify-center gap-1.5 h-44">
+                <div class="w-1/2 bg-emerald-400 rounded-t-lg transition-all group-hover:bg-emerald-500 transform group-hover:scale-y-105 origin-bottom shadow-sm" style="height: 90%;"></div>
+                <div class="w-1/2 bg-blue-500 rounded-t-lg transition-all group-hover:bg-blue-600 transform group-hover:scale-y-105 origin-bottom chart-bar-revenue shadow-sm" style="height: 88%;"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Jul 26</span>
+            </div>
+
+            <!-- Aug -->
+            <div class="flex flex-col items-center gap-2 h-full justify-end group relative cursor-pointer">
+              <!-- Tooltip Popup -->
+              <div class="absolute -top-14 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-20 bg-slate-900 text-white text-[11px] px-3 py-2 rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap flex flex-col items-center gap-0.5">
+                <span class="font-bold text-slate-300">August 2026</span>
+                <div class="flex items-center gap-2 font-semibold">
+                  <span class="text-emerald-400">1.340 Zimmer</span>
+                  <span class="text-slate-500">|</span>
+                  <span class="text-blue-400 chart-tooltip-rev" data-amount="€ 36.900">€ 36.900</span>
+                </div>
+                <div class="w-2 h-2 bg-slate-900 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-slate-700"></div>
+              </div>
+
+              <div class="w-full flex items-end justify-center gap-1.5 h-44">
+                <div class="w-1/2 bg-emerald-400 rounded-t-lg transition-all group-hover:bg-emerald-500 transform group-hover:scale-y-105 origin-bottom shadow-sm" style="height: 95%;"></div>
+                <div class="w-1/2 bg-blue-500 rounded-t-lg transition-all group-hover:bg-blue-600 transform group-hover:scale-y-105 origin-bottom chart-bar-revenue shadow-sm" style="height: 92%;"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Aug 26</span>
+            </div>
+
+            <!-- Sep (Current) -->
+            <div class="flex flex-col items-center gap-2 h-full justify-end group relative cursor-pointer">
+              <!-- Tooltip Popup -->
+              <div class="absolute -top-14 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-20 bg-slate-900 text-white text-[11px] px-3 py-2 rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap flex flex-col items-center gap-0.5">
+                <span class="font-bold text-emerald-400">September 2026 (Aktuell)</span>
+                <div class="flex items-center gap-2 font-semibold">
+                  <span class="text-emerald-400">1.350 Zimmer</span>
+                  <span class="text-slate-500">|</span>
+                  <span class="text-blue-400 chart-tooltip-rev" data-amount="€ 37.670">€ 37.670</span>
+                </div>
+                <div class="w-2 h-2 bg-slate-900 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2 border-r border-b border-slate-700"></div>
+              </div>
+
+              <div class="w-full flex items-end justify-center gap-1.5 h-44">
+                <div class="w-1/2 bg-emerald-600 rounded-t-lg transition-all group-hover:bg-emerald-700 transform group-hover:scale-y-105 origin-bottom shadow-md" style="height: 100%;"></div>
+                <div class="w-1/2 bg-blue-700 rounded-t-lg transition-all group-hover:bg-blue-800 transform group-hover:scale-y-105 origin-bottom chart-bar-revenue shadow-md" style="height: 96%;"></div>
+              </div>
+              <span class="text-xs font-bold text-emerald-700 group-hover:text-emerald-800 transition-colors">Sep 26 (Aktuell)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hotel Objects & Billing Summary Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Hotel-Objekte & Leistungsabrechnung (Aktueller Monat)</h3>
+              <p class="text-xs text-slate-500">Inklusive Feiertags- & Sonntagszuschläge sowie PDF-Vorschau</p>
+            </div>
+            <button onclick="openHotelModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-2 role-admin-only">
+              <i data-lucide="plus" class="w-4 h-4 text-emerald-400"></i> Neues Hotel anlegen
+            </button>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-4">Objekt (Hotel)</th>
+                  <th class="p-4">Objektleiter</th>
+                  <th class="p-4">Gereinigte Zimmer</th>
+                  <th class="p-4">Extrastunden</th>
+                  <th class="p-4">Zuschläge (Sonn/Feiertag)</th>
+                  <th class="p-4">Monatsumsatz</th>
+                  <th class="p-4 text-right">Aktionen</th>
+                </tr>
+              </thead>
+              <tbody id="hotelsTableBody" class="divide-y divide-slate-100">
+                <!-- Populated dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: TÄGLICHE ERFASSUNG (OBJEKTLEITER & VORARBEITER) -->
+      <div id="hotel-tab-daily" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-900 text-lg">Tägliche Zimmererfassung (Für Objektleiter & Vorarbeiter)</h3>
+            <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full" id="dailyModeBadge">Objektleiter-Modus</span>
+          </div>
+          <p class="text-xs text-slate-500 mb-6 bg-slate-50 p-3 rounded-xl border border-slate-200">
+            *Hinweis: Preise sind für Objektleiter maskiert. Sie erfassen exakt die Stückzahlen der gereinigten Zimmerkategorien pro Mitarbeiter.*
+          </p>
+
+          <form id="dailyLogForm" onsubmit="saveHotelDailyEntry(event)">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Datum *</label>
+                <input type="date" id="hotel-daily-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Objekt (Hotel) *</label>
+                <select id="hotel-daily-object" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+                  <!-- Populated from Hotels DB -->
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Mitarbeiter / Reinigungskraft *</label>
+                <select id="hotel-daily-employee" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+                  <!-- Populated from Employee Database -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Room Categories Count Inputs -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200 mb-6">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Einzelzimmer (EZ)</label>
+                <input type="number" id="hotel-daily-ez" value="12" min="0" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                <span class="text-[10px] text-emerald-600 font-semibold mt-1 block hotel-price-tag price-sensitive">€ 12,50 / Zimmer</span>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Doppelzimmer (DZ)</label>
+                <input type="number" id="hotel-daily-dz" value="8" min="0" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                <span class="text-[10px] text-emerald-600 font-semibold mt-1 block hotel-price-tag price-sensitive">€ 18,00 / Zimmer</span>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Suiten</label>
+                <input type="number" id="hotel-daily-suite" value="2" min="0" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                <span class="text-[10px] text-emerald-600 font-semibold mt-1 block hotel-price-tag price-sensitive">€ 35,00 / Zimmer</span>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Extrastunden (Std)</label>
+                <input type="number" step="0.5" id="hotel-daily-extra" value="1.5" min="0" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                <span class="text-[10px] text-emerald-600 font-semibold mt-1 block hotel-price-tag price-sensitive">€ 25,00 / Stundensatz</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Abwesenheitsgrund (falls zutreffend)</label>
+                <select id="hotel-daily-absence" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+                  <option value="Keine">Keine Abwesenheit (Regulär anwesend)</option>
+                  <option value="Krankmeldung">Krankmeldung (AU)</option>
+                  <option value="Erholungsurlaub">Erholungsurlaub</option>
+                  <option value="Unentschuldigt">Unentschuldigtes Fehlen</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Tätigkeit / Grund für Sonderreinigung</label>
+                <input type="text" id="hotel-daily-note" placeholder="z.B. Sonderreinigung Lobbymöbel, Grundreinigung Wellness" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+              </div>
+            </div>
+
+            <button type="submit" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow">
+              <i data-lucide="check-circle" class="w-4 h-4"></i> Tageserfassung Speichern
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 3: DIENSTPLAN & SCHICHTPLANER (NEU) -->
+      <div id="hotel-tab-roster" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Dienstplan- & Schichtplaner pro Hotel-Objekt</h3>
+              <p class="text-xs text-slate-500">Wochenplanung für Reinigungskräfte mit automatischer Speicherung und PDF-Export für den Aushang</p>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <button onclick="exportRosterPDF()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow">
+                <i data-lucide="file-down" class="w-4 h-4"></i> Dienstplan PDF Export
+              </button>
+              <button onclick="saveRosterPlan()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-2">
+                <i data-lucide="save" class="w-4 h-4 text-emerald-400"></i> Plan Speichern
+              </button>
+            </div>
+          </div>
+
+          <!-- Roster Controls -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Hotel-Objekt wählen</label>
+              <select id="rosterHotelSelect" onchange="renderRosterGrid()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                <option value="Grand Hotel Central Berlin">Grand Hotel Central Berlin</option>
+                <option value="Plaza Hotel Hamburg">Plaza Hotel Hamburg</option>
+                <option value="Maritim Resort München">Maritim Resort München</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Kalenderwoche / Zeitraum</label>
+              <input type="text" id="rosterWeek" value="KW 37 (07.09.2026 - 13.09.2026)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Zuständiger Objektleiter</label>
+              <input type="text" id="rosterLeader" value="Thomas Schneider" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold">
+            </div>
+          </div>
+
+          <!-- Weekly Schedule Grid -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border border-slate-200 rounded-xl overflow-hidden">
+              <thead class="bg-slate-900 text-white font-bold uppercase text-[11px]">
+                <tr>
+                  <th class="p-3">Mitarbeiter / Station</th>
+                  <th class="p-3 text-center">Mo (07.09)</th>
+                  <th class="p-3 text-center">Di (08.09)</th>
+                  <th class="p-3 text-center">Mi (09.09)</th>
+                  <th class="p-3 text-center">Do (10.09)</th>
+                  <th class="p-3 text-center">Fr (11.09)</th>
+                  <th class="p-3 text-center text-emerald-400">Sa (12.09)</th>
+                  <th class="p-3 text-center text-amber-400">So (13.09)</th>
+                </tr>
+              </thead>
+              <tbody id="rosterTableBody" class="divide-y divide-slate-200 bg-white">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: LOHNBUREAU & MITARBEITER-LOHNABRECHNUNG (NEU) -->
+      <div id="hotel-tab-payroll" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Lohnabrechnung & Lohnbuchhaltung (Admin)</h3>
+              <p class="text-xs text-slate-500">Bruttolohn-Berechnung, automatische Abzüge, Sonn- & Feiertagszuschläge und PDF-Auszahlungsbeleg</p>
+            </div>
+            <button onclick="calculateAndGeneratePayrollPDF()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow">
+              <i data-lucide="file-text" class="w-4 h-4"></i> Lohnabrechnung PDF Erstellen
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Payroll Input Form -->
+            <div class="lg:col-span-7 space-y-4 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+              <h4 class="font-bold text-xs uppercase text-slate-700 mb-3">Lohndaten des Mitarbeiters</h4>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Mitarbeiter wählen</label>
+                  <select id="payrollEmployeeSelect" onchange="updatePayrollInputs()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                    <!-- Populated by JS -->
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Abrechnungsmonat</label>
+                  <input type="text" id="payrollMonth" value="September 2026" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Reguläre Stunden</label>
+                  <input type="number" id="payrollRegHours" value="160" oninput="calculatePayroll()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Sonntagsstunden (+50%)</label>
+                  <input type="number" id="payrollSundayHours" value="12" oninput="calculatePayroll()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Feiertagsstunden (+100%)</label>
+                  <input type="number" id="payrollHolidayHours" value="8" oninput="calculatePayroll()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Grundstundenlohn (€)</label>
+                  <input type="text" id="payrollBaseWage" value="15.00" oninput="calculatePayroll()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Steuerklasse / Abzugskategorie</label>
+                  <select id="payrollTaxClass" onchange="calculatePayroll()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+                    <option value="minijob">Minijob (Pauschal 538€ / Steuerfrei)</option>
+                    <option value="klasse1" selected>Steuerklasse I (Standard SV-Pflichtig)</option>
+                    <option value="klasse3">Steuerklasse III (Verheiratet)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Calculation Summary Card -->
+            <div class="lg:col-span-5 bg-gradient-to-tr from-slate-900 to-slate-800 text-white p-6 rounded-2xl flex flex-col justify-between">
+              <div>
+                <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Abrechnungsübersicht (Live)</span>
+                <h4 class="text-lg font-bold mt-1" id="payrollEmpNameDisplay">Thomas Schneider (EMP-1001)</h4>
+                
+                <div class="space-y-2 mt-4 text-xs">
+                  <div class="flex justify-between text-slate-300">
+                    <span>Grundvergütung:</span>
+                    <span id="payrollDisplayBase" class="font-bold text-white">€ 2.400,00</span>
+                  </div>
+                  <div class="flex justify-between text-slate-300">
+                    <span>Sonntagszuschlag (+50%):</span>
+                    <span id="payrollDisplaySunday" class="font-bold text-emerald-400">€ 90,00</span>
+                  </div>
+                  <div class="flex justify-between text-slate-300">
+                    <span>Feiertagszuschlag (+100%):</span>
+                    <span id="payrollDisplayHoliday" class="font-bold text-emerald-400">€ 120,00</span>
+                  </div>
+                  <div class="flex justify-between text-slate-300 border-t border-slate-700 pt-2">
+                    <span class="font-bold">Gesamt-Brutto:</span>
+                    <span id="payrollDisplayGross" class="font-bold text-white">€ 2.610,00</span>
+                  </div>
+                  <div class="flex justify-between text-slate-400">
+                    <span>Geschätzte Abzüge (Steuern & SV):</span>
+                    <span id="payrollDisplayDeductions" class="text-rose-400">- € 548,10</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-t border-slate-700 pt-4 mt-6">
+                <span class="text-[11px] text-slate-400 uppercase font-semibold">Netto Auszahlungsbetrag</span>
+                <p class="text-3xl font-extrabold text-emerald-400 mt-0.5" id="payrollDisplayNet">€ 2.061,90</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: STAMMDATEN: HOTELS & ZIMMERPREISE -->
+      <div id="hotel-tab-master" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Stammdaten: Hotel-Objekte & Zimmerpreise (Admin)</h3>
+              <p class="text-xs text-slate-500">Verwaltung der Kategoriepreise pro Zimmer und Stundensätze pro Hotel</p>
+            </div>
+            <button onclick="openHotelModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i> Hotel hinzufügen
+            </button>
+          </div>
+
+          <div id="hotelsMasterList" class="space-y-4">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: SUBUNTERNEHMER & EXTERNE FIRMEN -->
+      <div id="hotel-tab-subcontractor" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Subunternehmer & Externe Firmenverwaltung</h3>
+              <p class="text-xs text-slate-500">Fremdfirmen mit eigener Personalzuordnung, individuellen Zimmerkonditionen & PDF-Gutschriften</p>
+            </div>
+            <button onclick="openSubcontractorModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i> Subunternehmer anlegen
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-4">Firma / Subunternehmer</th>
+                  <th class="p-4">Ansprechpartner</th>
+                  <th class="p-4">Zugewiesene Objekte</th>
+                  <th class="p-4">Mitarbeiteranzahl</th>
+                  <th class="p-4">Vereinbarte Konditionen</th>
+                  <th class="p-4 text-right">Aktionen</th>
+                </tr>
+              </thead>
+              <tbody id="subcontractorsTableBody" class="divide-y divide-slate-100">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 7: URLAUBSVERWALTUNG & FREIGABEN (NEU) -->
+      <div id="hotel-tab-leave" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Urlaubsverwaltung & Genehmigungs-Workflow</h3>
+              <p class="text-xs text-slate-500">Urlaubsanträge von Mitarbeitern mit Statusprüfung und Admin-Freigabe</p>
+            </div>
+            <button onclick="openLeaveModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i> Urlaubsantrag stellen
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-4">Mitarbeiter</th>
+                  <th class="p-4">Art des Urlaubs</th>
+                  <th class="p-4">Zeitraum (Von - Bis)</th>
+                  <th class="p-4">Tage</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 text-right">Admin-Entscheidung</th>
+                </tr>
+              </thead>
+              <tbody id="leaveTableBody" class="divide-y divide-slate-100">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 8: DIGITALE LEISTUNGSBESTÄTIGUNG MIT UNTERSCHRIFT (NEU) -->
+      <div id="hotel-tab-service_confirm" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Digitale Leistungsbestätigung & Kundenabnahme</h3>
+              <p class="text-xs text-slate-500">Protokollierung von Reinigungsleistungen mit digitaler Kundenunterschrift (Touch / Maus) und PDF-Beleg</p>
+            </div>
+          </div>
+
+          <form id="serviceConfirmForm" onsubmit="generateServiceConfirmationPDF(event)" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Hotel-Kunde / Objekt *</label>
+                <select id="signHotelSelect" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+                  <option value="Grand Hotel Central Berlin">Grand Hotel Central Berlin</option>
+                  <option value="Plaza Hotel Hamburg">Plaza Hotel Hamburg</option>
+                  <option value="Maritim Resort München">Maritim Resort München</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Verantwortlicher Objektleiter *</label>
+                <input type="text" id="signLeader" required value="Thomas Schneider" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Name des Hotel-Ansprechpartners *</label>
+                <input type="text" id="signClientName" required placeholder="Herr Direktor Dr. Meyer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Erbrachte Reinigungsleistung</label>
+                <textarea id="signDescription" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium" placeholder="Tägliche Zimmerreinigung: 45 EZ, 82 DZ, 15 Suiten ordnungsgemäß und mangelfrei übergeben."></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Kunden-Unterschrift (Hier zeichnen / unterschreiben)</label>
+                <div class="border-2 border-dashed border-emerald-300 rounded-2xl p-2 bg-slate-50 relative">
+                  <canvas id="signatureCanvas" width="400" height="120" class="w-full bg-white rounded-xl cursor-crosshair border border-slate-200"></canvas>
+                  <button type="button" onclick="clearSignatureCanvas()" class="absolute bottom-4 right-4 px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 text-[10px] font-bold rounded">
+                    Löschen
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+              <i data-lucide="file-check" class="w-4 h-4"></i> Leistungsbestätigung PDF mit Unterschrift Generieren
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 9: HR & VERTRÄGE (PDF-GENERATOR) -->
+      <div id="hotel-tab-hr" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Automatischer HR-Dokumenten- & Vertrag-Generator</h3>
+              <p class="text-xs text-slate-500">Rechtssichere Arbeitsverträge, Kündigungen, Behördenbescheinigungen und Sicherheitsunterweisungen</p>
+            </div>
+            <button onclick="openPayrollRegistrationModal()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs flex items-center gap-2">
+              <i data-lucide="mail" class="w-4 h-4 text-emerald-400"></i> Personalanmeldung ans Lohnbüro
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Mitarbeiter wählen</label>
+              <select id="hr-doc-employee" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+                <!-- Dynamically populated from Employee Database -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Dokumententyp wählen</label>
+              <select id="hr-doc-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+                <option value="arbeitsvertrag">📄 Arbeitsvertrag (Geringfügig / Minijob / Vollzeit)</option>
+                <option value="kuendigung">📄 Kündigungsbestätigung</option>
+                <option value="beschaeftigung">📄 Beschäftigungsbestätigung (für Behörden)</option>
+                <option value="unterweisung">📄 Sicherheitsunterweisung & Arbeitsschutz</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Gültig ab / Ausstellungsdatum</label>
+              <input type="date" id="hr-doc-date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Monatslohn / Stundensatz (€)</label>
+              <input type="text" id="hr-doc-salary" value="538.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+            </div>
+          </div>
+
+          <button onclick="generateHRDocumentPDF()" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20">
+            <i data-lucide="file-text" class="w-4 h-4"></i> PDF Dokument Generieren & Herunterladen
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 10: TICKET-SYSTEM -->
+      <div id="hotel-tab-tickets" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Interne Anfragen & Ticketsystem</h3>
+              <p class="text-xs text-slate-500">Anfragen von Objektleitern an die Admin-Ebene (Mitarbeiteranmeldungen, Material, Kündigungen).</p>
+            </div>
+            <button onclick="openCreateTicketModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow">
+              <i data-lucide="plus" class="w-4 h-4"></i> Neues Ticket erstellen
+            </button>
+          </div>
+
+          <div id="tickets-list-container" class="space-y-3">
+            <!-- Dynamically rendered -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 11: AUDIT-LOG / ÄNDERUNGSPROTOKOLL (NEU) -->
+      <div id="hotel-tab-audit" class="hotel-tab-content hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">Audit-Log & System-Änderungsprotokoll</h3>
+              <p class="text-xs text-slate-500">Protokolliert manipulationssicher: Wer hat wann was in welchem Objekt geändert</p>
+            </div>
+            <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">DSGVO-konform</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-3">Zeitstempel</th>
+                  <th class="p-3">Benutzer / Rolle</th>
+                  <th class="p-3">Aktion</th>
+                  <th class="p-3">Betroffenes Objekt / Eintrag</th>
+                  <th class="p-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody" class="divide-y divide-slate-100">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- MODAL: ROLLENWECHSEL / LOGIN -->
+  <div id="roleModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 custom-shadow">
+      <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+            <i data-lucide="shield" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-bold text-slate-900 text-lg">Benutzerrolle wählen</h3>
+        </div>
+        <button onclick="closeRoleModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-500 mb-4">Wählen Sie ein Profil, um das System mit den entsprechenden Berechtigungen zu testen:</p>
+
+      <div class="space-y-2.5">
+        <button onclick="setUserRole('superadmin')" class="w-full p-3.5 rounded-xl border-2 border-slate-200 hover:border-emerald-500 flex items-center justify-between text-left transition-all group">
+          <div>
+            <strong class="text-xs font-bold text-slate-900 group-hover:text-emerald-700">👑 Super-Admin</strong>
+            <p class="text-[11px] text-slate-500">Vollzugriff auf alles, Benutzer- & Rollenverwaltung</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-600 opacity-0 group-hover:opacity-100">Wählen →</span>
+        </button>
+
+        <button onclick="setUserRole('admin')" class="w-full p-3.5 rounded-xl border-2 border-slate-200 hover:border-emerald-500 flex items-center justify-between text-left transition-all group">
+          <div>
+            <strong class="text-xs font-bold text-slate-900 group-hover:text-emerald-700">💼 Admin</strong>
+            <p class="text-[11px] text-slate-500">Verwaltung, Abrechnung, Preise & Lohnabrechnung</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-600 opacity-0 group-hover:opacity-100">Wählen →</span>
+        </button>
+
+        <button onclick="setUserRole('objektleiter')" class="w-full p-3.5 rounded-xl border-2 border-slate-200 hover:border-emerald-500 flex items-center justify-between text-left transition-all group">
+          <div>
+            <strong class="text-xs font-bold text-slate-900 group-hover:text-emerald-700">📋 Objektleiter (Thomas Schneider)</strong>
+            <p class="text-[11px] text-slate-500">Nur eigenes Hotel (Grand Hotel), KEINE Preise, tägliche Erfassung</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-600 opacity-0 group-hover:opacity-100">Wählen →</span>
+        </button>
+
+        <button onclick="setUserRole('vorarbeiter')" class="w-full p-3.5 rounded-xl border-2 border-slate-200 hover:border-emerald-500 flex items-center justify-between text-left transition-all group">
+          <div>
+            <strong class="text-xs font-bold text-slate-900 group-hover:text-emerald-700">🧹 Vorarbeiter (Sabine Becker)</strong>
+            <p class="text-[11px] text-slate-500">Nur zugewiesene Schichten, eingeschränkte Erfassung, keine Preise</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-600 opacity-0 group-hover:opacity-100">Wählen →</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HOTEL ANLEGEN / BEARBEITEN -->
+  <div id="hotelModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 custom-shadow">
+      <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-200">
+        <h3 class="font-bold text-slate-900 text-lg">Hotel-Objekt & Zimmerpreise anlegen</h3>
+        <button onclick="closeHotelModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="hotelForm" onsubmit="saveHotelObject(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Name des Hotels *</label>
+          <input type="text" id="hotelFormName" required placeholder="z.B. Hilton Garden Munich" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Objektleiter zuweisen</label>
+          <input type="text" id="hotelFormLeader" required value="Thomas Schneider" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">EZ Preis (€)</label>
+            <input type="text" id="hotelFormEz" value="12.50" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">DZ Preis (€)</label>
+            <input type="text" id="hotelFormDz" value="18.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Suite Preis (€)</label>
+            <input type="text" id="hotelFormSuite" value="35.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Extrastundensatz (€/h)</label>
+          <input type="text" id="hotelFormHourly" value="25.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeHotelModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Abbrechen</button>
+          <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i> Hotel Speichern
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SUBUNTERNEHMER ANLEGEN -->
+  <div id="subcontractorModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 custom-shadow">
+      <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-200">
+        <h3 class="font-bold text-slate-900 text-lg">Subunternehmer hinzufügen</h3>
+        <button onclick="closeSubcontractorModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="subcontractorForm" onsubmit="saveSubcontractor(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Firmenname / Subunternehmer *</label>
+          <input type="text" id="subFormName" required placeholder="z.B. CleanPartner Service GmbH" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Ansprechpartner *</label>
+          <input type="text" id="subFormContact" required placeholder="z.B. Viktor Bauer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Zugewiesenes Hotel-Objekt</label>
+          <select id="subFormHotel" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+            <option value="Grand Hotel Central Berlin">Grand Hotel Central Berlin</option>
+            <option value="Plaza Hotel Hamburg">Plaza Hotel Hamburg</option>
+            <option value="Maritim Resort München">Maritim Resort München</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Mitarbeiteranzahl</label>
+            <input type="number" id="subFormStaff" value="5" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Konditionen (EZ/DZ Preis)</label>
+            <input type="text" id="subFormRates" value="EZ €11.50 / DZ €16.50" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeSubcontractorModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Abbrechen</button>
+          <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: URLAUBSANTRAG -->
+  <div id="leaveModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 custom-shadow">
+      <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-200">
+        <h3 class="font-bold text-slate-900 text-lg">Neuen Urlaubsantrag einreichen</h3>
+        <button onclick="closeLeaveModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="leaveForm" onsubmit="saveLeaveRequest(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Mitarbeiter *</label>
+          <select id="leaveEmpSelect" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+            <!-- Populated from Employee DB -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Art des Urlaubs</label>
+          <select id="leaveType" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+            <option value="Erholungsurlaub">Erholungsurlaub (Bezahlt)</option>
+            <option value="Sonderurlaub">Sonderurlaub (z.B. Umzug, Hochzeit)</option>
+            <option value="Unbezahlt">Unbezahlter Urlaub</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Von Datum *</label>
+            <input type="date" id="leaveStartDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Bis Datum *</label>
+            <input type="date" id="leaveEndDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Begründung / Bemerkung</label>
+          <input type="text" id="leaveNotes" placeholder="z.B. Jahresurlaub mit Familie" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeLeaveModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Abbrechen</button>
+          <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Antrag einreichen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PERSONALANMELDUNG ANS LOHNBÜRO -->
+  <div id="payrollRegistrationModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 custom-shadow">
+      <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-200">
+        <h3 class="font-bold text-slate-900 text-lg">Personalanmeldung an das Lohnbüro</h3>
+        <button onclick="closePayrollRegistrationModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <p class="text-slate-600">Senden Sie die vollständigen Stammdaten neuer Mitarbeiter direkt per E-Mail / Datenschnittstelle an Ihre externe Lohnbuchhaltung.</p>
+        
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Mitarbeiter auswählen</label>
+          <select id="regEmpSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">E-Mail Empfänger (Lohnbüro / Steuerberater)</label>
+          <input type="email" id="regEmailRecipient" value="lohnabrechnung@steuerberater-partner.de" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Betreff</label>
+          <input type="text" id="regEmailSubject" value="Neueinstellung CleanPro Reinigungsfirma - Stammdatensatz" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-semibold">
+        </div>
+
+        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-[11px]">
+          ✓ Alle relevanten Meldedaten (SV-Nr, Steuerklasse, Eintrittsdatum, Gehalt, Arbeitsvertrag) werden gebündelt übertragen.
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closePayrollRegistrationModal()" class="px-5 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl">Schließen</button>
+          <button onclick="sendPayrollRegistration()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i> Jetzt an Lohnbüro übermitteln
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PDF VORSCHAU (PREVIEW BEFORE DOWNLOAD) -->
+  <div id="pdfPreviewModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 custom-shadow max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <i data-lucide="file-text" class="w-6 h-6 text-emerald-600"></i>
+          <h3 class="font-bold text-slate-900 text-lg" id="previewTitle">PDF Dokumentenvorschau</h3>
+        </div>
+        <button onclick="closePdfPreviewModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-xs font-mono space-y-3 mb-6" id="previewContent">
+        <!-- Injected by JS -->
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+        <button onclick="closePdfPreviewModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Schließen</button>
+        <button id="previewDownloadBtn" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow">
+          <i data-lucide="download" class="w-4 h-4"></i> Als PDF Herunterladen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-slate-900 font-bold">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </div>
+        <span class="text-white font-bold text-sm">CleanPro Reinigungsfirma GmbH</span>
+      </div>
+      <p>© 2026 CleanPro. Alle Rechte vorbehalten. Impressum | Datenschutz | AGB</p>
+      <div class="flex gap-4">
+        <button onclick="switchView('mitarbeiter')" class="text-emerald-400 hover:text-emerald-300 font-semibold">Mitarbeiterverwaltung</button>
+        <span class="text-slate-600">|</span>
+        <button onclick="switchView('admin')" class="text-emerald-400 hover:text-emerald-300 font-semibold">Admin Login</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App JavaScript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
