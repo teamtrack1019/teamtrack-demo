@@ -2560,3 +2560,144 @@ function closePdfPreviewModal() {
   if (modal) modal.classList.add('hidden');
 }
 
+// ==================== CLEANPRO UPGRADE MODAL & TRIAL HANDLER ====================
+
+function openCleanProUpgradeModal() {
+  // 1. Notify parent frame (TeamTrack React App) to open the top-level Upgrade Modal if embedded
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'OPEN_UPGRADE_MODAL' }, '*');
+    }
+  } catch (err) {
+    console.warn('Could not postMessage to parent:', err);
+  }
+
+  // 2. Also open the local modal inside this frame
+  const modal = document.getElementById('cleanProUpgradeModal');
+  const formView = document.getElementById('cleanProUpgradeFormView');
+  const successView = document.getElementById('cleanProUpgradeSuccessView');
+  
+  if (formView) formView.classList.remove('hidden');
+  if (successView) successView.classList.add('hidden');
+  
+  // Prefill company name if client parameter exists
+  const params = new URLSearchParams(window.location.search);
+  const client = params.get('client');
+  const companyInput = document.getElementById('cleanUpgradeCompany');
+  if (companyInput && client && client !== 'Musterkunde' && client !== 'Standard-Demo') {
+    companyInput.value = client;
+  }
+
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeCleanProUpgradeModal() {
+  const modal = document.getElementById('cleanProUpgradeModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function handleCleanProUpgradeSubmit(e) {
+  e.preventDefault();
+  const submitBtn = document.getElementById('cleanUpgradeSubmitBtn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Wird gesendet...</span>';
+    if (window.lucide) lucide.createIcons();
+  }
+
+  const company = document.getElementById('cleanUpgradeCompany')?.value || '';
+  const name = document.getElementById('cleanUpgradeName')?.value || '';
+  const phone = document.getElementById('cleanUpgradePhone')?.value || '';
+  const email = document.getElementById('cleanUpgradeEmail')?.value || '';
+  const message = document.getElementById('cleanUpgradeMessage')?.value || '';
+
+  const checkedModules = Array.from(document.querySelectorAll('input[name="cleanModule"]:checked'))
+    .map(cb => cb.value)
+    .join(', ');
+
+  try {
+    await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        company,
+        contactName: name,
+        phone,
+        email,
+        selectedModules: checkedModules || 'CleanPro Gesamtsystem',
+        systemType: 'CleanPro Gebäudereinigung & Hotel',
+        message: message || 'Keine Notiz',
+        timeline: 'Schnellstmöglich'
+      })
+    });
+  } catch (err) {
+    console.warn('API submission error:', err);
+  }
+
+  const formView = document.getElementById('cleanProUpgradeFormView');
+  const successView = document.getElementById('cleanProUpgradeSuccessView');
+  if (formView) formView.classList.add('hidden');
+  if (successView) {
+    successView.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i><span>Unverbindliches Festpreis-Angebot anfordern</span>';
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function sendCleanProWhatsApp() {
+  const company = document.getElementById('cleanUpgradeCompany')?.value || 'Interessent';
+  const name = document.getElementById('cleanUpgradeName')?.value || '';
+  const phone = document.getElementById('cleanUpgradePhone')?.value || '';
+  const checkedModules = Array.from(document.querySelectorAll('input[name="cleanModule"]:checked'))
+    .map(cb => cb.value)
+    .join(', ');
+
+  const text = encodeURIComponent(
+    `Hallo TeamTrack,\n\nich interessiere mich für die maßgeschneiderte CleanPro Gebäudereinigung & Hotel-Software.\n\nFirma: ${company}\nAnsprechpartner: ${name}\nTelefon: ${phone}\nGewünschte Module: ${checkedModules || 'Gesamtpaket'}`
+  );
+
+  window.open(`https://wa.me/491726125371?text=${text}`, '_blank');
+}
+
+function initCleanProTrialParams() {
+  const params = new URLSearchParams(window.location.search);
+  const client = params.get('client');
+  const days = parseInt(params.get('days')) || 3;
+  const isAdmin = params.get('admin') === 'true';
+
+  const clientNameEl = document.getElementById('cleanProClientName');
+  const timerDisplayEl = document.getElementById('cleanProTimerDisplay');
+  const pillEl = document.getElementById('cleanProTrialPill');
+
+  if (clientNameEl && client) {
+    clientNameEl.textContent = client;
+  }
+
+  if (pillEl) {
+    if (isAdmin) {
+      pillEl.classList.remove('hidden');
+      pillEl.classList.add('flex');
+      if (timerDisplayEl) timerDisplayEl.textContent = 'Unbegrenzt';
+    } else if (client) {
+      pillEl.classList.remove('hidden');
+      pillEl.classList.add('flex');
+      if (timerDisplayEl) timerDisplayEl.textContent = `${days} Tage Demo`;
+    }
+  }
+}
+
+// Auto-run trial params initialization on DOM loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCleanProTrialParams);
+} else {
+  initCleanProTrialParams();
+}
+

@@ -107,12 +107,11 @@ export const Header = () => {
           {/* CTA: Request Original Software */}
           <button
             onClick={() => openUpgradeModal('Komplettpaket')}
-            className="flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 text-white text-[11px] sm:text-xs font-bold shadow-md shadow-brand-500/25 transition-all shrink-0"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 text-white text-[11px] sm:text-xs font-bold shadow-md shadow-brand-500/25 transition-all shrink-0 cursor-pointer"
           >
-            <Sparkles className="w-3 h-3 text-yellow-300 shrink-0" />
-            <span className="hidden xs:inline sm:hidden">Angebot</span>
+            <Sparkles className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
             <span className="hidden sm:inline">Vollversion anfragen</span>
-            <span className="xs:hidden">Anfragen</span>
+            <span className="sm:hidden">Anfragen</span>
           </button>
 
         </div>
