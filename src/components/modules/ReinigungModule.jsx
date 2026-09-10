@@ -33,13 +33,13 @@ export const ReinigungModule = () => {
   const reinigungUrl = `/reinigung/index.html${queryString ? `?${queryString}` : ''}`;
 
   return (
-    <div className="w-full rounded-3xl overflow-hidden border border-slate-700/60 shadow-2xl bg-white relative animate-in fade-in duration-200" style={{ height: 'calc(100vh - 180px)', minHeight: '820px' }}>
+    <div className="w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-700/60 shadow-2xl bg-white relative animate-in fade-in duration-200" style={{ height: 'calc(100vh - 150px)', minHeight: '840px' }}>
       {/* Embedded 100% Unchanged Exact CleanPro Application */}
       <iframe
         key={iframeKey}
         src={reinigungUrl}
         title="CleanPro Gebäudereinigung"
-        className="w-full h-full border-0"
+        className="w-full h-full border-0 block"
         allow="camera; microphone; geolocation"
       />
     </div>
