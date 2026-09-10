@@ -265,33 +265,46 @@ function switchView(view) {
   if (hotelView) hotelView.classList.add('hidden');
   if (mitarbeiterView) mitarbeiterView.classList.add('hidden');
 
-  // Update top nav module buttons styling
+  // Desktop buttons
   const navHotel = document.getElementById('nav-btn-hotel');
   const navMitarbeiter = document.getElementById('nav-btn-mitarbeiter');
   const navAdmin = document.getElementById('nav-btn-admin');
 
-  const activeClass = 'bg-emerald-600 text-white shadow-sm';
-  const inactiveClass = 'text-slate-300 hover:text-white hover:bg-slate-700/60';
+  // Mobile buttons
+  const navHotelMob = document.getElementById('nav-btn-hotel-mob');
+  const navMitarbeiterMob = document.getElementById('nav-btn-mitarbeiter-mob');
+  const navAdminMob = document.getElementById('nav-btn-admin-mob');
 
-  [navHotel, navMitarbeiter, navAdmin].forEach(btn => {
-    if (btn) {
-      btn.className = 'nav-module-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ' + inactiveClass;
-    }
-  });
+  const dActiveClass = 'nav-module-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white flex items-center gap-1.5 transition-all shadow-sm';
+  const dInactiveClass = 'nav-module-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5 transition-all';
+
+  const mActiveClass = 'nav-module-btn flex-1 py-2 px-1.5 rounded-xl text-[11px] font-bold bg-emerald-600 text-white flex items-center justify-center gap-1.5 transition-all shadow-sm';
+  const mInactiveClass = 'nav-module-btn flex-1 py-2 px-1.5 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white hover:bg-slate-800 flex items-center justify-center gap-1.5 transition-all';
+
+  if (navHotel) navHotel.className = dInactiveClass;
+  if (navMitarbeiter) navMitarbeiter.className = dInactiveClass;
+  if (navAdmin) navAdmin.className = dInactiveClass;
+
+  if (navHotelMob) navHotelMob.className = mInactiveClass;
+  if (navMitarbeiterMob) navMitarbeiterMob.className = mInactiveClass;
+  if (navAdminMob) navAdminMob.className = mInactiveClass;
 
   if (view === 'admin') {
     if (adminView) adminView.classList.remove('hidden');
-    if (navAdmin) navAdmin.className = 'nav-module-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ' + activeClass;
+    if (navAdmin) navAdmin.className = dActiveClass;
+    if (navAdminMob) navAdminMob.className = mActiveClass;
     renderAdminTable();
   } else if (view === 'mitarbeiter') {
     if (mitarbeiterView) mitarbeiterView.classList.remove('hidden');
-    if (navMitarbeiter) navMitarbeiter.className = 'nav-module-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ' + activeClass;
+    if (navMitarbeiter) navMitarbeiter.className = dActiveClass;
+    if (navMitarbeiterMob) navMitarbeiterMob.className = mActiveClass;
     renderEmployeesTable();
     renderTimesheetsTable();
   } else {
     // Default to hotel dashboard
     if (hotelView) hotelView.classList.remove('hidden');
-    if (navHotel) navHotel.className = 'nav-module-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ' + activeClass;
+    if (navHotel) navHotel.className = dActiveClass;
+    if (navHotelMob) navHotelMob.className = mActiveClass;
     initHotelModule();
   }
 
