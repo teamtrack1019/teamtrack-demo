@@ -80,6 +80,16 @@ export const OverviewHub = () => {
       color: 'from-rose-600 to-pink-500',
       stat: `${openTasks} offene Aufträge`,
       features: ['Interaktives Drag-and-Drop Board', 'Fristen & Prioritäten (Hoch, Mittel)', 'Mitarbeiter-Kapazitätsplanung']
+    },
+    {
+      id: 'reinigung',
+      title: 'Gebäudereinigung & CleanPro Suite',
+      category: 'Hotel- & Objektreinigung, Dienstplaner',
+      desc: 'Komplettsystem für Reinigungsfirmen: Zimmerkategorien, Objektleiter-Modus, Wochen-Dienstplaner mit PDF, §3b EStG Lohnzuschläge & digitale Kundenabnahme.',
+      icon: Sparkles,
+      color: 'from-emerald-600 to-teal-500',
+      stat: `Vollversion Aktiv`,
+      features: ['Hotel-Objekte & Zimmerabrechnung', 'Dienstplaner & §3b EStG Lohnzuschlag', 'Touch-Unterschrift & Express-Kalkulator']
     }
   ];
 

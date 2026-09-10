@@ -63,6 +63,14 @@ export const ModuleSelector = () => {
       subtitle: 'Kanban-Board',
       icon: KanbanSquare,
       badge: `${data.tasks?.length || 0}`
+    },
+    {
+      id: 'reinigung',
+      name: 'Gebäudereinigung',
+      shortName: 'Reinigung',
+      subtitle: 'CleanPro Suite',
+      icon: Sparkles,
+      badge: 'Live'
     }
   ];
 
@@ -116,7 +124,7 @@ export const ModuleSelector = () => {
 
         {/* MOBILE & TABLET VIEW: 100% Fit Responsive Grid - NO Horizontal Scrolling! */}
         <div className="lg:hidden">
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-1.5">
             {modules.map((m) => {
               const Icon = m.icon;
               const isActive = activeModule === m.id;

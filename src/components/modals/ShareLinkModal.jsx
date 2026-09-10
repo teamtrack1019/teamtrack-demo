@@ -6,13 +6,15 @@ export const ShareLinkModal = () => {
   const { isShareModalOpen, setIsShareModalOpen, addToast } = useDemo();
   const [clientInput, setClientInput] = useState('');
   const [daysInput, setDaysInput] = useState(7);
+  const [selectedModule, setSelectedModule] = useState('reinigung'); // 'all' or 'reinigung'
   const [copied, setCopied] = useState(false);
 
   if (!isShareModalOpen) return null;
 
   const origin = window.location.origin || 'https://demo.team-track.de';
   const cleanClient = (clientInput || 'Kundenname').trim().replace(/\s+/g, '-');
-  const generatedUrl = `${origin}${window.location.pathname}?client=${encodeURIComponent(cleanClient)}&days=${daysInput}`;
+  const moduleQuery = selectedModule === 'reinigung' ? '&module=reinigung' : '';
+  const generatedUrl = `${origin}${window.location.pathname}?client=${encodeURIComponent(cleanClient)}${moduleQuery}&days=${daysInput}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedUrl);
@@ -20,6 +22,10 @@ export const ShareLinkModal = () => {
     addToast('Link kopiert', `Der personalisierte Test-Link für "${cleanClient}" wurde in die Zwischenablage kopiert.`, 'success');
     setTimeout(() => setCopied(false), 2500);
   };
+
+  const whatsappMessage = selectedModule === 'reinigung'
+    ? `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für das CleanPro Gebäudereinigung & Hotel-Dashboard (${cleanClient}):\n\n🔗 ${generatedUrl}\n\nEnthaltene Module:\n🏨 Hotel-Objekte & Zimmerpreise (EZ, DZ, Suite)\n📅 Tägliche Erfassung & Dienstplaner mit PDF-Aushang\n💰 Lohnabrechnung mit Sonn- (+50%) und Feiertagszuschlägen\n✍️ Digitale Kundenabnahme mit Unterschrift\n🧮 Express-Preiskalkulator für Kundenanfragen\n\nViele Grüße,\nTeamTrack Softwareentwicklung`
+    : `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für die TeamTrack Handwerker- & Firmen-Software (${cleanClient}):\n\n🔗 ${generatedUrl}\n\nEnthaltene Module:\n⏱️ Zeiterfassung & Live-Stempeluhr\n📑 Rechnungen & DATEV\n👥 CRM & Kundenkartei\n🚗 Fuhrpark & TÜV-Manager\n📋 Auftragsdisposition\n✨ Gebäudereinigung Suite\n\nViele Grüße,\nTeamTrack Softwareentwicklung`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
@@ -52,11 +58,41 @@ export const ShareLinkModal = () => {
               <Building className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="z.B. Schmidt-Haustechnik-GmbH"
+                placeholder="z.B. Schmidt-Gebäudereinigung-GmbH"
                 value={clientInput}
                 onChange={(e) => setClientInput(e.target.value)}
                 className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-white"
               />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 font-semibold mb-1">Ziel-Modul beim Start:</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedModule('reinigung')}
+                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-left flex items-center justify-between ${
+                  selectedModule === 'reinigung'
+                    ? 'bg-emerald-600/30 border-emerald-500 text-emerald-200 shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>✨ Gebäudereinigung</span>
+                {selectedModule === 'reinigung' && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedModule('all')}
+                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-left flex items-center justify-between ${
+                  selectedModule === 'all'
+                    ? 'bg-brand-600/30 border-brand-500 text-white shadow-md shadow-brand-500/20'
+                    : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>🏢 Komplett-Suite</span>
+                {selectedModule === 'all' && <Check className="w-3.5 h-3.5 text-brand-400" />}
+              </button>
             </div>
           </div>
 
@@ -87,13 +123,15 @@ export const ShareLinkModal = () => {
             </div>
           </div>
 
-          {/* Social Preview Preview Box */}
+          {/* Social Preview Box */}
           <div className="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-2">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">WhatsApp & Social Vorschau:</span>
             <div className="flex items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
               <img src="/logo.jpg" alt="TeamTrack" className="w-11 h-11 rounded-lg object-contain bg-slate-900 border border-brand-500/20 shrink-0" />
               <div className="min-w-0 flex-1">
-                <h4 className="text-xs font-bold text-white truncate">TeamTrack | Interaktives Demo-Portal</h4>
+                <h4 className="text-xs font-bold text-white truncate">
+                  {selectedModule === 'reinigung' ? 'CleanPro | Gebäudereinigung & Hotel-Dashboard' : 'TeamTrack | Interaktives Demo-Portal'}
+                </h4>
                 <p className="text-[10px] text-slate-400 line-clamp-1">Kunden-Testumgebung für {clientInput || 'Interessent'} ({daysInput} Tage)</p>
                 <span className="text-[9px] text-brand-400">team-track.de</span>
               </div>
@@ -108,9 +146,7 @@ export const ShareLinkModal = () => {
 
           <div className="flex items-center gap-2">
             <a
-              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für die TeamTrack Handwerker- & Firmen-Software (${cleanClient}):\n\n🔗 ${generatedUrl}\n\nEnthaltene Module:\n⏱️ Zeiterfassung & Live-Stempeluhr\n📑 Rechnungen & DATEV\n👥 CRM & Kundenkartei\n🚗 Fuhrpark & TÜV-Manager\n📋 Auftragsdisposition\n\nViele Grüße,\nTeamTrack Softwareentwicklung`
-              )}`}
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/20 transition-all"

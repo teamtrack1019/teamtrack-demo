@@ -116,6 +116,12 @@ export const DemoProvider = ({ children }) => {
     setClientId(effectiveClientId);
     setTrialDays([3, 7, 14].includes(daysParam) ? daysParam : 7);
 
+    // Initial module selection from URL (?module=reinigung)
+    const moduleParam = params.get('module') || params.get('modul');
+    if (moduleParam && ['overview', 'zeiterfassung', 'rechnungen', 'crm', 'fuhrpark', 'disposition', 'reinigung'].includes(moduleParam.toLowerCase())) {
+      setActiveModule(moduleParam.toLowerCase());
+    }
+
     // Check or init trial start time in localStorage for this client
     const timeKey = `teamtrack_trial_start_${effectiveClientId}`;
     let savedStart = localStorage.getItem(timeKey);

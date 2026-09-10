@@ -8,6 +8,7 @@ import { RechnungenModule } from './components/modules/RechnungenModule';
 import { CrmModule } from './components/modules/CrmModule';
 import { FuhrparkModule } from './components/modules/FuhrparkModule';
 import { DispositionModule } from './components/modules/DispositionModule';
+import { ReinigungModule } from './components/modules/ReinigungModule';
 import { UpgradeModal } from './components/modals/UpgradeModal';
 import { RestrictionModal } from './components/modals/RestrictionModal';
 import { InvoicePreviewModal } from './components/modals/InvoicePreviewModal';
@@ -28,6 +29,7 @@ const MainContent = () => {
       {activeModule === 'crm' && <CrmModule />}
       {activeModule === 'fuhrpark' && <FuhrparkModule />}
       {activeModule === 'disposition' && <DispositionModule />}
+      {activeModule === 'reinigung' && <ReinigungModule />}
     </main>
   );
 };
