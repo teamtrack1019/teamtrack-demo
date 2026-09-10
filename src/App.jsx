@@ -37,22 +37,11 @@ const MainContent = () => {
 const AppContent = () => {
   const { isDedicatedClient } = useDemo();
 
-  // ONLY for dedicated cleaning clients (not Admin): render CleanPro standalone
-  if (isDedicatedClient) {
-    return (
-      <div className="min-h-screen w-full bg-slate-50 overflow-x-hidden">
-        <ReinigungModule />
-        <UpgradeModal />
-        <Toasts />
-      </div>
-    );
-  }
-
-  // For Admin and standard portal users: keep full TeamTrack layout with Header, Link Generator, etc.
   return (
     <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 selection:bg-brand-500 selection:text-white w-full max-w-full overflow-x-hidden">
       <Header />
-      <ModuleSelector />
+      {/* Hide the other 5 modules bar ONLY when a dedicated cleaning customer link is opened */}
+      {!isDedicatedClient && <ModuleSelector />}
       <MainContent />
       <Footer />
       
