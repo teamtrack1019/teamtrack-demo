@@ -21,7 +21,7 @@ export const ExpiredModal = () => {
 
         <p className="text-xs text-slate-300 leading-relaxed max-w-md mx-auto">
           Wir hoffen, Sie konnten sich einen guten ersten Eindruck von den TeamTrack Modulen verschaffen! 
-          Möchten Sie eine maßgeschneiderte Original-Version mit Ihrem Firmen-Branding und Ihren Prozessen produktiv nutzen?
+          Möchten Sie eine individuelle Vollversion mit Ihrem Firmen-Branding und Ihren Prozessen produktiv nutzen?
         </p>
 
         <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 text-left text-xs space-y-2">

@@ -2674,7 +2674,7 @@ function sendCleanProWhatsApp() {
     .join(', ');
 
   const text = encodeURIComponent(
-    `Hallo TeamTrack,\n\nich interessiere mich für die maßgeschneiderte CleanPro Gebäudereinigung & Hotel-Software.\n\nFirma: ${company}\nAnsprechpartner: ${name}\nTelefon: ${phone}\nGewünschte Module: ${checkedModules || 'Gesamtpaket'}`
+    `Hallo TeamTrack,\n\nich interessiere mich für die individuelle CleanPro Gebäudereinigung & Hotel-Software.\n\nFirma: ${company}\nAnsprechpartner: ${name}\nTelefon: ${phone}\nGewünschte Module: ${checkedModules || 'Gesamtpaket'}`
   );
 
   window.open(`https://wa.me/491726125371?text=${text}`, '_blank');

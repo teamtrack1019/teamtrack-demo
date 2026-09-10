@@ -110,7 +110,7 @@ export const OverviewHub = () => {
           </div>
 
           <h1 className="text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
-            Willkommen in Ihrer maßgeschneiderten <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-cyan-300">TeamTrack WebApp</span>
+            Willkommen in Ihrer individuellen <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-cyan-300">TeamTrack WebApp</span>
           </h1>
 
           <p className="mt-3 text-slate-300 text-sm lg:text-base leading-relaxed">

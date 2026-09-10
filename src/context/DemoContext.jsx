@@ -239,7 +239,7 @@ export const DemoProvider = ({ children }) => {
       isOpen: true,
       title: '🔒 Demo-Beschränkung',
       feature: featureName,
-      message: customMessage || `Diese Funktion ("${featureName}") ist in der maßgeschneiderten Original-Version für Ihr Unternehmen uneingeschränkt freigeschaltet.`
+      message: customMessage || `Diese Funktion ("${featureName}") ist in der individuellen Vollversion für Ihr Unternehmen uneingeschränkt freigeschaltet.`
     });
   };
 

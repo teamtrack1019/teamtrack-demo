@@ -141,7 +141,7 @@ export const UpgradeModal = () => {
   };
 
   const whatsappMessage = encodeURIComponent(
-    `Hallo TeamTrack, ich interessiere mich für eine maßgeschneiderte ${isCleaningMode ? 'Gebäudereinigung- & Hotel-Software (CleanPro)' : 'Firmen-Software'}.\n\nFirma: ${formData.company || clientId}\nAnsprechpartner: ${formData.contactName}\nGewünschte Module: ${selectedListString}\nTelefon: ${formData.phone}`
+    `Hallo TeamTrack, ich interessiere mich für eine individuelle ${isCleaningMode ? 'Gebäudereinigung- & Hotel-Software (CleanPro)' : 'Firmen-Software'}.\n\nFirma: ${formData.company || clientId}\nAnsprechpartner: ${formData.contactName}\nGewünschte Module: ${selectedListString}\nTelefon: ${formData.phone}`
   );
 
   return (
@@ -167,11 +167,11 @@ export const UpgradeModal = () => {
             <div className="pr-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-bold uppercase tracking-wider mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-                {isCleaningMode ? 'CleanPro Gebäudereinigung Vollversion' : 'Maßgeschneiderte Vollversion'}
+                {isCleaningMode ? 'CleanPro Gebäudereinigung Vollversion' : 'Individuelle Vollversion'}
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white">
                 {isCleaningMode 
-                  ? 'Ihre maßgeschneiderte Reinigungs-Software einrichten lassen' 
+                  ? 'Ihre individuelle Reinigungs-Software einrichten lassen' 
                   : 'Ihre eigene Firmen-Software einrichten lassen'}
               </h2>
               <p className="text-xs text-slate-300 mt-1">

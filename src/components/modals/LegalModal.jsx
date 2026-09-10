@@ -251,7 +251,7 @@ export const LegalModal = () => {
                   Auftragsverarbeitung (AVV gemäß Art. 28 DSGVO) & Fernwartung
                 </h4>
                 <p className="text-slate-300 leading-relaxed">
-                  Wenn TeamTrack für Ihr Unternehmen eine maßgeschneiderte Vollversion implementiert, hostet oder im Rahmen von Software-Updates wartet, schließen wir mit Ihnen einen standardisierten Vertrag zur Auftragsverarbeitung (AV-Vertrag nach Art. 28 Abs. 3 DSGVO) inklusive umfassender Technisch-Organisatorischer Maßnahmen (TOMs nach Art. 32 DSGVO) sowie Regelungen zum sicheren Fernwartungszugriff. Ihr Unternehmen bleibt dabei die alleinige verantwortliche Stelle im Sinne des Datenschutzrechts.
+                  Wenn TeamTrack für Ihr Unternehmen eine individuelle Vollversion implementiert, hostet oder im Rahmen von Software-Updates wartet, schließen wir mit Ihnen einen standardisierten Vertrag zur Auftragsverarbeitung (AV-Vertrag nach Art. 28 Abs. 3 DSGVO) inklusive umfassender Technisch-Organisatorischer Maßnahmen (TOMs nach Art. 32 DSGVO) sowie Regelungen zum sicheren Fernwartungszugriff. Ihr Unternehmen bleibt dabei die alleinige verantwortliche Stelle im Sinne des Datenschutzrechts.
                 </p>
               </div>
 
@@ -449,7 +449,7 @@ export const LegalModal = () => {
                 <PhoneCall className="w-5 h-5 text-cyan-400 shrink-0" />
                 <div>
                   <h4 className="font-bold text-white text-sm">Direkter Kontakt & Unverbindliche Beratung</h4>
-                  <p className="text-xs text-cyan-300">Sprechen Sie direkt mit dem Entwickler über Ihre maßgeschneiderte Firmen-Software</p>
+                  <p className="text-xs text-cyan-300">Sprechen Sie direkt mit dem Entwickler über Ihre individuelle Firmen-Software</p>
                 </div>
               </div>
 

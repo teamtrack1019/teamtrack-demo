@@ -59,7 +59,7 @@ export default async function handler(req, res) {
         <div class="container">
           <div class="header">
             <span class="badge">TeamTrack Demo-Portal</span>
-            <h2>⚡ Neue Anfrage für maßgeschneiderte WebApp</h2>
+            <h2>⚡ Neue Anfrage für individuelle WebApp</h2>
             <p style="color: #94a3b8; font-size: 13px; margin-top: 5px;">Eingegangen über die interaktive Demo-Umgebung (${clientId || 'Demo'})</p>
           </div>
 
