@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export const OverviewHub = () => {
-  const { setActiveModule, openUpgradeModal, data, clientId } = useDemo();
+  const { setActiveModule, openUpgradeModal, data, clientId, isAdmin } = useDemo();
 
   const totalInvoiced = (data.invoices || []).reduce((acc, inv) => {
     const sub = inv.items.reduce((s, it) => s + (it.qty * it.price), 0);
@@ -96,7 +96,7 @@ export const OverviewHub = () => {
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-bold uppercase tracking-wider mb-4">
             <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-            Interaktive Testumgebung für {clientId}
+            {isAdmin ? 'Live Demo- & Präsentationssystem (Admin)' : `Interaktive Testumgebung für ${clientId}`}
           </div>
 
           <h1 className="text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">

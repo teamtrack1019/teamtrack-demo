@@ -3,9 +3,9 @@ import { useDemo } from '../../context/DemoContext';
 import { Clock, Sparkles, Phone, Mail, RotateCcw } from 'lucide-react';
 
 export const ExpiredModal = () => {
-  const { isExpired, clientId, openUpgradeModal, resetSandbox } = useDemo();
+  const { isExpired, clientId, openUpgradeModal, resetSandbox, isAdmin } = useDemo();
 
-  if (!isExpired) return null;
+  if (!isExpired || isAdmin) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">

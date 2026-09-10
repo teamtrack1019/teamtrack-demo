@@ -88,16 +88,36 @@ export const DemoProvider = ({ children }) => {
   // Initialize Client, Admin & Trial from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const clientParam = params.get('client') || params.get('firma') || 'Musterkunde';
+    const clientParam = params.get('client') || params.get('firma');
     const daysParam = parseInt(params.get('days') || params.get('tage') || '7', 10);
-    const adminParam = params.get('admin') === 'true' || params.get('admin') === '1' || window.location.hostname === 'localhost';
+    const hasAdminQuery = params.get('admin') === 'true' || params.get('admin') === '1';
+    const isExplicitNonAdmin = params.get('admin') === 'false' || params.get('admin') === '0';
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
-    setClientId(clientParam);
+    // Determine admin status:
+    // 1. Explicit ?admin=true or localhost -> admin
+    // 2. Direct visit without client param -> admin (the owner's main page)
+    // 3. Saved admin flag in localStorage (unless explicit ?client=... without admin is clicked)
+    let adminState = false;
+    if (isExplicitNonAdmin) {
+      adminState = false;
+      localStorage.setItem('teamtrack_is_admin', 'false');
+    } else if (hasAdminQuery || isLocal || !clientParam) {
+      adminState = true;
+      if (hasAdminQuery) localStorage.setItem('teamtrack_is_admin', 'true');
+    } else {
+      // Client link provided (e.g. ?client=MusterFirma)
+      adminState = false;
+    }
+
+    setIsAdmin(adminState);
+
+    const effectiveClientId = clientParam || (adminState ? 'Live-Demo' : 'Musterkunde');
+    setClientId(effectiveClientId);
     setTrialDays([3, 7, 14].includes(daysParam) ? daysParam : 7);
-    setIsAdmin(adminParam);
 
     // Check or init trial start time in localStorage for this client
-    const timeKey = `teamtrack_trial_start_${clientParam}`;
+    const timeKey = `teamtrack_trial_start_${effectiveClientId}`;
     let savedStart = localStorage.getItem(timeKey);
     if (!savedStart) {
       savedStart = Date.now().toString();
@@ -150,8 +170,13 @@ export const DemoProvider = ({ children }) => {
     }
   }, [data, storageKey]);
 
-  // Countdown timer effect
+  // Countdown timer effect (only for customer trial links, not admin)
   useEffect(() => {
+    if (isAdmin) {
+      setIsExpired(false);
+      return;
+    }
+
     const updateCountdown = () => {
       const totalDurationMs = trialDays * 24 * 60 * 60 * 1000;
       const elapsedMs = Date.now() - startTime;
@@ -172,7 +197,7 @@ export const DemoProvider = ({ children }) => {
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, [startTime, trialDays]);
+  }, [startTime, trialDays, isAdmin]);
 
   // Toast trigger
   const addToast = (title, message, type = 'info') => {
@@ -229,7 +254,7 @@ export const DemoProvider = ({ children }) => {
   // Generic add with quota check
   const addItem = (moduleType, item) => {
     const currentCount = createdCounts[moduleType] || 0;
-    if (currentCount >= MAX_CREATION_LIMIT) {
+    if (!isAdmin && currentCount >= MAX_CREATION_LIMIT) {
       triggerRestrictedAction(
         `Maximales Kontingent (${MAX_CREATION_LIMIT} Testeinträge)`,
         `Sie haben das Demo-Limit für diesen Bereich erreicht. In Ihrer eigenen Firmen-Software haben Sie unbegrenztes Kontingent und volle Datenbankanbindung.`
@@ -247,7 +272,13 @@ export const DemoProvider = ({ children }) => {
       [moduleType]: currentCount + 1
     }));
 
-    addToast('Eintrag hinzugefügt', `Neuer Datensatz erfolgreich im Demo-System gespeichert (${currentCount + 1}/${MAX_CREATION_LIMIT}).`, 'success');
+    addToast(
+      'Eintrag hinzugefügt', 
+      isAdmin 
+        ? 'Neuer Datensatz erfolgreich im System gespeichert (Admin-Modus).'
+        : `Neuer Datensatz erfolgreich im Demo-System gespeichert (${currentCount + 1}/${MAX_CREATION_LIMIT}).`, 
+      'success'
+    );
     return true;
   };
 

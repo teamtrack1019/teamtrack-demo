@@ -5,7 +5,9 @@ import {
   RotateCcw, 
   Sparkles, 
   Building2, 
-  Share2
+  Share2,
+  Infinity as InfinityIcon,
+  ShieldCheck
 } from 'lucide-react';
 
 export const Header = () => {
@@ -38,7 +40,7 @@ export const Header = () => {
               <div className="flex items-center gap-1.5 leading-none">
                 <span className="font-extrabold text-base sm:text-lg tracking-tight text-white">TeamTrack</span>
                 <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest px-1 py-0.2 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">
-                  Demo
+                  {isAdmin ? 'Admin' : 'Demo'}
                 </span>
               </div>
               <p className="text-[9px] text-slate-400 mt-0.5 leading-none hidden lg:block">Softwareentwicklung</p>
@@ -46,9 +48,13 @@ export const Header = () => {
           </div>
 
           {/* Client Specific Badge (Hidden on very small mobile, visible on tablet/desktop) */}
-          <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-700/60 text-xs shrink-0 max-w-[150px]">
-            <Building2 className="w-3 h-3 text-brand-400 shrink-0" />
-            <span className="text-slate-400 text-[10px]">Mandant:</span>
+          <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-700/60 text-xs shrink-0 max-w-[170px]">
+            {isAdmin ? (
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            ) : (
+              <Building2 className="w-3 h-3 text-brand-400 shrink-0" />
+            )}
+            <span className="text-slate-400 text-[10px]">{isAdmin ? 'Modus:' : 'Mandant:'}</span>
             <span className="font-bold text-slate-200 text-[11px] truncate">{clientId}</span>
           </div>
         </div>
@@ -56,13 +62,25 @@ export const Header = () => {
         {/* Status Center & Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           
-          {/* Trial Countdown Pill */}
-          <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-brand-950/80 border border-brand-500/30 text-brand-300 shrink-0">
-            <Clock className="w-3 h-3 text-brand-400 shrink-0" />
-            <span className="font-bold font-mono tabular-nums text-white text-[11px] sm:text-xs">
-              {remainingTime.days}T {String(remainingTime.hours).padStart(2, '0')}:{String(remainingTime.minutes).padStart(2, '0')}:{String(remainingTime.seconds).padStart(2, '0')}
-            </span>
-          </div>
+          {/* Admin Unlimited Badge OR Trial Countdown Pill */}
+          {isAdmin ? (
+            <div 
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 shrink-0 shadow-sm shadow-emerald-950/40"
+              title="Admin-Modus: Unbegrenzte Demo für Kundenpräsentationen"
+            >
+              <InfinityIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="font-bold font-mono text-white text-[11px] sm:text-xs tracking-wide">
+                Unbegrenzt
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-brand-950/80 border border-brand-500/30 text-brand-300 shrink-0">
+              <Clock className="w-3 h-3 text-brand-400 shrink-0" />
+              <span className="font-bold font-mono tabular-nums text-white text-[11px] sm:text-xs">
+                {remainingTime.days}T {String(remainingTime.hours).padStart(2, '0')}:{String(remainingTime.minutes).padStart(2, '0')}:{String(remainingTime.seconds).padStart(2, '0')}
+              </span>
+            </div>
+          )}
 
           {/* Link Generator for Multi-Client (ONLY ADMIN) */}
           {isAdmin && (
