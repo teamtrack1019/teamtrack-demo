@@ -250,34 +250,49 @@ document.addEventListener('DOMContentLoaded', () => {
   populateEmployeeDropdowns();
   populateHotelDropdowns();
   applyRolePermissions();
+  switchView('hotel');
   
   if (window.lucide) lucide.createIcons();
 });
 
-// View Switcher (Landing vs Admin vs Hotel vs Mitarbeiter)
+// View Switcher (Hotel vs Mitarbeiter vs Admin)
 function switchView(view) {
-  const publicView = document.getElementById('publicView');
   const adminView = document.getElementById('adminView');
   const hotelView = document.getElementById('hotelView');
   const mitarbeiterView = document.getElementById('mitarbeiterView');
 
-  if (publicView) publicView.classList.add('hidden');
   if (adminView) adminView.classList.add('hidden');
   if (hotelView) hotelView.classList.add('hidden');
   if (mitarbeiterView) mitarbeiterView.classList.add('hidden');
 
+  // Update top nav module buttons styling
+  const navHotel = document.getElementById('nav-btn-hotel');
+  const navMitarbeiter = document.getElementById('nav-btn-mitarbeiter');
+  const navAdmin = document.getElementById('nav-btn-admin');
+
+  const activeClass = 'bg-emerald-600 text-white shadow-sm';
+  const inactiveClass = 'text-slate-300 hover:text-white hover:bg-slate-700/60';
+
+  [navHotel, navMitarbeiter, navAdmin].forEach(btn => {
+    if (btn) {
+      btn.className = 'nav-module-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ' + inactiveClass;
+    }
+  });
+
   if (view === 'admin') {
     if (adminView) adminView.classList.remove('hidden');
+    if (navAdmin) navAdmin.className = 'nav-module-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ' + activeClass;
     renderAdminTable();
-  } else if (view === 'hotel') {
-    if (hotelView) hotelView.classList.remove('hidden');
-    initHotelModule();
   } else if (view === 'mitarbeiter') {
     if (mitarbeiterView) mitarbeiterView.classList.remove('hidden');
+    if (navMitarbeiter) navMitarbeiter.className = 'nav-module-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ' + activeClass;
     renderEmployeesTable();
     renderTimesheetsTable();
   } else {
-    if (publicView) publicView.classList.remove('hidden');
+    // Default to hotel dashboard
+    if (hotelView) hotelView.classList.remove('hidden');
+    if (navHotel) navHotel.className = 'nav-module-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ' + activeClass;
+    initHotelModule();
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2544,191 +2559,4 @@ function closePdfPreviewModal() {
   const modal = document.getElementById('pdfPreviewModal');
   if (modal) modal.classList.add('hidden');
 }
-
-// ==================== MOBILE NAVIGATION TOGGLE ====================
-
-function toggleMobileNav() {
-  const dropdown = document.getElementById('mobileNavDropdown');
-  if (!dropdown) return;
-  const isHidden = dropdown.classList.contains('hidden');
-  if (isHidden) {
-    dropdown.classList.remove('hidden');
-  } else {
-    dropdown.classList.add('hidden');
-  }
-}
-
-// ==================== TRIAL & CLIENT URL PARAMETER INIT ====================
-
-function initCleanProTrialParams() {
-  const params = new URLSearchParams(window.location.search);
-  const clientParam = params.get('client') || params.get('firma');
-  const daysParam = parseInt(params.get('days') || params.get('tage') || '7', 10);
-  const isAdmin = params.get('admin') === 'true' || params.get('admin') === '1' || window.location.hostname === 'localhost';
-
-  const pill = document.getElementById('cleanProTrialPill');
-  const clientNameEl = document.getElementById('cleanProClientName');
-  const timerDisplay = document.getElementById('cleanProTimerDisplay');
-
-  if (!pill) return;
-
-  if (clientParam || isAdmin) {
-    pill.classList.remove('hidden');
-    pill.classList.add('flex');
-
-    if (clientNameEl) {
-      clientNameEl.textContent = clientParam ? `Mandant: ${clientParam}` : 'Admin-Modus';
-    }
-
-    if (isAdmin) {
-      if (timerDisplay) {
-        timerDisplay.textContent = '∞ Unbegrenzt';
-        timerDisplay.className = 'font-bold text-emerald-300';
-      }
-    } else {
-      const storageKey = `cleanpro_trial_start_${clientParam || 'default'}`;
-      let startTime = localStorage.getItem(storageKey);
-      if (!startTime) {
-        startTime = Date.now().toString();
-        localStorage.setItem(storageKey, startTime);
-      }
-      const startMs = parseInt(startTime, 10);
-      const totalMs = daysParam * 24 * 60 * 60 * 1000;
-
-      const updateTimer = () => {
-        const remaining = totalMs - (Date.now() - startMs);
-        if (remaining <= 0) {
-          if (timerDisplay) timerDisplay.textContent = '0T 00:00:00';
-        } else {
-          const d = Math.floor(remaining / (1000 * 60 * 60 * 24));
-          const h = Math.floor((remaining / (1000 * 60 * 60)) % 24);
-          const m = Math.floor((remaining / 1000 / 60) % 60);
-          const s = Math.floor((remaining / 1000) % 60);
-          if (timerDisplay) {
-            timerDisplay.textContent = `${d}T ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-          }
-        }
-      };
-      updateTimer();
-      setInterval(updateTimer, 1000);
-    }
-  }
-}
-
-// ==================== CLEANPRO UPGRADE MODAL HANDLERS ====================
-
-function openCleanProUpgradeModal() {
-  const modal = document.getElementById('cleanProUpgradeModal');
-  const formView = document.getElementById('cleanProUpgradeFormView');
-  const successView = document.getElementById('cleanProUpgradeSuccessView');
-  
-  if (formView) formView.classList.remove('hidden');
-  if (successView) successView.classList.add('hidden');
-
-  // Prefill company name if client query param exists
-  const params = new URLSearchParams(window.location.search);
-  const clientParam = params.get('client') || params.get('firma');
-  const companyInput = document.getElementById('cleanUpgradeCompany');
-  if (companyInput && clientParam && !companyInput.value) {
-    companyInput.value = clientParam;
-  }
-
-  if (modal) {
-    modal.classList.remove('hidden');
-    if (window.lucide) lucide.createIcons();
-  }
-}
-
-function closeCleanProUpgradeModal() {
-  const modal = document.getElementById('cleanProUpgradeModal');
-  if (modal) modal.classList.add('hidden');
-}
-
-function triggerCleanProUpgrade() {
-  openCleanProUpgradeModal();
-  if (window.parent && window.parent !== window) {
-    window.parent.postMessage({ type: 'OPEN_UPGRADE_MODAL', module: 'Gebäudereinigung' }, '*');
-  }
-}
-
-async function handleCleanProUpgradeSubmit(e) {
-  e.preventDefault();
-  const submitBtn = document.getElementById('cleanUpgradeSubmitBtn');
-  const company = document.getElementById('cleanUpgradeCompany')?.value || '';
-  const contactName = document.getElementById('cleanUpgradeName')?.value || '';
-  const phone = document.getElementById('cleanUpgradePhone')?.value || '';
-  const email = document.getElementById('cleanUpgradeEmail')?.value || '';
-  const message = document.getElementById('cleanUpgradeMessage')?.value || '';
-
-  // Collect checked modules
-  const checkedBoxes = Array.from(document.querySelectorAll('input[name="cleanModule"]:checked')).map(cb => cb.value);
-  const selectedModulesStr = checkedBoxes.join(', ');
-
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span>E-Mail wird gesendet...</span>';
-  }
-
-  try {
-    const response = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        company: company,
-        contactName: contactName,
-        phone: phone,
-        email: email,
-        selectedModules: selectedModulesStr,
-        systemType: 'CleanPro Gebäudereinigung & Hotel',
-        timeline: 'Schnellstmöglich',
-        message: message || 'Anfrage über CleanPro Dashboard'
-      })
-    });
-
-    const formView = document.getElementById('cleanProUpgradeFormView');
-    const successView = document.getElementById('cleanProUpgradeSuccessView');
-    if (formView) formView.classList.add('hidden');
-    if (successView) {
-      successView.classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
-    }
-  } catch (err) {
-    console.warn('Submission fallback:', err);
-    const formView = document.getElementById('cleanProUpgradeFormView');
-    const successView = document.getElementById('cleanProUpgradeSuccessView');
-    if (formView) formView.classList.add('hidden');
-    if (successView) {
-      successView.classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
-    }
-  } finally {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i><span>Unverbindliches Festpreis-Angebot anfordern</span>';
-      if (window.lucide) lucide.createIcons();
-    }
-  }
-}
-
-function sendCleanProWhatsApp() {
-  const company = document.getElementById('cleanUpgradeCompany')?.value || 'Interessent';
-  const contactName = document.getElementById('cleanUpgradeName')?.value || '';
-  const phone = document.getElementById('cleanUpgradePhone')?.value || '';
-  const checkedBoxes = Array.from(document.querySelectorAll('input[name="cleanModule"]:checked')).map(cb => cb.value);
-  const selectedModulesStr = checkedBoxes.join(', ');
-
-  const text = encodeURIComponent(
-    `Hallo TeamTrack, ich interessiere mich für die maßgeschneiderte CleanPro Gebäudereinigung & Hotel Software.\n\nFirma: ${company}\nAnsprechpartner: ${contactName}\nTelefon: ${phone}\nGewünschte Module: ${selectedModulesStr}`
-  );
-  window.open(`https://wa.me/491726125371?text=${text}`, '_blank');
-}
-
-// Run on load
-document.addEventListener('DOMContentLoaded', () => {
-  initCleanProTrialParams();
-});
-setTimeout(() => {
-  initCleanProTrialParams();
-}, 200);
-
 

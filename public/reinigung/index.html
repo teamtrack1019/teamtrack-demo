@@ -44,11 +44,6 @@
     *, *:before, *:after {
       box-sizing: border-box;
     }
-    .glass-nav {
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
     .custom-shadow {
       box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.02);
     }
@@ -56,457 +51,72 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col overflow-x-hidden w-full max-w-full">
 
-  <!-- TOP HEADER / NAVBAR -->
-  <header class="sticky top-0 z-50 glass-nav border-b border-slate-200/80 transition-all duration-300">
+  <!-- TOP HEADER / ENTERPRISE OPERATIONS NAVBAR -->
+  <header class="sticky top-0 z-50 bg-slate-900 text-white border-b border-slate-800 transition-all duration-300 shadow-lg">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16 sm:h-20 gap-2">
         
-        <!-- Logo -->
-        <div class="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onclick="switchView('landing')">
+        <!-- Logo & Enterprise Brand -->
+        <div class="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onclick="switchView('hotel')">
           <div class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-emerald-600 to-teal-400 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 shrink-0">
-            <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+            <i data-lucide="building-2" class="w-5 h-5 sm:w-6 sm:h-6"></i>
           </div>
           <div>
-            <span class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">CleanPro</span>
-            <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 ml-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 hidden xs:inline-block">Reinigungsfirma</span>
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <span class="text-lg sm:text-xl font-extrabold tracking-tight text-white">CleanPro</span>
+              <span class="text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold px-1.5 sm:px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Portal</span>
+            </div>
+            <span class="text-[10px] sm:text-xs text-slate-400 font-medium hidden sm:inline">Hotel- & Gebäudereinigung Management Hub</span>
           </div>
         </div>
 
-        <!-- Navigation Links (Desktop) -->
-        <nav class="hidden xl:flex items-center gap-6 2xl:gap-8 text-sm font-medium text-slate-600 mr-2">
-          <a href="#services" class="hover:text-emerald-600 transition-colors" data-i18n="nav_services">Dienstleistungen</a>
-          <a href="#calculator" class="hover:text-emerald-600 transition-colors" data-i18n="nav_calc">Preiskalkulator</a>
-          <a href="#about" class="hover:text-emerald-600 transition-colors" data-i18n="nav_about">Über Uns</a>
-          <a href="#contact" class="hover:text-emerald-600 transition-colors" data-i18n="nav_contact">Kontakt</a>
+        <!-- Internal Module Switcher Navigation -->
+        <nav class="hidden md:flex items-center gap-1.5 bg-slate-800/90 p-1 rounded-2xl border border-slate-700/80">
+          <button onclick="switchView('hotel')" id="nav-btn-hotel" class="nav-module-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white flex items-center gap-1.5 transition-all shadow-sm">
+            <i data-lucide="hotel" class="w-3.5 h-3.5"></i>
+            <span>Hotel-Dashboard</span>
+          </button>
+          <button onclick="switchView('mitarbeiter')" id="nav-btn-mitarbeiter" class="nav-module-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5 transition-all">
+            <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Mitarbeiter</span>
+          </button>
+          <button onclick="switchView('admin')" id="nav-btn-admin" class="nav-module-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center gap-1.5 transition-all">
+            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>Aufträge</span>
+          </button>
         </nav>
 
-        <!-- Action Buttons & Badges -->
+        <!-- Role Badge, Trial Pill & Action Buttons -->
         <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           
           <!-- Client & Trial Countdown Badge (Dynamic) -->
           <div id="cleanProTrialPill" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold shadow-sm">
             <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-            <span id="cleanProClientName" class="hidden md:inline font-normal text-slate-300 border-r border-slate-700 pr-1.5">Mandant</span>
+            <span id="cleanProClientName" class="hidden lg:inline font-normal text-slate-300 border-r border-slate-700 pr-1.5">Mandant</span>
             <span id="cleanProTimerDisplay" class="font-mono text-white">7T 23:59:59</span>
           </div>
 
           <!-- Active User / Role Badge -->
-          <button onclick="openRoleModal()" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all border border-slate-700 shadow-sm shrink-0" title="Rolle & Benutzer wechseln">
+          <button onclick="openRoleModal()" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-all border border-slate-700 shadow-sm shrink-0" title="Rolle & Benutzer wechseln">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-            <span id="headerRoleBadge" class="truncate max-w-[90px] sm:max-w-none">Super-Admin</span>
+            <span id="headerRoleBadge" class="truncate max-w-[80px] sm:max-w-none">Super-Admin</span>
             <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0"></i>
           </button>
 
-          <!-- Mitarbeiterverwaltung Button (Desktop & Tablet) -->
-          <button onclick="switchView('mitarbeiter')" class="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all border border-emerald-200 shrink-0">
-            <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i>
-            <span>Mitarbeiter</span>
-          </button>
-
-          <!-- Admin Portal Switch Button (Desktop & Tablet) -->
-          <button onclick="switchView('admin')" class="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-300/70 shrink-0">
-            <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-700"></i>
-            <span>Admin Panel</span>
-          </button>
-
-          <!-- Hotel & HR Module Button (Desktop & Tablet) -->
-          <button onclick="switchView('hotel')" class="hidden sm:flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all shadow-sm shrink-0">
-            <i data-lucide="building" class="w-3.5 h-3.5 text-emerald-100"></i>
-            <span>Hotel & Nuxt-Dashboard</span>
-          </button>
-
           <!-- CTA: Vollversion Anfragen -->
-          <button onclick="triggerCleanProUpgrade()" class="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white transition-all shadow-md shadow-emerald-600/20 shrink-0">
+          <button onclick="openCleanProUpgradeModal()" class="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white transition-all shadow-md shadow-emerald-600/20 shrink-0">
             <i data-lucide="sparkles" class="w-3.5 h-3.5 text-yellow-300"></i>
             <span class="hidden sm:inline">Vollversion anfragen</span>
             <span class="sm:hidden">Anfragen</span>
           </button>
 
-          <!-- Mobile Hamburger Menu Button (Mobile only) -->
-          <button id="mobileNavToggle" onclick="toggleMobileNav()" class="xl:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-all shrink-0" title="Menü öffnen">
-            <i data-lucide="menu" id="mobileNavIcon" class="w-5 h-5"></i>
-          </button>
-
         </div>
-      </div>
-    </div>
 
-    <!-- Mobile Dropdown Navigation Menu -->
-    <div id="mobileNavDropdown" class="hidden xl:hidden bg-white/95 border-b border-slate-200 px-4 py-4 space-y-3 shadow-xl backdrop-blur-lg animate-in slide-in-from-top-2 duration-200">
-      <div class="grid grid-cols-2 gap-2 text-xs font-bold">
-        <button onclick="switchView('hotel'); toggleMobileNav();" class="p-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center gap-2 shadow-sm text-left">
-          <i data-lucide="building" class="w-4 h-4"></i> Hotel-Dashboard
-        </button>
-        <button onclick="switchView('mitarbeiter'); toggleMobileNav();" class="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-2 text-left">
-          <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i> Mitarbeiter
-        </button>
-        <button onclick="switchView('admin'); toggleMobileNav();" class="p-2.5 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-2 text-left">
-          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Panel
-        </button>
-        <button onclick="switchView('landing'); toggleMobileNav();" class="p-2.5 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-2 text-left">
-          <i data-lucide="home" class="w-4 h-4"></i> Startseite / Buchung
-        </button>
-      </div>
-      <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-3 text-xs font-medium text-slate-600">
-        <a href="#services" onclick="toggleMobileNav()" class="hover:text-emerald-600">Dienstleistungen</a>
-        <a href="#calculator" onclick="toggleMobileNav()" class="hover:text-emerald-600">Preiskalkulator</a>
-        <a href="#about" onclick="toggleMobileNav()" class="hover:text-emerald-600">Über Uns</a>
-        <a href="#contact" onclick="toggleMobileNav()" class="hover:text-emerald-600">Kontakt</a>
-      </div>
-    </div>
-  </header>
       </div>
     </div>
   </header>
 
-  <!-- ==================== VIEW 1: PUBLIC LANDING & BOOKING ==================== -->
-  <main id="publicView" class="flex-grow">
-    
-    <!-- Hero Section -->
-    <section class="relative pt-12 pb-20 overflow-hidden bg-gradient-to-b from-white via-slate-50 to-emerald-50/30">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
-              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-              <span data-i18n="hero_badge">100% Kundenzufriedenheit & Zertifizierte Qualität</span>
-            </div>
-            
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-              <span data-i18n="hero_title_1">Makellose Sauberkeit für</span><br>
-              <span class="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent" data-i18n="hero_title_2">Ihr Zuhause & Büro</span>
-            </h1>
-            
-            <p class="text-lg text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed" data-i18n="hero_desc">
-              Professionelle Reinigungsdienste mit ökologischen Reinigungsmitteln, geschultem Personal und flexiblen Terminoptionen. Sofort online Preis berechnen und buchen!
-            </p>
 
-            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
-              <button onclick="scrollToBooking()" class="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5">
-                <i data-lucide="calculator" class="w-5 h-5"></i>
-                <span data-i18n="hero_cta_1">Preis Berechnen & Buchen</span>
-              </button>
-              <a href="#services" class="px-8 py-4 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-xl border border-slate-300 shadow-sm flex items-center justify-center gap-2 transition-all">
-                <span data-i18n="hero_cta_2">Unsere Leistungen</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </a>
-            </div>
-
-            <!-- Trust stats -->
-            <div class="grid grid-cols-3 gap-6 pt-6 border-t border-slate-200/80">
-              <div>
-                <p class="text-2xl sm:text-3xl font-extrabold text-slate-900">4.9 / 5</p>
-                <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-amber-400"></i> Google Bewertungen</p>
-              </div>
-              <div>
-                <p class="text-2xl sm:text-3xl font-extrabold text-slate-900">1.200+</p>
-                <p class="text-xs text-slate-500 mt-0.5" data-i18n="stat_cleans">Erfolgreiche Einsätze</p>
-              </div>
-              <div>
-                <p class="text-2xl sm:text-3xl font-extrabold text-emerald-600">100%</p>
-                <p class="text-xs text-slate-500 mt-0.5" data-i18n="stat_guarantee">Zufriedenheitsgarantie</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Hero Floating Card Preview -->
-          <div class="lg:col-span-5 relative">
-            <div class="bg-white p-6 sm:p-8 rounded-3xl custom-shadow border border-slate-100 relative">
-              <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
-                    <i data-lucide="zap" class="w-5 h-5"></i>
-                  </div>
-                  <div>
-                    <h3 class="font-bold text-slate-900" data-i18n="quick_calc_title">Express-Kalkulator</h3>
-                    <p class="text-xs text-slate-500" data-i18n="quick_calc_sub">In 30 Sekunden zum Festpreis</p>
-                  </div>
-                </div>
-                <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg">Live</span>
-              </div>
-
-              <!-- Mini Quick Form -->
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_service_type">Reinigungsart</label>
-                  <select id="quickService" onchange="calculatePrice()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500">
-                    <option value="wohnung">🏠 Wohnungsreinigung</option>
-                    <option value="buero">🏢 Büro- & Gewerbereinigung</option>
-                    <option value="bau">🔨 Bau- & Endreinigung</option>
-                    <option value="fenster">🪟 Fenster- & Glasreinigung</option>
-                    <option value="umzug">📦 Umzugsreinigung</option>
-                  </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_sqm">Fläche (m²)</label>
-                    <input type="number" id="quickSqm" value="80" min="20" max="1000" oninput="calculatePrice()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500">
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_frequency">Häufigkeit</label>
-                    <select id="quickFreq" onchange="calculatePrice()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-emerald-500">
-                      <option value="einmalig">Einmalig (Standard)</option>
-                      <option value="woechentlich">Wöchentlich (-15% Rabatt)</option>
-                      <option value="zweiwoechentlich">Alle 2 Wochen (-10%)</option>
-                      <option value="monatlich">Monatlich (-5%)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <!-- Live Estimated Box -->
-                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-2xl border border-emerald-100 flex items-center justify-between mt-4">
-                  <div>
-                    <span class="text-xs text-emerald-800 font-semibold" data-i18n="lbl_estimated_price">Geschätzter Gesamtpreis</span>
-                    <p class="text-2xl font-extrabold text-emerald-700" id="quickPriceDisplay">€ 149,00</p>
-                  </div>
-                  <button onclick="scrollToBooking()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition-all">
-                    <span data-i18n="btn_select">Auswählen</span>
-                  </button>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Services Section -->
-    <section id="services" class="py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-          <h2 class="text-xs font-bold tracking-widest text-emerald-600 uppercase" data-i18n="services_sub">Unsere Dienstleistungen</h2>
-          <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2" data-i18n="services_title">Für jeden Bedarf die passende Reinigung</p>
-          <p class="text-slate-600 mt-4 text-base" data-i18n="services_desc">Von privaten Haushalten bis zu gewerblichen Großflächen bieten wir zertifizierte Sauberkeit mit Zufriedenheitsgarantie.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          
-          <!-- Service 1 -->
-          <div class="p-8 rounded-3xl bg-slate-50 hover:bg-emerald-50/40 border border-slate-200/80 hover:border-emerald-200 transition-all duration-300 group">
-            <div class="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
-              <i data-lucide="home" class="w-7 h-7"></i>
-            </div>
-            <h3 class="text-xl font-bold text-slate-900 mb-3" data-i18n="srv_home_title">Wohnungsreinigung</h3>
-            <p class="text-slate-600 text-sm leading-relaxed mb-6" data-i18n="srv_home_desc">Regelmäßige oder einmalige Grundreinigung aller Zimmer, Küche, Bad, Böden und Oberflächen.</p>
-            <ul class="space-y-2 text-xs font-medium text-slate-600 mb-6">
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Staubwischen & Saugen</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Bad & WC Desinfektion</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Küchenoberflächen & Spüle</li>
-            </ul>
-            <button onclick="prefillService('wohnung')" class="w-full py-2.5 bg-white group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-bold rounded-xl border border-slate-300 group-hover:border-transparent transition-all">
-              Jetzt Buchen
-            </button>
-          </div>
-
-          <!-- Service 2 -->
-          <div class="p-8 rounded-3xl bg-slate-50 hover:bg-emerald-50/40 border border-slate-200/80 hover:border-emerald-200 transition-all duration-300 group">
-            <div class="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
-              <i data-lucide="building-2" class="w-7 h-7"></i>
-            </div>
-            <h3 class="text-xl font-bold text-slate-900 mb-3" data-i18n="srv_office_title">Büro- & Praxisreinigung</h3>
-            <p class="text-slate-600 text-sm leading-relaxed mb-6" data-i18n="srv_office_desc">Hygienische Arbeitsplatzreinigung, Konferenzräume, Küchen, Sanitäranlagen und Müllentsorgung.</p>
-            <ul class="space-y-2 text-xs font-medium text-slate-600 mb-6">
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Schreibtische & Bildschirme</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Flexible Arbeitszeiten (vor/nach Büro)</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Monatliche Rechnungsstellung</li>
-            </ul>
-            <button onclick="prefillService('buero')" class="w-full py-2.5 bg-white group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-bold rounded-xl border border-slate-300 group-hover:border-transparent transition-all">
-              Jetzt Buchen
-            </button>
-          </div>
-
-          <!-- Service 3 -->
-          <div class="p-8 rounded-3xl bg-slate-50 hover:bg-emerald-50/40 border border-slate-200/80 hover:border-emerald-200 transition-all duration-300 group">
-            <div class="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
-              <i data-lucide="hammer" class="w-7 h-7"></i>
-            </div>
-            <h3 class="text-xl font-bold text-slate-900 mb-3" data-i18n="srv_bau_title">Baureinigung</h3>
-            <p class="text-slate-600 text-sm leading-relaxed mb-6" data-i18n="srv_bau_desc">Baugrobreinigung und Baufeinreinigung nach Neubau oder Sanierung bezugsfertig vorbereitet.</p>
-            <ul class="space-y-2 text-xs font-medium text-slate-600 mb-6">
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Baustaub- & Mörtelentfernung</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Farb- & Zementschleierentfernung</li>
-              <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500"></i> Bezugsfertige Übergabe</li>
-            </ul>
-            <button onclick="prefillService('bau')" class="w-full py-2.5 bg-white group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-bold rounded-xl border border-slate-300 group-hover:border-transparent transition-all">
-              Jetzt Buchen
-            </button>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Booking & Detail Calculator Section -->
-    <section id="calculator" class="py-20 bg-slate-100/70 border-t border-slate-200">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-12">
-          <h2 class="text-xs font-bold tracking-widest text-emerald-600 uppercase" data-i18n="calc_sub">Online Buchung</h2>
-          <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2" data-i18n="calc_title">Wunschtermin & Festpreis Buchen</p>
-          <p class="text-slate-600 mt-3 text-sm" data-i18n="calc_desc">Wählen Sie Ihre Details, berechnen Sie den Live-Preis und sichern Sie sich Ihren Reinigungstermin.</p>
-        </div>
-
-        <div class="bg-white rounded-3xl custom-shadow border border-slate-200/80 p-6 sm:p-10">
-          <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-8">
-            
-            <!-- Step 1: Services Selection -->
-            <div>
-              <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">1</span>
-                <span data-i18n="step1_title">Reinigungsart & Umfang</span>
-              </h3>
-              
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <label class="cursor-pointer border-2 border-emerald-500 bg-emerald-50/50 p-4 rounded-2xl flex flex-col items-center text-center transition-all service-card" onclick="selectServiceCard('wohnung', this)">
-                  <input type="radio" name="mainService" value="wohnung" checked class="hidden">
-                  <i data-lucide="home" class="w-8 h-8 text-emerald-600 mb-2"></i>
-                  <span class="font-bold text-sm text-slate-900">Wohnung</span>
-                  <span class="text-xs text-slate-500 mt-1">Ab € 1.50 / m²</span>
-                </label>
-
-                <label class="cursor-pointer border-2 border-slate-200 hover:border-slate-300 p-4 rounded-2xl flex flex-col items-center text-center transition-all service-card" onclick="selectServiceCard('buero', this)">
-                  <input type="radio" name="mainService" value="buero" class="hidden">
-                  <i data-lucide="building" class="w-8 h-8 text-slate-600 mb-2"></i>
-                  <span class="font-bold text-sm text-slate-900">Büro / Gewerbe</span>
-                  <span class="text-xs text-slate-500 mt-1">Ab € 1.80 / m²</span>
-                </label>
-
-                <label class="cursor-pointer border-2 border-slate-200 hover:border-slate-300 p-4 rounded-2xl flex flex-col items-center text-center transition-all service-card" onclick="selectServiceCard('bau', this)">
-                  <input type="radio" name="mainService" value="bau" class="hidden">
-                  <i data-lucide="hammer" class="w-8 h-8 text-slate-600 mb-2"></i>
-                  <span class="font-bold text-sm text-slate-900">Bau / Umzug</span>
-                  <span class="text-xs text-slate-500 mt-1">Ab € 2.50 / m²</span>
-                </label>
-              </div>
-
-              <!-- Sliders and Inputs -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-200/60">
-                <div>
-                  <div class="flex justify-between text-sm font-semibold mb-2">
-                    <span data-i18n="lbl_area">Fläche in Quadratmeter:</span>
-                    <span class="text-emerald-700 font-bold" id="sqmValueText">80 m²</span>
-                  </div>
-                  <input type="range" id="calcSqm" min="20" max="400" value="80" step="5" oninput="updateFullPrice()" class="w-full accent-emerald-600 cursor-pointer">
-                </div>
-
-                <div>
-                  <div class="flex justify-between text-sm font-semibold mb-2">
-                    <span data-i18n="lbl_rooms">Zimmeranzahl:</span>
-                    <span class="text-emerald-700 font-bold" id="roomsValueText">3 Zimmer</span>
-                  </div>
-                  <input type="range" id="calcRooms" min="1" max="10" value="3" oninput="updateFullPrice()" class="w-full accent-emerald-600 cursor-pointer">
-                </div>
-              </div>
-            </div>
-
-            <!-- Extras Selection -->
-            <div>
-              <h4 class="text-sm font-bold text-slate-900 mb-3" data-i18n="lbl_extras">Zusatzleistungen (Extras):</h4>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 text-xs font-semibold">
-                  <input type="checkbox" id="extraFenster" onchange="updateFullPrice()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
-                  <span>🪟 Fenster (+€45)</span>
-                </label>
-                <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 text-xs font-semibold">
-                  <input type="checkbox" id="extraOfen" onchange="updateFullPrice()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
-                  <span>🍳 Backofen (+€35)</span>
-                </label>
-                <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 text-xs font-semibold">
-                  <input type="checkbox" id="extraKuehlschrank" onchange="updateFullPrice()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
-                  <span>❄️ Kühlschrank (+€25)</span>
-                </label>
-                <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 text-xs font-semibold">
-                  <input type="checkbox" id="extraBalkon" onchange="updateFullPrice()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
-                  <span>🌿 Balkon (+€30)</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Step 2: Date & Contact -->
-            <div class="pt-4 border-t border-slate-200">
-              <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">2</span>
-                <span data-i18n="step2_title">Termin & Kontaktdaten</span>
-              </h3>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_name">Vollständiger Name *</label>
-                  <input type="text" id="custName" required placeholder="Max Mustermann" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_email">E-Mail Adresse *</label>
-                  <input type="email" id="custEmail" required placeholder="max@example.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_phone">Telefonnummer *</label>
-                  <input type="tel" id="custPhone" required placeholder="+49 170 1234567" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_address">Adresse / Ort *</label>
-                  <input type="text" id="custAddress" required placeholder="Musterstr. 12, 80331 München" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_date">Wunschdatum *</label>
-                  <input type="date" id="custDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="lbl_time">Uhrzeit *</label>
-                  <select id="custTime" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
-                    <option value="08:00">08:00 Uhr</option>
-                    <option value="10:00" selected>10:00 Uhr</option>
-                    <option value="13:00">13:00 Uhr</option>
-                    <option value="15:00">15:00 Uhr</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Total Price Summary & Submit -->
-            <div class="bg-gradient-to-tr from-slate-900 to-slate-800 text-white p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div>
-                <span class="text-xs text-slate-400 font-medium tracking-wide uppercase" data-i18n="lbl_total_festpreis">Berechneter Festpreis (inkl. MwSt.)</span>
-                <div class="flex items-baseline gap-2 mt-1">
-                  <span class="text-4xl font-extrabold text-emerald-400" id="finalTotalDisplay">€ 149,00</span>
-                  <span class="text-xs text-slate-400">/ Keine versteckten Kosten</span>
-                </div>
-              </div>
-
-              <button type="submit" class="w-full sm:w-auto px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5">
-                <i data-lucide="check-circle-2" class="w-5 h-5"></i>
-                <span data-i18n="btn_submit_booking">Jetzt Verbindlich Buchen</span>
-              </button>
-            </div>
-
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <!-- Success Modal -->
-    <div id="successModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-md w-full p-8 text-center custom-shadow transform transition-all">
-        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>
-        </div>
-        <h3 class="text-2xl font-bold text-slate-900 mb-2" data-i18n="modal_success_title">Buchung Erfolgreich!</h3>
-        <p class="text-sm text-slate-600 mb-6" data-i18n="modal_success_desc">Vielen Dank! Ihre Buchungsanfrage wurde erfolgreich gespeichert. Sie erhalten in Kürze eine Bestätigung.</p>
-        <div class="bg-slate-50 p-4 rounded-xl text-xs text-left font-mono text-slate-700 mb-6 space-y-1" id="modalSummaryContent">
-          <!-- Summary inserted by JS -->
-        </div>
-        <div class="flex gap-3">
-          <button onclick="closeSuccessModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm">Schließen</button>
-          <button onclick="switchView('admin'); closeSuccessModal();" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1.5">
-            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Im Admin ansehen
-          </button>
-        </div>
-      </div>
-    </div>
-
-  </main>
 
   <!-- ==================== VIEW 2: MITARBEITERVERWALTUNG (VOLLSTÄNDIGES PERSONALMODUL) ==================== -->
   <main id="mitarbeiterView" class="hidden flex-grow bg-slate-100/90 py-8">
@@ -534,8 +144,8 @@
           <button onclick="exportEmployeesCSV()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-2 border border-slate-300">
             <i data-lucide="download" class="w-4 h-4"></i> CSV Export
           </button>
-          <button onclick="switchView('landing')" class="px-3.5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 flex items-center gap-1.5">
-            <i data-lucide="arrow-left" class="w-4 h-4"></i> Zurück
+          <button onclick="switchView('hotel')" class="px-3.5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 flex items-center gap-1.5">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Zum Hotel-Dashboard
           </button>
         </div>
       </div>
@@ -894,8 +504,8 @@
           <button onclick="exportBookingsCSV()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-2 border border-slate-300">
             <i data-lucide="download" class="w-4 h-4"></i> CSV Export
           </button>
-          <button onclick="switchView('landing')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow">
-            <i data-lucide="external-link" class="w-4 h-4"></i> Zurück zur Website
+          <button onclick="switchView('hotel')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow">
+            <i data-lucide="hotel" class="w-4 h-4"></i> Zum Hotel-Dashboard
           </button>
         </div>
       </div>
@@ -985,7 +595,7 @@
   </main>
 
   <!-- ==================== VIEW 4: HOTELREINIGUNG & NUXT ENTERPRISE DASHBOARD ==================== -->
-  <main id="hotelView" class="hidden flex-grow bg-slate-100/90 py-8">
+  <main id="hotelView" class="flex-grow bg-slate-100/90 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Top Banner -->
@@ -994,7 +604,7 @@
           <div>
             <div class="flex items-center gap-2 mb-2">
               <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-full flex items-center gap-1.5">
-                <i data-lucide="layers" class="w-3.5 h-3.5"></i> Nuxt/Tailwind Enterprise Architecture
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i> Nuxt Enterprise Architecture (Intern)
               </span>
               <span class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-xs border border-slate-700" id="currentRoleDisplay">Rolle: Super-Admin</span>
             </div>
@@ -1012,13 +622,10 @@
               <i data-lucide="user-check" class="w-4 h-4"></i> Rolle wechseln
             </button>
             <button onclick="switchView('mitarbeiter')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-2">
-              <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Personal
+              <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Personal & HR
             </button>
             <button onclick="switchView('admin')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-2">
-              <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i> Admin
-            </button>
-            <button onclick="switchView('landing')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl flex items-center gap-2">
-              <i data-lucide="external-link" class="w-4 h-4"></i> Zurück
+              <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i> Auftragsübersicht
             </button>
           </div>
         </div>
@@ -2198,9 +1805,11 @@
       </div>
       <p>© 2026 CleanPro. Alle Rechte vorbehalten. Impressum | Datenschutz | AGB</p>
       <div class="flex gap-4">
+        <button onclick="switchView('hotel')" class="text-emerald-400 hover:text-emerald-300 font-semibold">Hotel-Dashboard</button>
+        <span class="text-slate-600">|</span>
         <button onclick="switchView('mitarbeiter')" class="text-emerald-400 hover:text-emerald-300 font-semibold">Mitarbeiterverwaltung</button>
         <span class="text-slate-600">|</span>
-        <button onclick="switchView('admin')" class="text-emerald-400 hover:text-emerald-300 font-semibold">Admin Login</button>
+        <button onclick="switchView('admin')" class="text-emerald-400 hover:text-emerald-300 font-semibold">Auftragsübersicht</button>
       </div>
     </div>
   </footer>
