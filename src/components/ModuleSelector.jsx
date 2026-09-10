@@ -70,7 +70,7 @@ export const ModuleSelector = () => {
       shortName: 'Reinigung',
       subtitle: 'CleanPro Suite',
       icon: Sparkles,
-      badge: 'Live'
+      badge: '4'
     }
   ];
 

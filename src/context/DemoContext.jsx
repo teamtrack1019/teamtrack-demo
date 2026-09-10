@@ -85,6 +85,8 @@ export const DemoProvider = ({ children }) => {
     absences: 0
   });
 
+  const [isDedicatedClient, setIsDedicatedClient] = useState(false);
+
   // Initialize Client, Admin & Trial from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -121,6 +123,10 @@ export const DemoProvider = ({ children }) => {
     if (moduleParam && ['overview', 'zeiterfassung', 'rechnungen', 'crm', 'fuhrpark', 'disposition', 'reinigung'].includes(moduleParam.toLowerCase())) {
       setActiveModule(moduleParam.toLowerCase());
     }
+
+    // Is this a dedicated customer link specifically for cleaning?
+    const isDedicated = !adminState && (moduleParam?.toLowerCase() === 'reinigung' || params.get('only') === 'reinigung');
+    setIsDedicatedClient(isDedicated);
 
     // Check or init trial start time in localStorage for this client
     const timeKey = `teamtrack_trial_start_${effectiveClientId}`;
@@ -313,6 +319,7 @@ export const DemoProvider = ({ children }) => {
         setClientId,
         trialDays,
         isAdmin,
+        isDedicatedClient,
         remainingTime,
         isExpired,
         activeModule,
