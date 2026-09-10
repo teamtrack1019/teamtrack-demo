@@ -20,9 +20,12 @@ export const UpgradeModal = () => {
     setIsUpgradeModalOpen, 
     upgradePrefillModule, 
     clientId,
+    activeModule,
     triggerConfetti,
     addToast
   } = useDemo();
+
+  const isCleaningMode = activeModule === 'reinigung' || (upgradePrefillModule && upgradePrefillModule.toLowerCase().includes('reinigung'));
 
   const [selectedModules, setSelectedModules] = useState({
     zeiterfassung: true,
@@ -30,11 +33,17 @@ export const UpgradeModal = () => {
     crm: true,
     fuhrpark: true,
     disposition: true,
-    whitelabel: true
+    whitelabel: true,
+    hotel_objekte: true,
+    dienstplaner: true,
+    lohnabrechnung: true,
+    kundenabnahme: true,
+    preiskalkulator: true,
+    whitelabel_reinigung: true
   });
 
   const [formData, setFormData] = useState({
-    company: clientId !== 'Musterkunde' ? clientId : '',
+    company: clientId !== 'Musterkunde' && clientId !== 'Standard-Demo' ? clientId : '',
     contactName: '',
     email: '',
     phone: '',
@@ -61,19 +70,27 @@ export const UpgradeModal = () => {
     setSelectedModules(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const selectedListString = Object.entries(selectedModules)
-    .filter(([_, val]) => val)
-    .map(([key]) => {
-      const names = {
-        zeiterfassung: 'Zeiterfassung & Stempeluhr',
-        rechnungen: '1-Klick Rechnungen',
-        crm: 'CRM & Kundenkartei',
-        fuhrpark: 'Fuhrpark & Logistik',
-        disposition: 'Auftragsdisposition',
-        whitelabel: 'Eigenes Firmenbranding (White-Label)'
-      };
-      return names[key] || key;
-    })
+  const currentModuleOptions = isCleaningMode
+    ? [
+        { key: 'hotel_objekte', label: '🏨 Hotel- & Objektverwaltung (Zimmerpreise)' },
+        { key: 'dienstplaner', label: '📅 Tägliche Erfassung & Dienstplaner (PDF)' },
+        { key: 'lohnabrechnung', label: '💰 Lohnabrechnung & § 3b EStG Zuschläge' },
+        { key: 'kundenabnahme', label: '✍️ Digitale Kundenabnahme & Unterschrift' },
+        { key: 'preiskalkulator', label: '🧮 Express-Preiskalkulator für Sofortangebote' },
+        { key: 'whitelabel_reinigung', label: '✨ 100% Eigenes CleanPro Firmen-Branding' }
+      ]
+    : [
+        { key: 'zeiterfassung', label: '⏱️ Zeiterfassung & Stempeluhr (PWA)' },
+        { key: 'rechnungen', label: '🧾 1-Klick Rechnungen & DATEV' },
+        { key: 'crm', label: '👥 CRM & Kundenverwaltung' },
+        { key: 'fuhrpark', label: '🚚 Fuhrpark & Touren-Logistik' },
+        { key: 'disposition', label: '📋 Auftragsdisposition & Kanban' },
+        { key: 'whitelabel', label: '✨ 100% Eigenes Firmen-Branding' }
+      ];
+
+  const selectedListString = currentModuleOptions
+    .filter(mod => selectedModules[mod.key])
+    .map(mod => mod.label)
     .join(', ');
 
   const handleSubmit = async (e) => {
@@ -94,6 +111,7 @@ export const UpgradeModal = () => {
           phone: formData.phone,
           email: formData.email,
           selectedModules: selectedListString,
+          systemType: isCleaningMode ? 'CleanPro Gebäudereinigung & Hotel' : 'TeamTrack Handwerk & Firmen',
           timeline: formData.timeline,
           message: formData.message || 'Keine zusätzliche Notiz',
           clientId: clientId
@@ -123,7 +141,7 @@ export const UpgradeModal = () => {
   };
 
   const whatsappMessage = encodeURIComponent(
-    `Hallo TeamTrack, ich habe die Demo getestet und interessiere mich für eine Firmen-Software.\n\nFirma: ${formData.company || clientId}\nAnsprechpartner: ${formData.contactName}\nGewünschte Module: ${selectedListString}\nTelefon: ${formData.phone}`
+    `Hallo TeamTrack, ich interessiere mich für eine maßgeschneiderte ${isCleaningMode ? 'Gebäudereinigung- & Hotel-Software (CleanPro)' : 'Firmen-Software'}.\n\nFirma: ${formData.company || clientId}\nAnsprechpartner: ${formData.contactName}\nGewünschte Module: ${selectedListString}\nTelefon: ${formData.phone}`
   );
 
   return (
@@ -149,13 +167,17 @@ export const UpgradeModal = () => {
             <div className="pr-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-bold uppercase tracking-wider mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-                Maßgeschneiderte Vollversion
+                {isCleaningMode ? 'CleanPro Gebäudereinigung Vollversion' : 'Maßgeschneiderte Vollversion'}
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white">
-                Ihre eigene Firmen-Software einrichten lassen
+                {isCleaningMode 
+                  ? 'Ihre maßgeschneiderte Reinigungs-Software einrichten lassen' 
+                  : 'Ihre eigene Firmen-Software einrichten lassen'}
               </h2>
               <p className="text-xs text-slate-300 mt-1">
-                Wählen Sie Ihre gewünschten Module. Wir konfigurieren die WebApp exakt für Ihre Betriebsabläufe – 100% DSGVO-konform und mit Ihrem Firmenlogo.
+                {isCleaningMode
+                  ? 'Wählen Sie Ihre gewünschten Module für Ihren Reinigungsbetrieb. Wir konfigurieren die CleanPro Suite exakt für Ihre Objekte, Mitarbeiter und Abrechnung.'
+                  : 'Wählen Sie Ihre gewünschten Module. Wir konfigurieren die WebApp exakt für Ihre Betriebsabläufe – 100% DSGVO-konform und mit Ihrem Firmenlogo.'}
               </p>
             </div>
 
@@ -167,20 +189,13 @@ export const UpgradeModal = () => {
                   Gewünschte Module für Ihr Unternehmen auswählen:
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {[
-                    { key: 'zeiterfassung', label: '⏱️ Zeiterfassung & Stempeluhr (PWA)' },
-                    { key: 'rechnungen', label: '🧾 1-Klick Rechnungen & DATEV' },
-                    { key: 'crm', label: '👥 CRM & Kundenverwaltung' },
-                    { key: 'fuhrpark', label: '🚚 Fuhrpark & Touren-Logistik' },
-                    { key: 'disposition', label: '📋 Auftragsdisposition & Kanban' },
-                    { key: 'whitelabel', label: '✨ 100% Eigenes Firmen-Branding' },
-                  ].map((mod) => (
+                  {currentModuleOptions.map((mod) => (
                     <label
                       key={mod.key}
                       onClick={() => handleToggleModule(mod.key)}
-                      className={`flex items-center gap-2.5 p-2 rounded-xl border cursor-pointer transition-all ${
+                      className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-all ${
                         selectedModules[mod.key]
-                          ? 'bg-brand-600/20 border-brand-500/50 text-white font-bold'
+                          ? 'bg-emerald-600/20 border-emerald-500/50 text-white font-bold'
                           : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
                     >
@@ -188,7 +203,7 @@ export const UpgradeModal = () => {
                         type="checkbox"
                         checked={selectedModules[mod.key] || false}
                         onChange={() => {}}
-                        className="rounded bg-slate-900 border-slate-700 text-brand-500 focus:ring-0"
+                        className="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0"
                       />
                       <span className="text-[11px] sm:text-xs">{mod.label}</span>
                     </label>

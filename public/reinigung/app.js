@@ -2615,6 +2615,16 @@ function initCleanProTrialParams() {
   }
 }
 
+// Trigger Upgrade modal in parent React application
+function triggerCleanProUpgrade() {
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'OPEN_UPGRADE_MODAL', module: 'Gebäudereinigung' }, '*');
+  } else {
+    // Standalone fallback: redirect to contact section or booking
+    window.location.href = '#calculator';
+  }
+}
+
 // Run on load
 document.addEventListener('DOMContentLoaded', () => {
   initCleanProTrialParams();

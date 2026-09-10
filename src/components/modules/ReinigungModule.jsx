@@ -3,8 +3,19 @@ import { ArrowLeft, RefreshCw, Sparkles } from 'lucide-react';
 import { useDemo } from '../../context/DemoContext';
 
 export const ReinigungModule = () => {
-  const { clientId, trialDays, isAdmin, setActiveModule } = useDemo();
+  const { clientId, trialDays, isAdmin, setActiveModule, openUpgradeModal } = useDemo();
   const [iframeKey, setIframeKey] = useState(0);
+
+  // Listen for modal trigger requests from inside CleanPro iframe
+  React.useEffect(() => {
+    const handleMessage = (e) => {
+      if (e.data && e.data.type === 'OPEN_UPGRADE_MODAL') {
+        openUpgradeModal('Gebäudereinigung');
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [openUpgradeModal]);
 
   // Forward query parameters so client name & trial countdown work inside CleanPro
   const currentParams = new URLSearchParams(window.location.search);
