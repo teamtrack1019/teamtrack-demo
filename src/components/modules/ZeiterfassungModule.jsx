@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
+import { VariantSelectorBar } from '../VariantSelectorBar';
 import { 
   Play, 
   Square, 
@@ -31,7 +32,13 @@ import {
   Truck,
   Hammer,
   ShieldAlert,
-  Gauge
+  Gauge,
+  Hash,
+  QrCode,
+  Layers,
+  Table,
+  MonitorCheck,
+  Key
 } from 'lucide-react';
 
 export const ZeiterfassungModule = () => {
@@ -42,8 +49,87 @@ export const ZeiterfassungModule = () => {
     triggerRestrictedAction, 
     openUpgradeModal,
     maxCreationLimit,
-    createdCounts
+    createdCounts,
+    addToast
   } = useDemo();
+
+  // Active Variant: 'a' (Live-Stempeluhr) | 'b' (Wochen-Matrix) | 'c' (Terminal Kiosk)
+  const [activeVariant, setActiveVariant] = useState('a');
+
+  const variants = [
+    {
+      id: 'a',
+      badge: 'Variante A',
+      title: 'Live-Stempeluhr (Mobil & LKW)',
+      subtitle: 'GPS-Verifikation, Smartphone PWA & LKW-Sicherheitsmodus nach EU-VO 561/2006',
+      icon: Smartphone,
+      color: 'brand'
+    },
+    {
+      id: 'b',
+      badge: 'Variante B',
+      title: 'Wochen-Matrix & DATEV',
+      subtitle: 'Montag–Sonntag Stundentabelle, Überstundenberechnung & 1-Klick Lohnexport',
+      icon: Table,
+      color: 'emerald'
+    },
+    {
+      id: 'c',
+      badge: 'Variante C',
+      title: 'Werkstatt-Terminal / Kiosk',
+      subtitle: 'Tablet-Stempelterminal für Halle & Werkstatt mit PIN-Code & RFID/NFC Chip',
+      icon: MonitorCheck,
+      color: 'purple'
+    }
+  ];
+
+  // State for Variante B: Wochen-Matrix
+  const [weeklyMatrix, setWeeklyMatrix] = useState([
+    { id: 'EMP-01', name: 'Max Mustermann', role: 'Bauleiter', mon: 8.5, tue: 8.0, wed: 8.5, thu: 9.0, fri: 6.0, sat: 0, target: 40.0 },
+    { id: 'EMP-02', name: 'Sarah Weber', role: 'Elektro-Technikerin', mon: 8.0, tue: 8.0, wed: 8.0, thu: 8.0, fri: 8.0, sat: 0, target: 40.0 },
+    { id: 'EMP-03', name: 'Jan Becker', role: 'Monteur', mon: 7.5, tue: 8.0, wed: 7.5, thu: 8.0, fri: 7.0, sat: 0, target: 38.0 },
+    { id: 'EMP-04', name: 'Murat Demir', role: 'LKW-Fahrer (VO 561)', mon: 9.0, tue: 9.0, wed: 8.5, thu: 9.0, fri: 4.5, sat: 0, target: 40.0 },
+    { id: 'EMP-05', name: 'Elena Rostova', role: 'Objektleiterin', mon: 6.0, tue: 6.0, wed: 6.0, thu: 6.0, fri: 6.0, sat: 0, target: 30.0 }
+  ]);
+
+  const handleMatrixChange = (empId, day, val) => {
+    const num = parseFloat(val) || 0;
+    setWeeklyMatrix(weeklyMatrix.map(emp => emp.id === empId ? { ...emp, [day]: num } : emp));
+  };
+
+  // State for Variante C: Werkstatt-Terminal (Kiosk)
+  const [terminalEmployee, setTerminalEmployee] = useState('Max Mustermann');
+  const [pinCode, setPinCode] = useState('');
+  const [terminalMessage, setTerminalMessage] = useState(null);
+
+  const handleTerminalKeypad = (num) => {
+    if (pinCode.length < 4) {
+      setPinCode(pinCode + num);
+    }
+  };
+
+  const handleTerminalClear = () => {
+    setPinCode('');
+  };
+
+  const handleTerminalPunch = (type) => {
+    const timeStr = new Date().toLocaleTimeString('de-DE');
+    setTerminalMessage({
+      type: 'success',
+      text: `${type === 'in' ? '🟢 KOMMEN' : '🔴 GEHEN'} erfolgreich gebucht für ${terminalEmployee} um ${timeStr} Uhr.`
+    });
+    setPinCode('');
+    addToast('Terminal-Buchung erfasst', `${terminalEmployee}: ${type === 'in' ? 'Kommen' : 'Gehen'} um ${timeStr} gebucht.`, 'success');
+  };
+
+  const handleTerminalNfc = () => {
+    const timeStr = new Date().toLocaleTimeString('de-DE');
+    setTerminalMessage({
+      type: 'success',
+      text: `💳 RFID / NFC Chip von ${terminalEmployee} erkannt! Zeit (${timeStr}) automatisch gebucht.`
+    });
+    addToast('NFC Chip erkannt', `Stempelung für ${terminalEmployee} gebucht.`, 'success');
+  };
 
   // Perspective Switcher: 'chef' (Büro & Meister) vs 'worker' (Mitarbeiter Smartphone App)
   const [viewPerspective, setViewPerspective] = useState('chef');
@@ -345,8 +431,18 @@ export const ZeiterfassungModule = () => {
         </div>
       </div>
 
-      {/* Perspective Switcher: Chef Büro vs. Mitarbeiter Smartphone App */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-brand-950/40 to-slate-900 border border-brand-500/30 shadow-lg">
+      {/* Variant Selector Tabs */}
+      <VariantSelectorBar
+        variants={variants}
+        activeVariant={activeVariant}
+        onSelect={setActiveVariant}
+      />
+
+      {/* VARIANTE A: Live-Stempeluhr & Perspective Switcher */}
+      {activeVariant === 'a' && (
+        <>
+          {/* Perspective Switcher: Chef Büro vs. Mitarbeiter Smartphone App */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-brand-950/40 to-slate-900 border border-brand-500/30 shadow-lg">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center border border-brand-500/30 shrink-0">
             <Smartphone className="w-4 h-4" />
@@ -1209,6 +1305,392 @@ export const ZeiterfassungModule = () => {
 
           </div>
 
+        </div>
+      )}
+        </>
+      )}
+
+      {/* VARIANTE B: Wochen-Matrix & DATEV Lohnexport */}
+      {activeVariant === 'b' && (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <ModuleWorkflowGuide
+            moduleTitle="Wochen-Matrix & DATEV Lohnexport"
+            tagline="Wöchentliche Arbeitszeiten im Überblick – mit Überstunden-Konto, Soll-Ist-Vergleich und DATEV-Schnittstelle"
+            steps={[
+              {
+                title: '1. Arbeitszeiten erfassen',
+                desc: 'Tragen Sie Tagesstunden direkt in die Matrix ein oder lassen Sie diese automatisch aus der App einfließen.',
+                hint: 'Live-Kalkulation aller Summen'
+              },
+              {
+                title: '2. Soll-Ist & Überstunden prüfen',
+                desc: 'Automatische Gegenüberstellung mit vertraglichen Wochen-Sollstunden und farblicher Saldo-Anzeige.',
+                hint: 'Rot = Minus / Grün = Plus'
+              },
+              {
+                title: '3. Freigabe durch Bauleitung',
+                desc: 'Prüfen und sperren Sie die Kalenderwoche mit 1 Klick gegen nachträgliche Änderungen.',
+                hint: 'GoBD-konform gesperrt'
+              },
+              {
+                title: '4. DATEV Lodas / L&G Export',
+                desc: 'Exportieren Sie fertige Lohnstunden als ASCII/CSV für Ihren Steuerberater oder Lohnbuchhalter.',
+                hint: '1-Klick DATEV-Format'
+              }
+            ]}
+            benefitText="Klicken Sie in die Zellen der Tabelle, um Stunden zu ändern – Summen und Salden passen sich in Echtzeit an!"
+          />
+
+          {/* Quick KPIs */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Erfasste Stunden</div>
+              <div className="text-2xl font-black text-white mt-1">
+                {weeklyMatrix.reduce((acc, emp) => acc + emp.mon + emp.tue + emp.wed + emp.thu + emp.fri + emp.sat, 0).toFixed(1)} h
+              </div>
+              <div className="text-[10px] text-emerald-400 mt-1 font-semibold">✓ 5 von 5 Mitarbeitern erfasst</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Überstunden-Saldo</div>
+              <div className="text-2xl font-black text-emerald-400 mt-1">
+                +{weeklyMatrix.reduce((acc, emp) => acc + (emp.mon + emp.tue + emp.wed + emp.thu + emp.fri + emp.sat - emp.target), 0).toFixed(1)} h
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">Wochensumme Saldo</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lohnsumme ca.</div>
+              <div className="text-2xl font-black text-white mt-1">
+                € {Math.round(weeklyMatrix.reduce((acc, emp) => acc + emp.mon + emp.tue + emp.wed + emp.thu + emp.fri + emp.sat, 0) * 32.50).toLocaleString('de-DE')}
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">Basierend auf Lohngruppen</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">DATEV-Status</div>
+              <div className="text-2xl font-black text-brand-400 mt-1 flex items-center gap-1.5">
+                <CheckCircle2 className="w-5 h-5 text-brand-400" />
+                <span>Bereit</span>
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">Format: DATEV Lodas 2026</div>
+            </div>
+          </div>
+
+          {/* Week Toolbar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="flex items-center gap-2">
+              <button className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">
+                ◀ Vorwoche
+              </button>
+              <span className="px-3 py-1.5 rounded-lg bg-brand-500/20 text-brand-300 text-xs font-bold border border-brand-500/30">
+                📅 KW 42 (14.10. – 20.10.2026)
+              </span>
+              <button className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">
+                Nächste Woche ▶
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setWeeklyMatrix(weeklyMatrix.map(e => ({ ...e, mon: 8, tue: 8, wed: 8, thu: 8, fri: 8, sat: 0 })));
+                  addToast('Regelarbeitszeit gefüllt', 'Alle Mitarbeiter auf 8.0h / Tag gesetzt.', 'success');
+                }}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+              >
+                ⚡ Standard (8h) füllen
+              </button>
+              <button
+                onClick={() => triggerRestrictedAction('DATEV Export', 'Vollversion exportiert die Wochen-Matrix direkt als DATEV Lodas ASCII-Datei.')}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-500/20"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>DATEV Lodas Export</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Interactive Matrix Table */}
+          <div className="glass-panel rounded-2xl border border-white/10 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-800 bg-slate-900/80 text-slate-400">
+                    <th className="py-3 px-4 font-bold">Mitarbeiter</th>
+                    <th className="py-3 px-3 font-bold text-center">Mo</th>
+                    <th className="py-3 px-3 font-bold text-center">Di</th>
+                    <th className="py-3 px-3 font-bold text-center">Mi</th>
+                    <th className="py-3 px-3 font-bold text-center">Do</th>
+                    <th className="py-3 px-3 font-bold text-center">Fr</th>
+                    <th className="py-3 px-3 font-bold text-center">Sa</th>
+                    <th className="py-3 px-4 font-bold text-right">Gesamt (Ist)</th>
+                    <th className="py-3 px-4 font-bold text-right">Soll</th>
+                    <th className="py-3 px-4 font-bold text-right">Saldo (+/-)</th>
+                    <th className="py-3 px-4 font-bold text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {weeklyMatrix.map((emp) => {
+                    const sum = emp.mon + emp.tue + emp.wed + emp.thu + emp.fri + emp.sat;
+                    const diff = sum - emp.target;
+                    return (
+                      <tr key={emp.id} className="hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="font-bold text-white">{emp.name}</div>
+                          <div className="text-[10px] text-slate-400">{emp.role} • {emp.id}</div>
+                        </td>
+                        {['mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map((day) => (
+                          <td key={day} className="py-2 px-1 text-center">
+                            <input
+                              type="number"
+                              step="0.5"
+                              min="0"
+                              max="24"
+                              value={emp[day]}
+                              onChange={(e) => handleMatrixChange(emp.id, day, e.target.value)}
+                              className="w-14 text-center py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:border-brand-500 focus:outline-none"
+                            />
+                          </td>
+                        ))}
+                        <td className="py-3 px-4 text-right font-mono font-bold text-white text-sm">
+                          {sum.toFixed(1)} h
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono text-slate-400">
+                          {emp.target.toFixed(1)} h
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono font-bold">
+                          <span className={`px-2 py-0.5 rounded-md text-xs font-mono font-bold ${
+                            diff > 0 
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                              : diff < 0 
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' 
+                              : 'bg-slate-800 text-slate-400'
+                          }`}>
+                            {diff > 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1)} h
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Geprüft
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* VARIANTE C: Werkstatt-Terminal & Tablet Kiosk */}
+      {activeVariant === 'c' && (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <ModuleWorkflowGuide
+            moduleTitle="Werkstatt-Terminal & Tablet-Kiosk"
+            tagline="Zentrales Stempelterminal für Werkstatt, Halle oder Montage – per 4-stelligem PIN oder RFID/NFC Chip"
+            steps={[
+              {
+                title: '1. Mitarbeiter wählen & PIN',
+                desc: 'Mitarbeiter tippt seinen Namen an und gibt seinen 4-stelligen Sicherheits-PIN über das Display ein.',
+                hint: 'Schutz vor Fehlbuchungen'
+              },
+              {
+                title: '2. Oder RFID/NFC Schlüsselanhänger',
+                desc: 'Berührungsloses Stempeln in 0.5 Sekunden – Schlüsselchip oder Mitarbeiterkarte an das Tablet halten.',
+                hint: '100% kontaktlos & schnell'
+              },
+              {
+                title: '3. Kommen / Gehen buchen',
+                desc: 'Status (Kommen, Pause, Gehen) wird mit Live-Zeitstempel und Terminal-ID sofort ins System übertragen.',
+                hint: 'Echtzeit-Synchronisation'
+              },
+              {
+                title: '4. Live-Anwesenheitsliste',
+                desc: 'Die Zentrale sieht sofort auf dem Dashboard, wer aktuell im Werkstattbereich oder auf dem Hof anwesend ist.',
+                hint: 'Notfall-Evakuierungsliste'
+              }
+            ]}
+            benefitText="Tippen Sie den PIN auf dem Ziffernblock ein oder klicken Sie auf 'RFID / NFC', um die Stempelung zu testen!"
+          />
+
+          {/* Terminal Kiosk Simulator Container */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left: Terminal Screen */}
+            <div className="lg:col-span-7 bg-slate-950 border-2 border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center">
+              <div className="w-full flex items-center justify-between pb-4 border-b border-slate-800 text-xs text-slate-400">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="font-bold text-slate-300">Terminal #01 – Werkstatt Haupteingang</span>
+                </div>
+                <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[11px] font-mono text-slate-300">
+                  Online (WLAN 5 GHz)
+                </span>
+              </div>
+
+              {/* Big Live Clock */}
+              <div className="my-6 text-center">
+                <div className="text-4xl sm:text-5xl font-mono font-black text-white tracking-widest">
+                  {new Date().toLocaleTimeString('de-DE')}
+                </div>
+                <div className="text-xs text-brand-400 font-semibold mt-1">
+                  {new Date().toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
+                </div>
+              </div>
+
+              {/* Employee Selection */}
+              <div className="w-full max-w-sm mb-4">
+                <label className="block text-slate-400 text-xs font-semibold mb-1 text-center">Mitarbeiter auswählen:</label>
+                <select
+                  value={terminalEmployee}
+                  onChange={(e) => setTerminalEmployee(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-center text-sm focus:outline-none focus:border-brand-500"
+                >
+                  {employeeList.map(e => (
+                    <option key={e.name} value={e.name}>{e.name} ({e.role || 'Mitarbeiter'})</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* PIN Code Display Dots */}
+              <div className="flex items-center justify-center gap-3 my-3">
+                {[0, 1, 2, 3].map((idx) => (
+                  <div
+                    key={idx}
+                    className={`w-4 h-4 rounded-full border-2 transition-all ${
+                      pinCode.length > idx
+                        ? 'bg-brand-500 border-brand-400 scale-110 shadow-md shadow-brand-500/50'
+                        : 'bg-slate-900 border-slate-700'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Numeric Keypad */}
+              <div className="grid grid-cols-3 gap-2.5 w-full max-w-xs my-2">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => handleTerminalKeypad(num.toString())}
+                    className="py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 active:bg-brand-600 text-white font-mono text-lg font-bold border border-slate-800 hover:border-slate-700 transition-all shadow-md active:scale-95"
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button
+                  onClick={handleTerminalClear}
+                  className="py-3 rounded-2xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 font-bold border border-rose-900/50 transition-all text-xs active:scale-95"
+                >
+                  C (Löschen)
+                </button>
+                <button
+                  onClick={() => handleTerminalKeypad('0')}
+                  className="py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-mono text-lg font-bold border border-slate-800 transition-all active:scale-95"
+                >
+                  0
+                </button>
+                <button
+                  onClick={handleTerminalNfc}
+                  className="py-3 rounded-2xl bg-brand-950/60 hover:bg-brand-900/60 text-brand-300 font-bold border border-brand-800/50 transition-all text-xs active:scale-95"
+                >
+                  RFID / NFC
+                </button>
+              </div>
+
+              {/* Action Punch Buttons */}
+              <div className="grid grid-cols-3 gap-3 w-full max-w-sm mt-4">
+                <button
+                  onClick={() => handleTerminalPunch('in')}
+                  className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 active:scale-95 transition-all flex flex-col items-center justify-center gap-1"
+                >
+                  <Play className="w-4 h-4 fill-white" />
+                  <span>KOMMEN</span>
+                </button>
+                <button
+                  onClick={() => handleTerminalPunch('pause')}
+                  className="py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-lg shadow-amber-600/30 active:scale-95 transition-all flex flex-col items-center justify-center gap-1"
+                >
+                  <Pause className="w-4 h-4" />
+                  <span>PAUSE</span>
+                </button>
+                <button
+                  onClick={() => handleTerminalPunch('out')}
+                  className="py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 active:scale-95 transition-all flex flex-col items-center justify-center gap-1"
+                >
+                  <Square className="w-4 h-4 fill-white" />
+                  <span>GEHEN</span>
+                </button>
+              </div>
+
+              {/* Message Feedback */}
+              {terminalMessage && (
+                <div className="w-full max-w-sm mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs text-center font-bold animate-in zoom-in-95">
+                  {terminalMessage.text}
+                </div>
+              )}
+            </div>
+
+            {/* Right: Live Presence & Kiosk Log */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="glass-panel p-5 rounded-3xl border border-white/10 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>Live-Anwesenheit im Betrieb</span>
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+                    3 anwesend
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  {[
+                    { name: 'Max Mustermann', role: 'Bauleiter', since: '07:45 Uhr', status: 'Anwesend (Werkstatt)' },
+                    { name: 'Sarah Weber', role: 'Elektro-Technikerin', since: '08:00 Uhr', status: 'Anwesend (Prüfstand)' },
+                    { name: 'Murat Demir', role: 'LKW-Fahrer', since: '06:30 Uhr', status: 'Auf Tour (LKW #3)' },
+                    { name: 'Jan Becker', role: 'Monteur', since: '-', status: 'Abwesend (Urlaub)' }
+                  ].map((emp, i) => (
+                    <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                      <div>
+                        <div className="font-bold text-white">{emp.name}</div>
+                        <div className="text-[10px] text-slate-400">{emp.role} • seit {emp.since}</div>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                        emp.status.includes('Anwesend') ? 'bg-emerald-500/20 text-emerald-300' :
+                        emp.status.includes('Auf Tour') ? 'bg-sky-500/20 text-sky-300' : 'bg-slate-800 text-slate-400'
+                      }`}>
+                        {emp.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-panel p-5 rounded-3xl border border-white/10 space-y-3">
+                <h4 className="text-xs font-bold text-slate-300 flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5 text-brand-400" />
+                  <span>Letzte Terminal-Buchungen</span>
+                </h4>
+                <div className="space-y-1.5 text-[11px] font-mono text-slate-400">
+                  <div className="p-2 rounded-lg bg-slate-950 border border-slate-800/80 flex justify-between">
+                    <span>08:00:14 • Sarah Weber</span>
+                    <span className="text-emerald-400 font-bold">KOMMEN (RFID)</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950 border border-slate-800/80 flex justify-between">
+                    <span>07:45:32 • Max Mustermann</span>
+                    <span className="text-emerald-400 font-bold">KOMMEN (PIN)</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950 border border-slate-800/80 flex justify-between">
+                    <span>06:30:05 • Murat Demir</span>
+                    <span className="text-sky-400 font-bold">TOUR-START</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

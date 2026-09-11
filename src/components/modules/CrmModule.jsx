@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
+import { VariantSelectorBar } from '../VariantSelectorBar';
 import { 
   Users, 
   Plus, 
@@ -15,7 +16,16 @@ import {
   ExternalLink,
   ShieldCheck,
   Filter,
-  DollarSign
+  DollarSign,
+  KanbanSquare,
+  Globe,
+  ArrowRight,
+  CheckCircle,
+  FileText,
+  Send,
+  Sparkles,
+  HelpCircle,
+  AlertCircle
 } from 'lucide-react';
 
 export const CrmModule = () => {
@@ -26,13 +36,114 @@ export const CrmModule = () => {
     triggerRestrictedAction, 
     openUpgradeModal,
     maxCreationLimit,
-    createdCounts 
+    createdCounts,
+    addToast
   } = useDemo();
+
+  // Active Variant: 'a' (360° Kundenakte) | 'b' (Kanban Pipeline) | 'c' (Kundenportal)
+  const [activeVariant, setActiveVariant] = useState('a');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // State for Variante B: Kanban Sales Pipeline
+  const [pipelineStages, setPipelineStages] = useState([
+    {
+      id: 'leads',
+      name: 'Neuer Lead & Anfrage',
+      color: 'border-slate-700 bg-slate-900/40 text-slate-300',
+      deals: [
+        { id: 'DEAL-101', customer: 'Logistikzentrum Mainfranken', title: 'Hallenbeleuchtung & Notstrom', value: 24500, prob: '20%', contact: 'Hr. Schmidt' },
+        { id: 'DEAL-102', customer: 'Praxis Dr. Sommer', title: 'Komplettrenovierung & Bodenbelag', value: 12800, prob: '30%', contact: 'Fr. Sommer' }
+      ]
+    },
+    {
+      id: 'contact',
+      name: 'Erstgespräch & Aufmaß',
+      color: 'border-cyan-500/30 bg-cyan-950/20 text-cyan-300',
+      deals: [
+        { id: 'DEAL-103', customer: 'Bavaria Industrie & Handwerk', title: 'Industriezaun & Zufahrtstor', value: 38000, prob: '50%', contact: 'Stefan Bayer' }
+      ]
+    },
+    {
+      id: 'offer',
+      name: 'Angebot versendet',
+      color: 'border-amber-500/30 bg-amber-950/20 text-amber-300',
+      deals: [
+        { id: 'DEAL-104', customer: 'Huber Bauunternehmung GmbH', title: 'Elektroinstallation Bauabschnitt 2', value: 54000, prob: '75%', contact: 'Michael Huber' }
+      ]
+    },
+    {
+      id: 'won',
+      name: 'Gewonnen & Beauftragt',
+      color: 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300',
+      deals: [
+        { id: 'DEAL-105', customer: 'Kramer Tiefbau KG', title: 'Baustromverteiler & Wartung', value: 18500, prob: '100%', contact: 'Hr. Kramer' }
+      ]
+    }
+  ]);
+
+  const moveDeal = (dealId, targetStageId) => {
+    let movingDeal = null;
+    const newStages = pipelineStages.map(stage => {
+      const remaining = stage.deals.filter(d => {
+        if (d.id === dealId) {
+          movingDeal = d;
+          return false;
+        }
+        return true;
+      });
+      return { ...stage, deals: remaining };
+    });
+
+    if (movingDeal) {
+      const updated = newStages.map(stage => {
+        if (stage.id === targetStageId) {
+          return { ...stage, deals: [...stage.deals, movingDeal] };
+        }
+        return stage;
+      });
+      setPipelineStages(updated);
+      addToast('Angebots-Pipeline aktualisiert', `Auftrag ${dealId} in nächste Phase verschoben.`, 'info');
+    }
+  };
+
+  // State for Variante C: Kunden-Self-Service-Portal
+  const [customerTickets, setCustomerTickets] = useState([
+    {
+      id: 'TCK-881',
+      title: 'Zusätzlicher Steckdosenanschluss Serverraum',
+      date: '10.09.2026',
+      status: 'In Bearbeitung',
+      priority: 'Normal'
+    },
+    {
+      id: 'TCK-882',
+      title: 'Abnahmebeleg für Bauabschnitt 1 anfordern',
+      date: '08.09.2026',
+      status: 'Erledigt',
+      priority: 'Niedrig'
+    }
+  ]);
+
+  const [newTicketText, setNewTicketText] = useState('');
+
+  const handleCreateCustomerTicket = (e) => {
+    e.preventDefault();
+    if (!newTicketText.trim()) return;
+    const newT = {
+      id: `TCK-${Math.floor(880 + Math.random() * 100)}`,
+      title: newTicketText,
+      date: new Date().toLocaleDateString('de-DE'),
+      status: 'Eingegangen',
+      priority: 'Dringend'
+    };
+    setCustomerTickets([newT, ...customerTickets]);
+    setNewTicketText('');
+    addToast('Service-Ticket übermittelt', 'Ihr Auftraggeber hat das Ticket direkt im TeamTrack-Portal empfangen.', 'success');
+  };
 
   const [newCustomer, setNewCustomer] = useState({
     company: 'Bavaria Industrie & Handwerk GmbH',
@@ -58,6 +169,7 @@ export const CrmModule = () => {
 
     if (added) {
       setIsModalOpen(false);
+      addToast('Kunde angelegt', `${newCustomer.company} wurde zur Kundenkartei hinzugefügt.`, 'success');
     }
   };
 
@@ -68,6 +180,34 @@ export const CrmModule = () => {
     const matchesStatus = statusFilter === 'all' || c.status.toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
   });
+
+  const variants = [
+    {
+      id: 'a',
+      badge: 'A',
+      label: 'Variante A',
+      sub: '360° Digitale Kundenakte',
+      icon: Users
+    },
+    {
+      id: 'b',
+      badge: 'B',
+      label: 'Variante B',
+      sub: 'Kanban Angebots-Pipeline',
+      icon: KanbanSquare
+    },
+    {
+      id: 'c',
+      badge: 'C',
+      label: 'Variante C',
+      sub: 'Kunden-Self-Service-Portal',
+      icon: Globe
+    }
+  ];
+
+  const totalPipelineValue = pipelineStages.reduce((acc, stage) => {
+    return acc + stage.deals.reduce((s, d) => s + d.value, 0);
+  }, 0);
 
   const workflowSteps = [
     {
@@ -128,128 +268,348 @@ export const CrmModule = () => {
         </div>
       </div>
 
-      {/* Module Workflow Guide */}
-      <ModuleWorkflowGuide
-        moduleTitle="Kundenverwaltung (CRM)"
-        tagline="Alle Kundendaten, Ansprechpartner, Projekte und Umsätze an einem zentralen Ort"
-        steps={workflowSteps}
-        benefitText="Klicken Sie auf eine Kundenkartei, um Details einzusehen oder legen Sie einen neuen Kunden an."
+      {/* Top Variant Selector Bar */}
+      <VariantSelectorBar
+        moduleName="CRM & Kundenverwaltung"
+        variants={variants}
+        activeVariant={activeVariant}
+        onSelectVariant={setActiveVariant}
       />
 
-      {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 glass-card p-4 rounded-xl">
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Kunde, Ansprechpartner, Ort suchen..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
+      {/* ======================= VARIANTE A: 360° DIGITALE KUNDENAKTE ======================= */}
+      {activeVariant === 'a' && (
+        <div className="space-y-6">
+          {/* Module Workflow Guide */}
+          <ModuleWorkflowGuide
+            moduleTitle="Kundenverwaltung (Variante A: 360° Kundenakte)"
+            tagline="Alle Kundendaten, Ansprechpartner, Projekte und Umsätze an einem zentralen Ort"
+            steps={workflowSteps}
+            benefitText="Klicken Sie auf eine Kundenkartei, um Details einzusehen oder legen Sie einen neuen Kunden an."
           />
-        </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <Filter className="w-3.5 h-3.5 text-slate-400" />
-          <span className="text-xs text-slate-400">Status:</span>
-          {['all', 'aktiv', 'vip', 'interessent'].map((st) => (
-            <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold capitalize transition-all ${
-                statusFilter === st ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              {st === 'all' ? 'Alle' : st}
-            </button>
-          ))}
-        </div>
-      </div>
+          {/* Filter & Search Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 glass-card p-4 rounded-xl">
+            <div className="relative w-full sm:w-80">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Kunde, Ansprechpartner, Ort suchen..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
+              />
+            </div>
 
-      {/* Customer Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredCustomers.map((cust) => {
-          const statusColors = {
-            VIP: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-            Aktiv: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-            Interessent: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
-          };
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <Filter className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-xs text-slate-400">Status:</span>
+              {['all', 'aktiv', 'vip', 'interessent'].map((st) => (
+                <button
+                  key={st}
+                  onClick={() => setStatusFilter(st)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold capitalize transition-all ${
+                    statusFilter === st ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {st === 'all' ? 'Alle' : st}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          return (
-            <div
-              key={cust.id}
-              className="glass-card p-5 rounded-2xl flex flex-col justify-between border-slate-800 hover:border-violet-500/30 transition-all group"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-3">
+          {/* Customer Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredCustomers.map((cust) => {
+              const statusColors = {
+                VIP: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+                Aktiv: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+                Interessent: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
+              };
+
+              return (
+                <div
+                  key={cust.id}
+                  className="glass-card p-5 rounded-2xl flex flex-col justify-between border-slate-800 hover:border-violet-500/30 transition-all group"
+                >
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 font-semibold">{cust.id}</span>
-                    <h3 className="text-base font-bold text-white group-hover:text-violet-300 transition-colors">
-                      {cust.company}
-                    </h3>
-                    <p className="text-xs text-violet-400 font-medium">{cust.industry}</p>
-                  </div>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusColors[cust.status] || statusColors.Aktiv}`}>
-                    {cust.status}
-                  </span>
-                </div>
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div>
+                        <span className="text-[10px] font-mono text-slate-400 font-semibold">{cust.id}</span>
+                        <h3 className="text-base font-bold text-white group-hover:text-violet-300 transition-colors">
+                          {cust.company}
+                        </h3>
+                        <p className="text-xs text-violet-400 font-medium">{cust.industry}</p>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusColors[cust.status] || statusColors.Aktiv}`}>
+                        {cust.status}
+                      </span>
+                    </div>
 
-                <div className="space-y-2 py-3 border-y border-slate-800/80 text-xs">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span>{cust.contactPerson}</span>
+                    <div className="space-y-2 py-3 border-y border-slate-800/80 text-xs">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span>{cust.contactPerson}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span>{cust.street}, {cust.city}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="font-mono">{cust.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{cust.email}</span>
+                      </div>
+                    </div>
+
+                    {cust.notes && (
+                      <div className="mt-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 italic">
+                        "{cust.notes}"
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span>{cust.street}, {cust.city}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="font-mono">{cust.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="truncate">{cust.email}</span>
+
+                  <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-medium">Bisheriger Umsatz:</span>
+                      <span className="text-sm font-bold text-emerald-400">
+                        {(cust.totalRevenue || 0).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => triggerRestrictedAction('Direktanruf & WhatsApp Connect', `In Ihrer Vollversion startet dieser Button direkt einen WhatsApp-Chat oder Anruf mit ${cust.contactPerson}.`)}
+                        className="p-2 rounded-lg bg-slate-800 hover:bg-emerald-600/20 text-slate-300 hover:text-emerald-400 border border-slate-700 transition-all cursor-pointer"
+                        title="Anruf / WhatsApp"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        onClick={() => deleteItem('customers', cust.id)}
+                        className="p-2 rounded-lg bg-slate-800 hover:bg-rose-600/20 text-slate-500 hover:text-rose-400 border border-slate-700 transition-all cursor-pointer"
+                        title="Löschen"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-                {cust.notes && (
-                  <div className="mt-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 italic">
-                    "{cust.notes}"
-                  </div>
-                )}
+      {/* ======================= VARIANTE B: KANBAN ANGEBOTS-PIPELINE ======================= */}
+      {activeVariant === 'b' && (
+        <div className="space-y-6">
+          <div className="glass-panel p-6 rounded-3xl border border-violet-500/20 shadow-2xl space-y-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+              <div>
+                <span className="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                  Sales & Lead-Pipeline
+                </span>
+                <h3 className="text-xl font-black text-white mt-1.5">
+                  Interaktive Angebots- & Auftrags-Pipeline
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Verschieben Sie Angebote mit 1-Klick von der Anfrage bis zur Beauftragung.
+                </p>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">Bisheriger Umsatz:</span>
-                  <span className="text-sm font-bold text-emerald-400">
-                    {(cust.totalRevenue || 0).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => triggerRestrictedAction('Direktanruf & WhatsApp Connect', `In Ihrer Vollversion startet dieser Button direkt einen WhatsApp-Chat oder Anruf mit ${cust.contactPerson}.`)}
-                    className="p-2 rounded-lg bg-slate-800 hover:bg-emerald-600/20 text-slate-300 hover:text-emerald-400 border border-slate-700 transition-all"
-                    title="Anruf / WhatsApp"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                  </button>
-
-                  <button
-                    onClick={() => deleteItem('customers', cust.id)}
-                    className="p-2 rounded-lg bg-slate-800 hover:bg-rose-600/20 text-slate-500 hover:text-rose-400 border border-slate-700 transition-all"
-                    title="Löschen"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+              <div className="text-right">
+                <span className="text-xs text-slate-400">Aktives Pipeline-Volumen:</span>
+                <div className="text-2xl font-black text-violet-400 font-mono">
+                  {totalPipelineValue.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
                 </div>
               </div>
             </div>
-          );
-        })}
-      </div>
+
+            {/* Kanban Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {pipelineStages.map((stage, sIdx) => (
+                <div key={stage.id} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-800/80 mb-3">
+                      <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-violet-400"></span>
+                        {stage.name}
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300 font-bold">
+                        {stage.deals.length}
+                      </span>
+                    </div>
+
+                    <div className="space-y-3">
+                      {stage.deals.map((deal) => (
+                        <div key={deal.id} className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-violet-500/40 transition-all space-y-2 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-[10px] text-violet-400 font-bold">{deal.id}</span>
+                            <span className="text-[10px] px-2 py-0.2 rounded bg-slate-800 text-slate-300 font-mono font-bold">
+                              WSK: {deal.prob}
+                            </span>
+                          </div>
+
+                          <div className="font-bold text-white text-xs">{deal.customer}</div>
+                          <p className="text-[11px] text-slate-400 leading-tight">{deal.title}</p>
+
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 font-medium">
+                            <span className="text-[10px] text-slate-500">{deal.contact}</span>
+                            <span className="font-bold font-mono text-emerald-400">
+                              {deal.value.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+                            </span>
+                          </div>
+
+                          {/* Move to next stage button */}
+                          {sIdx < pipelineStages.length - 1 && (
+                            <button
+                              onClick={() => moveDeal(deal.id, pipelineStages[sIdx + 1].id)}
+                              className="w-full mt-1.5 py-1.5 rounded-lg bg-slate-800 hover:bg-violet-600 text-slate-300 hover:text-white font-bold text-[10px] flex items-center justify-center gap-1 transition-all cursor-pointer"
+                            >
+                              <span>Weiter zu: {pipelineStages[sIdx + 1].name.split('&')[0]}</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-900 text-[10px] text-slate-500 text-right">
+                    Summe: {stage.deals.reduce((s, d) => s + d.value, 0).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================= VARIANTE C: KUNDEN-SELF-SERVICE-PORTAL ======================= */}
+      {activeVariant === 'c' && (
+        <div className="space-y-6">
+          <div className="glass-panel p-6 rounded-3xl border border-sky-500/20 shadow-2xl space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+              <div>
+                <span className="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                  Kunden-Login & Self-Service
+                </span>
+                <h3 className="text-xl font-black text-white mt-1.5">
+                  Kunden-Portal Vorschau (Auftraggeber-Sicht)
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  So sieht Ihr Kunde (z. B. Huber Bauunternehmung) seine Rechnungen, Freigaben und Service-Tickets in Echtzeit.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 bg-slate-950 px-3.5 py-2 rounded-xl border border-slate-800 text-xs">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                <span className="text-slate-300 font-bold">Angemeldet als: Huber Bauunternehmung</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Left 2 Cols: Tickets & Service-Anfragen */}
+              <div className="lg:col-span-2 space-y-4">
+                <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-sky-400" />
+                    <span>Neues Service-Ticket / Mängelmeldung aufgeben</span>
+                  </h4>
+
+                  <form onSubmit={handleCreateCustomerTicket} className="space-y-3">
+                    <input
+                      type="text"
+                      placeholder="Beschreiben Sie Ihre Anfrage (z. B. Zusätzliche Steckdose im OG gewünscht)..."
+                      value={newTicketText}
+                      onChange={(e) => setNewTicketText(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-sky-500/20 transition-all cursor-pointer"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Ticket absenden</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Ticket History */}
+                <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 pb-2 border-b border-slate-800">
+                    Aktuelle Service-Vorgänge
+                  </h4>
+
+                  <div className="space-y-2.5">
+                    {customerTickets.map((t) => (
+                      <div key={t.id} className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-sky-400 font-bold text-[10px]">{t.id}</span>
+                            <span className={`px-2 py-0.2 rounded-full text-[10px] font-bold ${
+                              t.status === 'Erledigt' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                              t.status === 'In Bearbeitung' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                              'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                            }`}>
+                              {t.status}
+                            </span>
+                          </div>
+                          <div className="font-bold text-white mt-1">{t.title}</div>
+                        </div>
+
+                        <span className="text-[11px] text-slate-400 font-mono">{t.date}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Col: Client Document Vault */}
+              <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2 pb-2 border-b border-slate-800">
+                  <FileText className="w-4 h-4 text-emerald-400" />
+                  <span>Meine Rechnungen & Belege</span>
+                </h4>
+
+                <div className="space-y-2.5 text-xs">
+                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                    <div>
+                      <span className="font-mono text-emerald-400 font-bold block">RE-2026-0142</span>
+                      <span className="text-white font-semibold">1.404,20 €</span>
+                    </div>
+                    <span className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white text-[11px] font-bold border border-slate-700 cursor-pointer">
+                      PDF Download
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                    <div>
+                      <span className="font-mono text-emerald-400 font-bold block">RE-2026-0139</span>
+                      <span className="text-white font-semibold">3.820,00 €</span>
+                    </div>
+                    <span className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white text-[11px] font-bold border border-slate-700 cursor-pointer">
+                      PDF Download
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300">
+                  ✓ 100% DSGVO-konformes Portal mit SSL-Verschlüsselung und eigenem Firmenlogo für Ihren Kunden.
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* New Customer Modal */}
       {isModalOpen && (
