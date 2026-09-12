@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { VariantSelectorBar } from '../VariantSelectorBar';
+import { TimeTrackProApp } from '../timetrack/TimeTrackProApp';
 import { 
   Play, 
   Square, 
@@ -52,6 +53,8 @@ export const ZeiterfassungModule = () => {
     createdCounts,
     addToast
   } = useDemo();
+
+  const [showFullTimeTrack, setShowFullTimeTrack] = useState(false);
 
   // Active Variant: 'a' (Live-Stempeluhr) | 'b' (Wochen-Matrix) | 'c' (Terminal Kiosk)
   const [activeVariant, setActiveVariant] = useState('a');
@@ -405,6 +408,18 @@ export const ZeiterfassungModule = () => {
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           <button
+            onClick={() => setShowFullTimeTrack(!showFullTimeTrack)}
+            className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer w-full sm:w-auto ${
+              showFullTimeTrack
+                ? 'bg-slate-800 text-brand-300 border border-brand-500/40'
+                : 'bg-brand-600 hover:bg-brand-500 text-white shadow-brand-500/20'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{showFullTimeTrack ? 'Zurück zur Modul-Übersicht' : 'Vollständige TimeTrack Pro App öffnen'}</span>
+          </button>
+
+          <button
             onClick={() => triggerRestrictedAction('Excel & DATEV Export', 'In Ihrer Vollversion können alle Zeiteinträge mit 1 Klick als DATEV-Lohnabrechnung oder Excel exportiert werden.')}
             className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all w-full sm:w-auto"
           >
@@ -431,12 +446,16 @@ export const ZeiterfassungModule = () => {
         </div>
       </div>
 
-      {/* Variant Selector Tabs */}
-      <VariantSelectorBar
-        variants={variants}
-        activeVariant={activeVariant}
-        onSelect={setActiveVariant}
-      />
+      {showFullTimeTrack ? (
+        <TimeTrackProApp onBack={() => setShowFullTimeTrack(false)} />
+      ) : (
+        <>
+          {/* Variant Selector Tabs */}
+          <VariantSelectorBar
+            variants={variants}
+            activeVariant={activeVariant}
+            onSelect={setActiveVariant}
+          />
 
       {/* VARIANTE A: Live-Stempeluhr & Perspective Switcher */}
       {activeVariant === 'a' && (
@@ -1693,6 +1712,8 @@ export const ZeiterfassungModule = () => {
           </div>
         </div>
       )}
+      </>
+    )}
 
       {/* Manual Entry Modal */}
       {isModalOpen && (
