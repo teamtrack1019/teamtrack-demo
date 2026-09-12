@@ -147,11 +147,45 @@ export const ShareLinkModal = () => {
   const emailBody = emailLines.join('\r\n');
   const mailtoUrl = `mailto:${encodeURIComponent(emailInput.trim())}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody).replace(/%0A/g, '%0D%0A').replace(/%0D%0D%0A/g, '%0D%0A')}`;
 
-  const handleCopyEmailText = () => {
-    navigator.clipboard.writeText(`Betreff: ${emailSubject}\r\n\r\n${emailBody}`);
-    setEmailCopied(true);
-    addToast('E-Mail-Text kopiert', 'Der vollständige E-Mail-Text inkl. Link wurde kopiert.', 'success');
-    setTimeout(() => setEmailCopied(false), 2500);
+  const [htmlCopied, setHtmlCopied] = useState(false);
+
+  const handleCopyRichText = async () => {
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; font-size: 14px; color: #1e293b; line-height: 1.6;">
+        <p>Sehr geehrte Damen und Herren,<br>liebes Team von <strong>${displayClient}</strong>,</p>
+        <p>vielen Dank für Ihr Interesse an TeamTrack.</p>
+        <p>Wir haben für Ihr Unternehmen eine 100% isolierte, persönliche Test-Umgebung für den Bereich <strong>"${currentConfig.name}"</strong> eingerichtet. Sie können alle Funktionen für die nächsten <strong>${daysInput} Tage</strong> unverbindlich testen:</p>
+        <p style="margin: 20px 0;">
+          <a href="${generatedUrl}" style="background-color: #0284c7; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">👉 Hier klicken: Zu Ihrer persönlichen Demo</a>
+        </p>
+        <p>Direktlink: <a href="${generatedUrl}" style="color: #0284c7; text-decoration: underline;">${generatedUrl}</a></p>
+        <p><strong>Enthaltene Module & Funktionen:</strong></p>
+        <ul>
+          ${currentConfig.bullets.map(b => `<li>${b.replace(/^[•\s-]+/, '')}</li>`).join('')}
+        </ul>
+        <p>Bei Fragen oder für eine kurze gemeinsame Online-Vorstellung stehen wir Ihnen jederzeit gerne zur Verfügung.</p>
+        <p>Mit freundlichen Grüßen,<br><strong>TeamTrack Softwareentwicklung</strong><br>E-Mail: <a href="mailto:info@team-track.de">info@team-track.de</a><br>Web: <a href="https://team-track.de">https://team-track.de</a></p>
+      </div>
+    `;
+
+    const plainText = `Betreff: ${emailSubject}\n\n${emailBody}`;
+
+    try {
+      const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+      const blobText = new Blob([plainText], { type: 'text/plain' });
+      const item = new ClipboardItem({
+        'text/html': blobHtml,
+        'text/plain': blobText
+      });
+      await navigator.clipboard.write([item]);
+      setHtmlCopied(true);
+      addToast('HTML-E-Mail kopiert!', 'Einfügen in Outlook (Strg+V): Der Link ist sofort als klickbarer Button formatiert!', 'success');
+      setTimeout(() => setHtmlCopied(false), 3000);
+    } catch (err) {
+      navigator.clipboard.writeText(plainText);
+      setEmailCopied(true);
+      setTimeout(() => setEmailCopied(false), 3000);
+    }
   };
 
   const whatsappMessage = `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für ${currentConfig.title} (${displayClient}):\n\n${generatedUrl}\n\nEnthaltene Module:\n${currentConfig.bullets.join('\n')}\n\nViele Grüße,\nTeamTrack Softwareentwicklung`;
@@ -284,7 +318,18 @@ export const ShareLinkModal = () => {
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Generierter Test-Link:</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-slate-300 font-semibold">Generierter Test-Link:</label>
+              <a
+                href={generatedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-brand-400 hover:text-brand-300 font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <ExternalLink className="w-3 h-3" />
+                <span>Im Browser testen ↗</span>
+              </a>
+            </div>
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-[11px] text-brand-300 break-all select-all">
               {generatedUrl}
             </div>
@@ -296,10 +341,12 @@ export const ShareLinkModal = () => {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Vorschau & Vorbereitung:</span>
               <button
                 type="button"
-                onClick={handleCopyEmailText}
-                className="text-[10px] text-sky-400 hover:text-sky-300 font-semibold cursor-pointer"
+                onClick={handleCopyRichText}
+                className="text-[10px] text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1 cursor-pointer"
+                title="Kopiert formatierten HTML-Text mit klickbarem Button direkt für Outlook / Webmail"
               >
-                {emailCopied ? '✓ E-Mail kopiert' : 'E-Mail-Text kopieren'}
+                <Sparkles className="w-3 h-3" />
+                <span>{htmlCopied ? '✓ Formatiert kopiert!' : 'Klickbaren Outlook-Text kopieren'}</span>
               </button>
             </div>
             <div className="flex items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
