@@ -1,13 +1,105 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
-import { Share2, Copy, Check, X, Link, Clock, Building, Mail, Send, ExternalLink } from 'lucide-react';
+import { Share2, Copy, Check, X, Link, Clock, Building, Mail, Send, ExternalLink, Sparkles, Layers } from 'lucide-react';
+
+const MODULE_CONFIG = {
+  all: {
+    name: 'Komplett-Suite',
+    title: 'TeamTrack | Handwerker- & Firmen-Software',
+    previewName: 'TeamTrack | Interaktives Demo-Portal',
+    query: '',
+    bullets: [
+      '• ⏱️ Zeiterfassung & Live-Stempeluhr (Mobil, LKW, Terminal)',
+      '• 📑 Rechnungen, VOB-Abschläge & XRechnung / ZUGFeRD',
+      '• 👥 CRM, Kundenakte & Angebots-Pipeline',
+      '• 🚗 Fuhrpark, TÜV/UVV-Radar & Werkzeug-Tracker',
+      '• 🗺️ Disposition & Smarte GPS-Tourenplanung',
+      '• ✨ Gebäudereinigung Suite (CleanPro)'
+    ]
+  },
+  reinigung: {
+    name: 'Gebäudereinigung (CleanPro)',
+    title: 'CleanPro | Gebäudereinigung & Hotel-Dashboard',
+    previewName: 'CleanPro | Gebäudereinigung & Hotel-Dashboard',
+    query: '&module=reinigung',
+    bullets: [
+      '• 🏨 Hotel-Objekte & Zimmerpreise (EZ, DZ, Suite)',
+      '• 📅 Tägliche Erfassung & digitaler Dienstplaner mit PDF-Aushang',
+      '• 💰 Lohnabrechnung mit Sonn- (+50%) und Feiertagszuschlägen',
+      '• ✍️ Digitale Kundenabnahme & Signatur auf Tablet/Smartphone',
+      '• 🧮 Express-Preiskalkulator für Neukunden-Angebote'
+    ]
+  },
+  zeiterfassung: {
+    name: 'Zeiterfassung & Stempeluhr',
+    title: 'TeamTrack | Mobile Zeiterfassung & Stempeluhr',
+    previewName: 'TeamTrack | Zeiterfassung & Stempeluhr',
+    query: '&module=zeiterfassung',
+    bullets: [
+      '• ⏱️ GPS-verifizierte Live-Stempeluhr (Kommen / Gehen / Pause)',
+      '• 📊 Wochen-Matrix & 1-Klick DATEV Lodas Lohnexport',
+      '• 🚛 EU-VO 561/2006 Modus für LKW- & Berufskraftfahrer',
+      '• 📟 Tablet-Kiosk Terminal mit PIN & RFID/NFC Chip',
+      '• 🏖️ Digitaler Urlaubsantrag & Krankmeldung (eAU)'
+    ]
+  },
+  rechnungen: {
+    name: 'Rechnungen, VOB & XRechnung',
+    title: 'TeamTrack | Rechnungen, VOB & XRechnung',
+    previewName: 'TeamTrack | Rechnungen & Finanzen',
+    query: '&module=rechnungen',
+    bullets: [
+      '• 📑 Rechtssichere PDF-Rechnungen mit QR-Zahlcode',
+      '• ⚡ Pflicht-konforme XRechnung & ZUGFeRD 2025/2026 (XML)',
+      '• 🏗️ Kümulative VOB- & Abschlagsrechnungen mit Sicherheitseinbehalt',
+      '• ⚠️ 3-stufiges automatisiertes Mahnwesen mit Verzugszins',
+      '• 🏦 Live-Bankabgleich mit automatischem Zahlungsabgleich'
+    ]
+  },
+  crm: {
+    name: 'CRM & Kundenakte',
+    title: 'TeamTrack | CRM & Kundenkartei',
+    previewName: 'TeamTrack | CRM & Kundenkartei',
+    query: '&module=crm',
+    bullets: [
+      '• 👥 360° Kundenakte mit Baustellen- & Kontakthistorie',
+      '• 📈 Kanban Angebots-Pipeline mit Live-Umsatzvolumen',
+      '• 🔑 Kunden-Self-Service Portal für Tickets & Rechnungs-Download',
+      '• 🗂️ Notizen, Dokumentenarchiv & Schnellkontakt'
+    ]
+  },
+  disposition: {
+    name: 'Disposition & Tourenplanung',
+    title: 'TeamTrack | Disposition & Tourenplanung',
+    previewName: 'TeamTrack | Disposition & Tourenplanung',
+    query: '&module=disposition',
+    bullets: [
+      '• 🗺️ Smarte GPS-Tourenplanung mit Google Maps Navigation',
+      '• ✍️ Digitaler Lieferschein mit Touch-Signatur auf dem Smartphone',
+      '• 📋 4-Stufen Kanban Auftragspipeline (Geplant bis Abnahme)',
+      '• 👷 Monteur- & Kolonnen-Zuweisung ohne Doppelbelegungen'
+    ]
+  },
+  fuhrpark: {
+    name: 'Fuhrpark & Werkzeug-Tracker',
+    title: 'TeamTrack | Fuhrpark & Werkzeug-Tracker',
+    previewName: 'TeamTrack | Fuhrpark & Werkzeug-Tracker',
+    query: '&module=fuhrpark',
+    bullets: [
+      '• 🚗 Fahrzeug-Radar mit TÜV-, UVV- & Inspektions-Countdown',
+      '• 🔧 Digitaler Werkzeug-Tracker für Hilti/Bosch mit QR-Code',
+      '• ⛽ Digitales Tankkarten- & Schaden-Logbuch mit Foto-Upload',
+      '• 📊 Kosten- & Verbrauchskontrolle pro Fahrzeug'
+    ]
+  }
+};
 
 export const ShareLinkModal = () => {
   const { isShareModalOpen, setIsShareModalOpen, addToast } = useDemo();
   const [clientInput, setClientInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [daysInput, setDaysInput] = useState(7);
-  const [selectedModule, setSelectedModule] = useState('reinigung'); // 'all' or 'reinigung'
+  const [selectedModule, setSelectedModule] = useState('reinigung'); // 'all' or specific module key
   const [copied, setCopied] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
 
@@ -16,7 +108,9 @@ export const ShareLinkModal = () => {
   const origin = window.location.origin || 'https://demo.team-track.de';
   const cleanClient = (clientInput || 'Kundenname').trim().replace(/\s+/g, '-');
   const displayClient = clientInput.trim() || 'Ihr Unternehmen';
-  const moduleQuery = selectedModule === 'reinigung' ? '&module=reinigung' : '';
+  
+  const currentConfig = MODULE_CONFIG[selectedModule] || MODULE_CONFIG.all;
+  const moduleQuery = currentConfig.query;
   const generatedUrl = `${origin}${window.location.pathname}?client=${encodeURIComponent(cleanClient)}${moduleQuery}&days=${daysInput}`;
 
   const handleCopy = () => {
@@ -26,13 +120,9 @@ export const ShareLinkModal = () => {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const emailSubject = selectedModule === 'reinigung'
-    ? `Ihr persönlicher CleanPro Demo-Zugang für ${displayClient} (${daysInput} Tage)`
-    : `Ihr persönlicher TeamTrack Demo-Zugang für ${displayClient} (${daysInput} Tage)`;
+  const emailSubject = `Ihr persönlicher ${currentConfig.name} Demo-Zugang für ${displayClient} (${daysInput} Tage)`;
 
-  const emailBody = selectedModule === 'reinigung'
-    ? `Sehr geehrte Damen und Herren,\nliebes Team von ${displayClient},\n\nvielen Dank für Ihr Interesse an unserer CleanPro Software-Lösung für Gebäudereinigung & Hotel-Service.\n\nWir haben für Ihr Unternehmen eine 100% isolierte, persönliche Test-Umgebung eingerichtet. Sie können alle Funktionen für die nächsten ${daysInput} Tage unverbindlich testen:\n\n👉 Hier geht es zu Ihrem persönlichen Demo-Zugang:\n${generatedUrl}\n\nEnthaltene Module & Funktionen:\n• Objekt- & Zimmerverwaltung (EZ, DZ, Suite)\n• Tägliche Erfassung & digitaler Dienstplaner mit PDF-Aushang\n• Lohnabrechnung mit Sonn- (+50%) und Feiertagszuschlägen\n• Digitale Kundenabnahme & Signatur auf Tablet/Smartphone\n• Express-Preiskalkulator für Neukunden-Angebote\n\nBei Rückfragen oder für eine kurze gemeinsame Online-Vorstellung stehen wir Ihnen gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nTeamTrack Softwareentwicklung\nE-Mail: info@team-track.de\nWeb: https://team-track.de`
-    : `Sehr geehrte Damen und Herren,\nliebes Team von ${displayClient},\n\nvielen Dank für Ihr Interesse an TeamTrack.\n\nWir haben für Ihr Unternehmen eine 100% isolierte, persönliche Test-Umgebung eingerichtet. Sie können alle Module für die nächsten ${daysInput} Tage unverbindlich testen:\n\n👉 Hier geht es zu Ihrem persönlichen Demo-Zugang:\n${generatedUrl}\n\nEnthaltene Module & Funktionen:\n• Zeiterfassung & Live-Stempeluhr (Mobil, LKW, Werkstatt-Terminal)\n• Rechnungen, VOB-Abschläge & XRechnung / ZUGFeRD\n• CRM, Kundenakte & Angebots-Pipeline\n• Fuhrpark, TÜV/UVV-Radar & Werkzeug-Tracker\n• Disposition & Smarte GPS-Tourenplanung\n• Gebäudereinigung Suite (CleanPro)\n\nBei Fragen oder für eine kurze gemeinsame Online-Vorstellung stehen wir Ihnen jederzeit gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nTeamTrack Softwareentwicklung\nE-Mail: info@team-track.de\nWeb: https://team-track.de`;
+  const emailBody = `Sehr geehrte Damen und Herren,\nliebes Team von ${displayClient},\n\nvielen Dank für Ihr Interesse an TeamTrack.\n\nWir haben für Ihr Unternehmen eine 100% isolierte, persönliche Test-Umgebung für den Bereich "${currentConfig.name}" eingerichtet. Sie können alle Funktionen für die nächsten ${daysInput} Tage unverbindlich testen:\n\n👉 Hier geht es zu Ihrem persönlichen Demo-Zugang:\n${generatedUrl}\n\nEnthaltene Module & Funktionen:\n${currentConfig.bullets.join('\n')}\n\nBei Fragen oder für eine kurze gemeinsame Online-Vorstellung stehen wir Ihnen jederzeit gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nTeamTrack Softwareentwicklung\nE-Mail: info@team-track.de\nWeb: https://team-track.de`;
 
   const mailtoUrl = `mailto:${encodeURIComponent(emailInput.trim())}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
@@ -43,9 +133,7 @@ export const ShareLinkModal = () => {
     setTimeout(() => setEmailCopied(false), 2500);
   };
 
-  const whatsappMessage = selectedModule === 'reinigung'
-    ? `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für das CleanPro Gebäudereinigung & Hotel-Dashboard (${displayClient}):\n\n🔗 ${generatedUrl}\n\nEnthaltene Module:\n🏨 Hotel-Objekte & Zimmerpreise (EZ, DZ, Suite)\n📅 Tägliche Erfassung & Dienstplaner mit PDF-Aushang\n💰 Lohnabrechnung mit Sonn- (+50%) und Feiertagszuschlägen\n✍️ Digitale Kundenabnahme mit Unterschrift\n🧮 Express-Preiskalkulator für Kundenanfragen\n\nViele Grüße,\nTeamTrack Softwareentwicklung`
-    : `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für die TeamTrack Handwerker- & Firmen-Software (${displayClient}):\n\n🔗 ${generatedUrl}\n\nEnthaltene Module:\n⏱️ Zeiterfassung & Live-Stempeluhr\n📑 Rechnungen & DATEV\n👥 CRM & Kundenkartei\n🚗 Fuhrpark & TÜV-Manager\n📋 Auftragsdisposition\n✨ Gebäudereinigung Suite\n\nViele Grüße,\nTeamTrack Softwareentwicklung`;
+  const whatsappMessage = `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für ${currentConfig.title} (${displayClient}):\n\n🔗 ${generatedUrl}\n\nEnthaltene Module:\n${currentConfig.bullets.join('\n')}\n\nViele Grüße,\nTeamTrack Softwareentwicklung`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
@@ -103,21 +191,37 @@ export const ShareLinkModal = () => {
             </div>
           </div>
 
+          {/* Module Selector: Dropdown for Specific Module vs Komplett-Suite */}
           <div>
             <label className="block text-slate-300 font-semibold mb-1">Ziel-Modul beim Start:</label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setSelectedModule('reinigung')}
-                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-left flex items-center justify-between ${
-                  selectedModule === 'reinigung'
-                    ? 'bg-emerald-600/30 border-emerald-500 text-emerald-200 shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <span>✨ Gebäudereinigung</span>
-                {selectedModule === 'reinigung' && <Check className="w-3.5 h-3.5 text-emerald-400" />}
-              </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              
+              {/* Left: Dropdown of Specific Modules */}
+              <div className={`p-1.5 rounded-xl border transition-all ${
+                selectedModule !== 'all'
+                  ? 'bg-emerald-600/20 border-emerald-500 shadow-md shadow-emerald-500/20'
+                  : 'bg-slate-900/80 border-slate-800'
+              }`}>
+                <div className="text-[10px] text-slate-400 font-bold px-2 py-0.5 flex items-center justify-between">
+                  <span>🎯 Einzelfokus-Modul:</span>
+                  {selectedModule !== 'all' && <span className="text-emerald-400 font-bold">Aktiv ✓</span>}
+                </div>
+                <select
+                  value={selectedModule === 'all' ? 'reinigung' : selectedModule}
+                  onChange={(e) => setSelectedModule(e.target.value)}
+                  onClick={() => { if (selectedModule === 'all') setSelectedModule('reinigung'); }}
+                  className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white font-bold text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
+                >
+                  <option value="reinigung">✨ Gebäudereinigung (CleanPro)</option>
+                  <option value="zeiterfassung">⏱️ Zeiterfassung & Stempeluhr</option>
+                  <option value="rechnungen">📑 Rechnungen, VOB & XRechnung</option>
+                  <option value="crm">👥 CRM & Kundenakte</option>
+                  <option value="disposition">🗺️ Disposition & Tourenplanung</option>
+                  <option value="fuhrpark">🚗 Fuhrpark & Werkzeug-Radar</option>
+                </select>
+              </div>
+
+              {/* Right: Komplett-Suite Button */}
               <button
                 type="button"
                 onClick={() => setSelectedModule('all')}
@@ -127,8 +231,13 @@ export const ShareLinkModal = () => {
                     : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <span>🏢 Komplett-Suite</span>
-                {selectedModule === 'all' && <Check className="w-3.5 h-3.5 text-brand-400" />}
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span>🏢 Komplett-Suite</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-normal">Alle Module freigeschaltet</div>
+                </div>
+                {selectedModule === 'all' && <Check className="w-4 h-4 text-brand-400 shrink-0" />}
               </button>
             </div>
           </div>
@@ -167,7 +276,7 @@ export const ShareLinkModal = () => {
               <button
                 type="button"
                 onClick={handleCopyEmailText}
-                className="text-[10px] text-sky-400 hover:text-sky-300 font-semibold"
+                className="text-[10px] text-sky-400 hover:text-sky-300 font-semibold cursor-pointer"
               >
                 {emailCopied ? '✓ E-Mail kopiert' : 'E-Mail-Text kopieren'}
               </button>
@@ -176,7 +285,7 @@ export const ShareLinkModal = () => {
               <img src="/logo.jpg" alt="TeamTrack" className="w-11 h-11 rounded-lg object-contain bg-slate-900 border border-brand-500/20 shrink-0" />
               <div className="min-w-0 flex-1">
                 <h4 className="text-xs font-bold text-white truncate">
-                  {selectedModule === 'reinigung' ? 'CleanPro | Gebäudereinigung & Hotel-Dashboard' : 'TeamTrack | Interaktives Demo-Portal'}
+                  {currentConfig.previewName}
                 </h4>
                 <p className="text-[10px] text-slate-400 line-clamp-1">Kunden-Testumgebung für {displayClient} ({daysInput} Tage)</p>
                 <span className="text-[9px] text-brand-400">team-track.de {emailInput ? `• an ${emailInput}` : ''}</span>
