@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { VariantSelectorBar } from '../VariantSelectorBar';
+import { DispoTrackProApp } from '../disposition/DispoTrackProApp';
 import { 
   KanbanSquare, 
   Plus, 
@@ -37,6 +38,8 @@ export const DispositionModule = () => {
     createdCounts,
     addToast
   } = useDemo();
+
+  const [showFullDispo, setShowFullDispo] = useState(false);
 
   // Active Variant: 'a' (Routenplanung) | 'b' (Digitaler Lieferschein) | 'c' (Fracht & Kanban)
   const [activeVariant, setActiveVariant] = useState('a');
@@ -227,6 +230,18 @@ export const DispositionModule = () => {
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           <button
+            onClick={() => setShowFullDispo(!showFullDispo)}
+            className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer w-full sm:w-auto ${
+              showFullDispo
+                ? 'bg-slate-800 text-sky-300 border border-sky-500/40'
+                : 'bg-sky-600 hover:bg-sky-500 text-white shadow-sky-500/20'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{showFullDispo ? 'Zurück zur Modul-Übersicht' : 'Vollständige DispoTrack Pro App öffnen'}</span>
+          </button>
+
+          <button
             onClick={() => triggerRestrictedAction('Routen-Optimierung (KI)', 'In Ihrer Vollversion optimiert der KI-Algorithmus Fahrwege und Tankkosten automatisch.')}
             className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all w-full sm:w-auto"
           >
@@ -244,12 +259,16 @@ export const DispositionModule = () => {
         </div>
       </div>
 
-      {/* Top Variant Selector Bar */}
-      <VariantSelectorBar
-        variants={variants}
-        activeVariant={activeVariant}
-        onSelect={setActiveVariant}
-      />
+      {showFullDispo ? (
+        <DispoTrackProApp onBack={() => setShowFullDispo(false)} />
+      ) : (
+        <>
+          {/* Top Variant Selector Bar */}
+          <VariantSelectorBar
+            variants={variants}
+            activeVariant={activeVariant}
+            onSelect={setActiveVariant}
+          />
 
       {/* ======================= VARIANTE A: SMARTE ROUTEN- & TOURENPLANUNG ======================= */}
       {activeVariant === 'a' && (
@@ -601,6 +620,8 @@ export const DispositionModule = () => {
       </div>
     </div>
   )}
+  </>
+)}
 
       {/* New Task Modal */}
       {isModalOpen && (

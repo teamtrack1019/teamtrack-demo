@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { VariantSelectorBar } from '../VariantSelectorBar';
+import { FleetTrackProApp } from '../fuhrpark/FleetTrackProApp';
 import { 
   Truck, 
   Plus, 
@@ -41,6 +42,8 @@ export const FuhrparkModule = () => {
     createdCounts,
     addToast
   } = useDemo();
+
+  const [showFullFleet, setShowFullFleet] = useState(false);
 
   // Active Variant: 'a' (Fuhrpark & TÜV) | 'b' (Werkzeug & QR) | 'c' (Tank & Schaden)
   const [activeVariant, setActiveVariant] = useState('a');
@@ -236,6 +239,18 @@ export const FuhrparkModule = () => {
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           <button
+            onClick={() => setShowFullFleet(!showFullFleet)}
+            className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer w-full sm:w-auto ${
+              showFullFleet
+                ? 'bg-slate-800 text-emerald-300 border border-emerald-500/40'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{showFullFleet ? 'Zurück zur Modul-Übersicht' : 'Vollständige FleetTrack Pro App öffnen'}</span>
+          </button>
+
+          <button
             onClick={() => triggerRestrictedAction('OBD2 & Live Telematik', 'In der Vollversion liest TeamTrack KM-Stände, Reifendruck, Fehlercodes und Tankfüllungen live über die Bordelektronik (OBD2/CAN-Bus) aus.')}
             className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all w-full sm:w-auto"
           >
@@ -253,13 +268,17 @@ export const FuhrparkModule = () => {
         </div>
       </div>
 
-      {/* Top Variant Selector Bar */}
-      <VariantSelectorBar
-        moduleName="Fuhrpark & Geräteverwaltung"
-        variants={variants}
-        activeVariant={activeVariant}
-        onSelectVariant={setActiveVariant}
-      />
+      {showFullFleet ? (
+        <FleetTrackProApp onBack={() => setShowFullFleet(false)} />
+      ) : (
+        <>
+          {/* Top Variant Selector Bar */}
+          <VariantSelectorBar
+            moduleName="Fuhrpark & Geräteverwaltung"
+            variants={variants}
+            activeVariant={activeVariant}
+            onSelectVariant={setActiveVariant}
+          />
 
       {/* ======================= VARIANTE A: FUHRPARK & TÜV/SERVICE-RADAR ======================= */}
       {activeVariant === 'a' && (
@@ -684,6 +703,8 @@ export const FuhrparkModule = () => {
           </div>
         </div>
       )}
+      </>
+    )}
 
       {/* New Vehicle Modal */}
       {isModalOpen && (

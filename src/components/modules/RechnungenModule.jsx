@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { VariantSelectorBar } from '../VariantSelectorBar';
+import { InvoiceTrackProApp } from '../rechnungen/InvoiceTrackProApp';
 import { 
   Receipt, 
   Plus, 
@@ -38,6 +39,8 @@ export const RechnungenModule = () => {
     createdCounts,
     addToast
   } = useDemo();
+
+  const [showFullInvoice, setShowFullInvoice] = useState(false);
 
   // Active Variant State: 'a' (PDF & XRechnung) | 'b' (Abschlag & VOB) | 'c' (Mahnwesen & Bank)
   const [activeVariant, setActiveVariant] = useState('a');
@@ -290,6 +293,18 @@ export const RechnungenModule = () => {
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           <button
+            onClick={() => setShowFullInvoice(!showFullInvoice)}
+            className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer w-full sm:w-auto ${
+              showFullInvoice
+                ? 'bg-slate-800 text-emerald-300 border border-emerald-500/40'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{showFullInvoice ? 'Zurück zur Modul-Übersicht' : 'Vollständige InvoiceFlow Pro App öffnen'}</span>
+          </button>
+
+          <button
             onClick={handleAutoGenerateFromTimesheets}
             className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all w-full sm:w-auto"
             title="1-Klick Rechnung aus Zeiterfassung erstellen"
@@ -308,13 +323,17 @@ export const RechnungenModule = () => {
         </div>
       </div>
 
-      {/* Top Variant Selector Bar (Variante A, B, C) */}
-      <VariantSelectorBar
-        moduleName="Rechnungen & Finanzen"
-        variants={variants}
-        activeVariant={activeVariant}
-        onSelectVariant={setActiveVariant}
-      />
+      {showFullInvoice ? (
+        <InvoiceTrackProApp onBack={() => setShowFullInvoice(false)} />
+      ) : (
+        <>
+          {/* Top Variant Selector Bar (Variante A, B, C) */}
+          <VariantSelectorBar
+            moduleName="Rechnungen & Finanzen"
+            variants={variants}
+            activeVariant={activeVariant}
+            onSelectVariant={setActiveVariant}
+          />
 
       {/* ======================= VARIANTE A: PDF & XRECHNUNG / ZUGFeRD ======================= */}
       {activeVariant === 'a' && (
@@ -819,6 +838,8 @@ export const RechnungenModule = () => {
           </div>
         </div>
       )}
+      </>
+    )}
 
       {/* Manual Invoice Creation Modal */}
       {isModalOpen && (

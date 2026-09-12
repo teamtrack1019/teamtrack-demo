@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { VariantSelectorBar } from '../VariantSelectorBar';
 import { 
@@ -12,17 +12,31 @@ import {
   ExternalLink, 
   Check, 
   Camera, 
-  ShieldCheck,
-  RotateCcw,
-  Plus,
-  Trash2
+  ShieldCheck, 
+  RotateCcw, 
+  Plus, 
+  Trash2,
+  Maximize2,
+  Minimize2,
+  Laptop,
+  Smartphone,
+  LayoutDashboard
 } from 'lucide-react';
 
 export const ReinigungModule = () => {
   const { clientId, trialDays, isAdmin, isDedicatedClient, openUpgradeModal, addToast, triggerRestrictedAction } = useDemo();
   const [activeVariant, setActiveVariant] = useState('a');
   const [showFullCleanPro, setShowFullCleanPro] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isFullscreen) setIsFullscreen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
 
   // State for Variante A: Raum-Checklisten
   const [rooms, setRooms] = useState([
@@ -243,16 +257,60 @@ export const ReinigungModule = () => {
         </div>
       </div>
 
-      {/* Full CleanPro iframe mode */}
+      {/* Full CleanPro iframe mode with Fullscreen toolbar */}
       {showFullCleanPro ? (
-        <div className="w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-700/60 shadow-2xl bg-white relative animate-in fade-in duration-200" style={{ height: 'calc(100vh - 150px)', minHeight: '840px' }}>
-          <iframe
-            key={iframeKey}
-            src={reinigungUrl}
-            title="CleanPro Gebäudereinigung"
-            className="w-full h-full border-0 block"
-            allow="camera; microphone; geolocation"
-          />
+        <div className={`transition-all duration-300 ${
+          isFullscreen 
+            ? 'fixed inset-0 z-50 bg-slate-950 p-4 sm:p-6 overflow-y-auto w-full h-full flex flex-col space-y-4' 
+            : 'space-y-4 w-full animate-in fade-in duration-200'
+        }`}>
+          {/* Top Control bar inside CleanPro */}
+          <div className="glass-panel p-3.5 rounded-2xl border border-teal-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/90 shadow-xl shrink-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></span>
+              <span className="text-xs font-bold text-white">CleanPro Suite Live Web-App</span>
+              {isFullscreen && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+                  ⛶ Vollbildansicht aktiv (Esc)
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <button
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md ${
+                  isFullscreen 
+                    ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/30' 
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                }`}
+                title={isFullscreen ? 'Vollbild verlassen (Esc)' : 'Auf Vollbild vergrößern'}
+              >
+                {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5 text-teal-400" />}
+                <span>{isFullscreen ? 'Vollbild beenden' : '⛶ Vollbild'}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsFullscreen(false);
+                  setShowFullCleanPro(false);
+                }}
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition-all cursor-pointer"
+              >
+                Zurück zur Übersicht
+              </button>
+            </div>
+          </div>
+
+          <div className="w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-700/60 shadow-2xl bg-white relative flex-1" style={{ minHeight: isFullscreen ? 'calc(100vh - 120px)' : '840px', height: isFullscreen ? '100%' : 'calc(100vh - 150px)' }}>
+            <iframe
+              key={iframeKey}
+              src={reinigungUrl}
+              title="CleanPro Gebäudereinigung"
+              className="w-full h-full border-0 block"
+              allow="camera; microphone; geolocation"
+            />
+          </div>
         </div>
       ) : (
         <>

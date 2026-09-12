@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { ModuleWorkflowGuide } from '../ModuleWorkflowGuide';
 import { VariantSelectorBar } from '../VariantSelectorBar';
+import { CrmTrackProApp } from '../crm/CrmTrackProApp';
 import { 
   Users, 
   Plus, 
@@ -39,6 +40,8 @@ export const CrmModule = () => {
     createdCounts,
     addToast
   } = useDemo();
+
+  const [showFullCrm, setShowFullCrm] = useState(false);
 
   // Active Variant: 'a' (360° Kundenakte) | 'b' (Kanban Pipeline) | 'c' (Kundenportal)
   const [activeVariant, setActiveVariant] = useState('a');
@@ -250,17 +253,29 @@ export const CrmModule = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+          <button
+            onClick={() => setShowFullCrm(!showFullCrm)}
+            className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer w-full sm:w-auto ${
+              showFullCrm
+                ? 'bg-slate-800 text-indigo-300 border border-indigo-500/40'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{showFullCrm ? 'Zurück zur Modul-Übersicht' : 'Vollständige CRM 360° Suite öffnen'}</span>
+          </button>
+
           <button
             onClick={() => triggerRestrictedAction('CRM Excel/CSV Export', 'In Ihrer Vollversion können alle Kundendaten, Leads und Notizen DSGVO-konform exportiert oder aus Alt-Systemen importiert werden.')}
-            className="flex-1 md:flex-none px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all"
+            className="flex-1 md:flex-none px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all"
           >
             Kundenliste exportieren
           </button>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold shadow-lg shadow-violet-500/20 transition-all"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold shadow-lg shadow-violet-500/20 transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Kunde anlegen</span>
@@ -268,13 +283,17 @@ export const CrmModule = () => {
         </div>
       </div>
 
-      {/* Top Variant Selector Bar */}
-      <VariantSelectorBar
-        moduleName="CRM & Kundenverwaltung"
-        variants={variants}
-        activeVariant={activeVariant}
-        onSelectVariant={setActiveVariant}
-      />
+      {showFullCrm ? (
+        <CrmTrackProApp onBack={() => setShowFullCrm(false)} />
+      ) : (
+        <>
+          {/* Top Variant Selector Bar */}
+          <VariantSelectorBar
+            moduleName="CRM & Kundenverwaltung"
+            variants={variants}
+            activeVariant={activeVariant}
+            onSelectVariant={setActiveVariant}
+          />
 
       {/* ======================= VARIANTE A: 360° DIGITALE KUNDENAKTE ======================= */}
       {activeVariant === 'a' && (
@@ -610,6 +629,8 @@ export const CrmModule = () => {
           </div>
         </div>
       )}
+      </>
+    )}
 
       {/* New Customer Modal */}
       {isModalOpen && (
