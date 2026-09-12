@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
-import { Share2, Copy, Check, X, Link, Clock, Building, Mail, Send, ExternalLink, Sparkles, Layers } from 'lucide-react';
+import { Share2, Copy, Check, X, Link, Clock, Building, Mail, Send, ExternalLink, Sparkles, Layers, Loader2 } from 'lucide-react';
 
 const MODULE_CONFIG = {
   all: {
@@ -24,7 +24,7 @@ const MODULE_CONFIG = {
     query: '&module=reinigung',
     bullets: [
       '• 🏨 Hotel-Objekte & Zimmerpreise (EZ, DZ, Suite)',
-      '• 📅 Tägliche Erfassung & digitaler Dienstplaner mit PDF-Aushang',
+      '• 📅 Tägliche Erfassung & Dienstplaner mit PDF-Aushang',
       '• 💰 Lohnabrechnung mit Sonn- (+50%) und Feiertagszuschlägen',
       '• ✍️ Digitale Kundenabnahme & Signatur auf Tablet/Smartphone',
       '• 🧮 Express-Preiskalkulator für Neukunden-Angebote'
@@ -103,6 +103,7 @@ export const ShareLinkModal = () => {
   const [copied, setCopied] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
   const [htmlCopied, setHtmlCopied] = useState(false);
+  const [isSendingMail, setIsSendingMail] = useState(false);
 
   if (!isShareModalOpen) return null;
 
@@ -185,6 +186,40 @@ export const ShareLinkModal = () => {
       navigator.clipboard.writeText(plainText);
       setEmailCopied(true);
       setTimeout(() => setEmailCopied(false), 3000);
+    }
+  };
+
+  const handleSendDirectEmail = async () => {
+    if (!emailInput.trim() || !emailInput.includes('@')) {
+      addToast('E-Mail fehlt', 'Bitte tragen Sie oben die Kunden-E-Mail-Adresse ein.', 'warning');
+      return;
+    }
+
+    setIsSendingMail(true);
+    try {
+      const res = await fetch('/api/send-demo-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerEmail: emailInput.trim(),
+          clientName: displayClient,
+          moduleName: currentConfig.name,
+          days: daysInput,
+          demoUrl: generatedUrl,
+          bullets: currentConfig.bullets
+        })
+      });
+
+      const resData = await res.json();
+      if (res.ok && resData.success) {
+        addToast('E-Mail gesendet! 🚀', `Der Demo-Zugang mit 100% klickbarem Button wurde direkt an "${emailInput}" gesendet!`, 'success');
+      } else {
+        addToast('Versand-Status', resData.error || 'Serverversand nicht aktiv. Bitte nutzen Sie "Outlook öffnen" oder "Kopieren".', 'info');
+      }
+    } catch (err) {
+      addToast('Info', 'Nutzen Sie bitte den "Outlook öffnen" oder "Kopieren" Button zum direkten Versand.', 'info');
+    } finally {
+      setIsSendingMail(false);
     }
   };
 
@@ -362,13 +397,27 @@ export const ShareLinkModal = () => {
           </div>
         </div>
 
-        {/* Action Buttons: Outlook, WhatsApp, Copy Link */}
+        {/* Action Buttons: Direct Send, Outlook, WhatsApp, Copy Link */}
         <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           <span className="text-[11px] text-slate-400 hidden lg:inline">
             100% isolierte Mandanten-Umgebung.
           </span>
 
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+            {/* Direct Send Email Button */}
+            {emailInput && (
+              <button
+                type="button"
+                disabled={isSendingMail}
+                onClick={handleSendDirectEmail}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all cursor-pointer"
+                title="Sendet die Demo direkt als gestaltete HTML-Mail an den Kunden"
+              >
+                {isSendingMail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                <span>{isSendingMail ? 'Sende E-Mail...' : 'E-Mail direkt senden'}</span>
+              </button>
+            )}
+
             {/* Outlook / E-Mail Button */}
             <a
               href={mailtoUrl}
@@ -393,7 +442,7 @@ export const ShareLinkModal = () => {
             {/* Copy Link Button */}
             <button
               onClick={handleCopy}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 active:scale-95 text-white text-xs font-bold shadow-lg shadow-brand-500/25 transition-all"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 active:scale-95 text-white text-xs font-bold shadow-lg shadow-brand-500/25 transition-all cursor-pointer"
             >
               {copied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
               <span>{copied ? 'Kopiert!' : 'Link kopieren'}</span>
