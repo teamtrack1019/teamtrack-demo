@@ -102,16 +102,18 @@ export const ShareLinkModal = () => {
   const [selectedModule, setSelectedModule] = useState('reinigung'); // 'all' or specific module key
   const [copied, setCopied] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
+  const [htmlCopied, setHtmlCopied] = useState(false);
 
   if (!isShareModalOpen) return null;
 
-  const origin = window.location.origin || 'https://demo.team-track.de';
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://demo.team-track.de';
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
   const cleanClient = (clientInput || 'Kundenname').trim().replace(/\s+/g, '-');
   const displayClient = clientInput.trim() || 'Ihr Unternehmen';
   
   const currentConfig = MODULE_CONFIG[selectedModule] || MODULE_CONFIG.all;
   const moduleQuery = currentConfig.query;
-  const generatedUrl = `${origin}${window.location.pathname}?client=${encodeURIComponent(cleanClient)}${moduleQuery}&days=${daysInput}`;
+  const generatedUrl = `${origin}${pathname}?client=${encodeURIComponent(cleanClient)}${moduleQuery}&days=${daysInput}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedUrl);
@@ -146,8 +148,6 @@ export const ShareLinkModal = () => {
 
   const emailBody = emailLines.join('\r\n');
   const mailtoUrl = `mailto:${encodeURIComponent(emailInput.trim())}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody).replace(/%0A/g, '%0D%0A').replace(/%0D%0D%0A/g, '%0D%0A')}`;
-
-  const [htmlCopied, setHtmlCopied] = useState(false);
 
   const handleCopyRichText = async () => {
     const htmlContent = `
