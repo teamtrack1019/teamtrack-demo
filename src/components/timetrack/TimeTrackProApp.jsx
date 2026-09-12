@@ -229,7 +229,7 @@ export const TimeTrackProApp = ({ onBack }) => {
           
           {/* Left / Center: Interactive Smartphone Container */}
           <div className="lg:col-span-7 flex justify-center w-full">
-            <div className="w-full max-w-md bg-slate-950 rounded-[40px] p-3 sm:p-4 border-4 border-slate-800 shadow-2xl shadow-brand-950/40 relative">
+            <div className="w-full max-w-md bg-slate-950 rounded-[40px] p-3 sm:p-4 border-4 border-slate-800 shadow-2xl shadow-brand-950/40 relative overflow-hidden">
               
               {/* Smartphone Speaker & Camera Notch */}
               <div className="w-32 h-5 bg-slate-900 rounded-full mx-auto mb-3 flex items-center justify-center gap-2 border border-slate-800">
@@ -238,7 +238,7 @@ export const TimeTrackProApp = ({ onBack }) => {
               </div>
 
               {/* Smartphone Screen Content */}
-              <div className="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 rounded-[30px] p-4 sm:p-5 border border-slate-800 space-y-4 text-white">
+              <div className="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 rounded-[30px] p-3.5 sm:p-5 border border-slate-800 space-y-3.5 text-white overflow-hidden">
                 
                 {/* Mobile Top Status Bar */}
                 <div className="flex items-center justify-between text-[11px] text-slate-400 border-b border-slate-800/80 pb-2">
@@ -254,40 +254,49 @@ export const TimeTrackProApp = ({ onBack }) => {
                 </div>
 
                 {/* Worker Profile Switcher & Greeting */}
-                <div className="flex items-center justify-between gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-black text-sm border-2 border-brand-400 shadow-md">
-                      {selectedEmp.split(' ').map(n => n[0]).join('')}
+                <div className="bg-slate-800/70 p-3 rounded-2xl border border-slate-700/60 space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <div className="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center text-white font-black text-xs border border-brand-400 shadow-md shrink-0">
+                        {selectedEmp.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[10px] text-brand-300 font-semibold uppercase tracking-wider">Mitarbeiter</div>
+                        <div className="text-xs font-bold text-white truncate">{selectedEmp}</div>
+                        <div className="text-[10px] text-slate-400 truncate">{currentEmpData.role}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-[11px] text-brand-300 font-semibold">Angemeldet als:</div>
-                      <select
-                        value={selectedEmp}
-                        onChange={(e) => setSelectedEmp(e.target.value)}
-                        className="bg-slate-900 text-white font-bold text-xs rounded-lg px-2 py-1 border border-slate-700 focus:ring-1 focus:ring-brand-500 cursor-pointer"
-                      >
-                        {employees.map(e => (
-                          <option key={e.id} value={e.name}>{e.name} ({e.role?.split('/')[0]})</option>
-                        ))}
-                      </select>
+
+                    <div className="shrink-0">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider block whitespace-nowrap ${
+                        punchStatus === 'working' 
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                          : punchStatus === 'break'
+                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          : punchStatus === 'drive'
+                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          : 'bg-slate-800 text-slate-400 border border-slate-700'
+                      }`}>
+                        {punchStatus === 'working' && '🟢 Am Arbeiten'}
+                        {punchStatus === 'break' && '🟡 In Pause'}
+                        {punchStatus === 'drive' && '🔵 Fahrt'}
+                        {punchStatus === 'off' && '⚪ Feierabend'}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
-                      punchStatus === 'working' 
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        : punchStatus === 'break'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : punchStatus === 'drive'
-                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                        : 'bg-slate-800 text-slate-400 border border-slate-700'
-                    }`}>
-                      {punchStatus === 'working' && '🟢 Am Arbeiten'}
-                      {punchStatus === 'break' && '🟡 In Pause'}
-                      {punchStatus === 'drive' && '🔵 Fahrt / Tour'}
-                      {punchStatus === 'off' && '⚪ Feierabend'}
-                    </span>
+                  {/* Switcher dropdown row */}
+                  <div className="pt-2 border-t border-slate-700/50 flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-slate-400 font-semibold shrink-0">Profil wechseln:</span>
+                    <select
+                      value={selectedEmp}
+                      onChange={(e) => setSelectedEmp(e.target.value)}
+                      className="bg-slate-900 text-slate-200 font-semibold text-[11px] rounded-lg px-2 py-1 border border-slate-700 focus:ring-1 focus:ring-brand-500 cursor-pointer w-full max-w-[200px] truncate"
+                    >
+                      {employees.map(e => (
+                        <option key={e.id} value={e.name}>{e.name} ({e.role?.split('/')[0]})</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
