@@ -41,7 +41,17 @@ import {
   Radio,
   Sliders,
   ExternalLink,
-  Laptop
+  Laptop,
+  Maximize2,
+  Minimize2,
+  LayoutDashboard,
+  Building2,
+  TrendingUp,
+  Filter,
+  Download,
+  CheckCheck,
+  XCircle,
+  Eye
 } from 'lucide-react';
 
 export const TimeTrackProApp = ({ onBack }) => {
@@ -53,8 +63,11 @@ export const TimeTrackProApp = ({ onBack }) => {
     addToast 
   } = useDemo();
 
-  // App Modes: 'mobile' (Smartphone PWA) | 'kiosk' (Tablet-Terminal) | 'meister' (Büro Cockpit)
-  const [appMode, setAppMode] = useState('mobile');
+  // Fullscreen Mode State
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // App Modes: 'mobile' (Smartphone PWA) | 'desktop' (Desktop ERP) | 'kiosk' (Tablet-Terminal) | 'meister' (Büro Cockpit)
+  const [appMode, setAppMode] = useState('desktop');
 
   // Selected Employee for Mobile View
   const [selectedEmp, setSelectedEmp] = useState('Max Mustermann');
@@ -73,14 +86,33 @@ export const TimeTrackProApp = ({ onBack }) => {
     { id: 3, type: 'Pause Ende', time: '12:30', project: 'Neubau Wohnpark Würzburg-Nord', location: 'Würzburg (GPS verifiziert)', status: 'Verifiziert' }
   ]);
 
+  // Desktop Cloud Portal Live Timesheets state
+  const [portalTimesheets, setPortalTimesheets] = useState([
+    { id: 'TS-201', emp: 'Max Mustermann', role: 'Bauleiter / Meister', project: 'Neubau Wohnpark Würzburg-Nord', from: '07:30', to: '16:15', breakM: 45, hours: 8.0, rate: 75.0, status: 'Genehmigt', gps: 'Würzburg Nord (100% OK)' },
+    { id: 'TS-202', emp: 'Sarah Weber', role: 'Elektro-Technikerin', project: 'Sanierung Bürokomplex Randersacker', from: '08:00', to: '16:30', breakM: 30, hours: 8.0, rate: 68.0, status: 'In Prüfung', gps: 'Randersacker (100% OK)' },
+    { id: 'TS-203', emp: 'Jan Becker', role: 'Monteur & Handwerker', project: 'Neubau Wohnpark Würzburg-Nord', from: '07:45', to: '15:45', breakM: 30, hours: 7.5, rate: 62.0, status: 'In Prüfung', gps: 'Würzburg Nord (100% OK)' },
+    { id: 'TS-204', emp: 'Murat Demir', role: 'LKW- & Berufskraftfahrer', project: 'Material-Logistik & Transport', from: '06:30', to: '15:30', breakM: 45, hours: 8.25, rate: 64.0, status: 'Genehmigt', gps: 'B27 / A3 Schweinfurt' },
+    { id: 'TS-205', emp: 'Elena Rostova', role: 'Objektleiterin', project: 'Klinikum Würzburg Unterhaltsreinigung', from: '06:00', to: '13:30', breakM: 30, hours: 7.0, rate: 58.0, status: 'Genehmigt', gps: 'Klinikum Würzburg' }
+  ]);
+
   // Photo & Note modal state
-  const [noteText, setNoteText] = useState('');
   const [photoCount, setPhotoCount] = useState(2);
   const [showPhotoSuccess, setShowPhotoSuccess] = useState(false);
 
   // Kiosk PIN Pad State
   const [pinCode, setPinCode] = useState('');
   const [kioskFeedback, setKioskFeedback] = useState(null);
+
+  // Listen for Escape key to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
 
   // Live Clock Ticker
   useEffect(() => {
@@ -136,14 +168,19 @@ export const TimeTrackProApp = ({ onBack }) => {
     addToast('Bautagebuch-Foto gespeichert', 'GPS-Standortstempel & Uhrzeit wasserfest eingebettet.', 'success');
   };
 
+  // Handle Approve Timesheet in Desktop Portal
+  const handleApproveTimesheet = (id) => {
+    setPortalTimesheets(prev => prev.map(ts => ts.id === id ? { ...ts, status: 'Genehmigt' } : ts));
+    addToast('Stundenzettel freigegeben', `Eintrag ${id} genehmigt und für Lohnabrechnung markiert.`, 'success');
+  };
+
   // Handle Kiosk PIN Keypad
   const handlePinPress = (num) => {
     if (pinCode.length < 4) {
       const nextPin = pinCode + num;
       setPinCode(nextPin);
       if (nextPin.length === 4) {
-        // Evaluate PIN
-        const emp = employees[parseInt(nextPin) % employees.length] || employees[0];
+        const emp = employees[parseInt(nextPin, 10) % employees.length] || employees[0];
         setKioskFeedback({
           name: emp.name,
           role: emp.role,
@@ -159,73 +196,393 @@ export const TimeTrackProApp = ({ onBack }) => {
   };
 
   return (
-    <div className="space-y-6 w-full animate-in fade-in duration-300">
+    <div className={`transition-all duration-300 ${
+      isFullscreen 
+        ? 'fixed inset-0 z-50 bg-slate-950 p-4 sm:p-6 overflow-y-auto w-full h-full flex flex-col' 
+        : 'space-y-6 w-full animate-in fade-in duration-300'
+    }`}>
       
       {/* Top App Bar & Navigation */}
-      <div className="glass-panel p-4 rounded-2xl border border-brand-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-slate-900/90 shadow-2xl">
+      <div className="glass-panel p-4 rounded-2xl border border-brand-500/30 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-slate-900/90 shadow-2xl shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/30">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/30 shrink-0">
             <Clock className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-black text-white">TimeTrack Pro Suite</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Live PWA Simulator
+                Cloud ERP & Mobil Live
               </span>
+              {isFullscreen && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+                  ⛶ Vollbildansicht aktiv (Esc zum Beenden)
+                </span>
+              )}
             </div>
             <p className="text-xs text-slate-400">
-              Vollständige mobile Zeiterfassungs-Applikation für Baustelle, Handwerk, Logistik & Büro
+              Umfassende Zeiterfassungs- & Personal-Suite für Baustelle, Handwerk, Logistik & Meister-Büro
             </p>
           </div>
         </div>
 
-        {/* Mode Switcher Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-950/80 rounded-xl border border-slate-800 w-full md:w-auto overflow-x-auto">
+        {/* Action Controls & Mode Switcher */}
+        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          {/* 4 App Modes */}
+          <div className="flex items-center gap-1 p-1 bg-slate-950/80 rounded-xl border border-slate-800 overflow-x-auto w-full sm:w-auto">
+            <button
+              onClick={() => setAppMode('desktop')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                appMode === 'desktop'
+                  ? 'bg-brand-600 text-white shadow-lg shadow-brand-500/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>1. Desktop Cloud-Portal</span>
+            </button>
+
+            <button
+              onClick={() => setAppMode('mobile')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                appMode === 'mobile'
+                  ? 'bg-brand-600 text-white shadow-lg shadow-brand-500/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>2. Smartphone App</span>
+            </button>
+
+            <button
+              onClick={() => setAppMode('kiosk')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                appMode === 'kiosk'
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              <MonitorCheck className="w-3.5 h-3.5" />
+              <span>3. Werkstatt-Terminal</span>
+            </button>
+
+            <button
+              onClick={() => setAppMode('meister')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                appMode === 'meister'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              <Laptop className="w-3.5 h-3.5" />
+              <span>4. Live-Cockpit</span>
+            </button>
+          </div>
+
+          {/* Fullscreen Toggle Button */}
           <button
-            onClick={() => setAppMode('mobile')}
-            className={`px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
-              appMode === 'mobile'
-                ? 'bg-brand-600 text-white shadow-lg shadow-brand-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md ${
+              isFullscreen 
+                ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/30' 
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
             }`}
+            title={isFullscreen ? 'Vollbild verlassen (Esc)' : 'Auf Vollbild vergrößern'}
           >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span>1. Smartphone App</span>
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4 text-brand-400" />}
+            <span>{isFullscreen ? 'Vollbild beenden' : '⛶ Vollbild'}</span>
           </button>
 
-          <button
-            onClick={() => setAppMode('kiosk')}
-            className={`px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
-              appMode === 'kiosk'
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            <MonitorCheck className="w-3.5 h-3.5" />
-            <span>2. Werkstatt-Terminal</span>
-          </button>
-
-          <button
-            onClick={() => setAppMode('meister')}
-            className={`px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
-              appMode === 'meister'
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            <Laptop className="w-3.5 h-3.5" />
-            <span>3. Meister Live-Cockpit</span>
-          </button>
+          {/* Back button if in modal or embedded */}
+          {onBack && !isFullscreen && (
+            <button
+              onClick={onBack}
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition-all cursor-pointer"
+            >
+              Zurück
+            </button>
+          )}
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* 1. SMARTPHONE MOBILE APP VIEW */}
+      {/* 1. DESKTOP CLOUD-PORTAL VIEW (FULL-WIDTH ERP DASHBOARD) */}
+      {/* ========================================================================= */}
+      {appMode === 'desktop' && (
+        <div className="space-y-6 flex-1 animate-in fade-in duration-200">
+          
+          {/* Top KPI Cards Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="glass-panel p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <span>Gesamtstunden Heute</span>
+                <Clock className="w-4 h-4 text-brand-400" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-white mt-2">38.75 Std.</div>
+              <div className="text-[11px] text-emerald-400 font-semibold mt-1 flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5" /> +12% produktiver als Vorgewoche
+              </div>
+            </div>
+
+            <div className="glass-panel p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <span>Wertschöpfung Heute</span>
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-400 mt-2">2.592,50 €</div>
+              <div className="text-[11px] text-slate-400 mt-1">
+                Bereit für 1-Klick Fakturierung
+              </div>
+            </div>
+
+            <div className="glass-panel p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <span>Mitarbeiter im Einsatz</span>
+                <User className="w-4 h-4 text-sky-400" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-white mt-2">5 / 5 Aktiv</div>
+              <div className="text-[11px] text-sky-400 font-semibold mt-1">
+                100% Baustellen-Besetzung
+              </div>
+            </div>
+
+            <div className="glass-panel p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <span>Lohnexport & DATEV</span>
+                <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+              </div>
+              <button
+                onClick={() => triggerRestrictedAction('DATEV Lohnexport', 'In Ihrer Vollversion werden alle geprüften Stundenzettel mit 1 Klick als DATEV-Lohnabrechnung oder Excel exportiert.')}
+                className="mt-2 w-full py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20 cursor-pointer transition-all"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>DATEV Export erstellen</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Main ERP Layout: 2 Columns */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            {/* Left 4 Cols: Project Controlling & Live Geofencing Radar */}
+            <div className="lg:col-span-4 space-y-6">
+              
+              {/* Project Hours & Budget Progress */}
+              <div className="glass-panel p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4 bg-slate-900/80">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-brand-400" />
+                    <h3 className="text-sm font-bold text-white">Projekt- & Baustellen-Controlling</h3>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-mono">Live Budget</span>
+                </div>
+
+                <div className="space-y-3.5">
+                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-bold text-white">Neubau Wohnpark Würzburg-Nord</span>
+                      <span className="text-brand-400 font-bold font-mono">15.5h / 40h</span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-brand-500 h-full rounded-full" style={{ width: '38%' }}></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400">
+                      <span>2 Monteure vor Ort</span>
+                      <span className="text-emerald-400">Im Soll-Zeitplan ✓</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-bold text-white">Sanierung Bürokomplex Randersacker</span>
+                      <span className="text-brand-400 font-bold font-mono">8.0h / 25h</span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-emerald-500 h-full rounded-full" style={{ width: '32%' }}></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400">
+                      <span>1 Elektrikerin vor Ort</span>
+                      <span className="text-emerald-400">Pünktlich ✓</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-bold text-white">Klinikum Würzburg Wartung</span>
+                      <span className="text-brand-400 font-bold font-mono">7.0h / 10h</span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-amber-500 h-full rounded-full" style={{ width: '70%' }}></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400">
+                      <span>1 Objektleiterin vor Ort</span>
+                      <span className="text-amber-400">Abschluss heute</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live GPS Team Radar Box */}
+              <div className="glass-panel p-5 rounded-3xl border border-slate-800 shadow-xl space-y-3 bg-gradient-to-br from-slate-900 via-slate-900 to-brand-950/30">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-rose-400" />
+                    <h3 className="text-sm font-bold text-white">GPS Team-Radar (Live)</h3>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Echtzeit
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
+                      <span className="font-bold text-white truncate">Max Mustermann</span>
+                    </div>
+                    <span className="text-slate-400 text-[11px] shrink-0 font-mono">Würzburg Nord</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
+                      <span className="font-bold text-white truncate">Sarah Weber</span>
+                    </div>
+                    <span className="text-slate-400 text-[11px] shrink-0 font-mono">Randersacker</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 rounded-full bg-blue-400 shrink-0"></div>
+                      <span className="font-bold text-white truncate">Murat Demir</span>
+                    </div>
+                    <span className="text-blue-400 text-[11px] shrink-0 font-mono">LKW auf B27</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Right 8 Cols: Interactive Timesheet Table & Approval Suite */}
+            <div className="lg:col-span-8 glass-panel p-5 sm:p-6 rounded-3xl border border-slate-800 shadow-xl space-y-4 bg-slate-900/80">
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                <div>
+                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                    <Table className="w-4 h-4 text-brand-400" />
+                    Digitale Stundenzettel & Freigabe-Center
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Alle mobil gestempelten Zeiten zur Meister-Prüfung & DATEV-Übergabe
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setPortalTimesheets(prev => prev.map(ts => ({ ...ts, status: 'Genehmigt' })));
+                      addToast('Alle Zeiten freigegeben', 'Alle 5 Stundenzettel für heute wurden genehmigt.', 'success');
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-brand-600/20 cursor-pointer transition-all"
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    <span>Alle freigeben</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Table Container */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="text-slate-400 border-b border-slate-800">
+                      <th className="pb-3 font-semibold">Mitarbeiter & Rolle</th>
+                      <th className="pb-3 font-semibold">Projekt / Einsatz</th>
+                      <th className="pb-3 font-semibold">Zeit & Pause</th>
+                      <th className="pb-3 font-semibold">Stunden</th>
+                      <th className="pb-3 font-semibold">Betrag</th>
+                      <th className="pb-3 font-semibold">Status</th>
+                      <th className="pb-3 font-semibold text-right">Aktion</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {portalTimesheets.map((ts) => (
+                      <tr key={ts.id} className="hover:bg-slate-950/60 transition-colors">
+                        <td className="py-3.5 font-bold text-white">
+                          <div>{ts.emp}</div>
+                          <div className="text-[10px] text-slate-400 font-normal">{ts.role}</div>
+                        </td>
+                        <td className="py-3.5 text-slate-300">
+                          <div className="font-semibold text-white">{ts.project}</div>
+                          <div className="text-[10px] text-emerald-400 flex items-center gap-1 font-mono">
+                            <MapPin className="w-2.5 h-2.5" /> {ts.gps}
+                          </div>
+                        </td>
+                        <td className="py-3.5 text-slate-300 font-mono">
+                          <div>{ts.from} - {ts.to}</div>
+                          <div className="text-[10px] text-slate-400 font-sans">({ts.breakM} Min Pause)</div>
+                        </td>
+                        <td className="py-3.5 font-mono font-bold text-brand-300 text-sm">
+                          {ts.hours.toFixed(1)} h
+                        </td>
+                        <td className="py-3.5 font-mono font-bold text-emerald-400">
+                          {(ts.hours * ts.rate).toFixed(2)} €
+                        </td>
+                        <td className="py-3.5">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            ts.status === 'Genehmigt'
+                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          }`}>
+                            {ts.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 text-right">
+                          {ts.status === 'Genehmigt' ? (
+                            <span className="text-emerald-400 font-bold text-xs flex items-center justify-end gap-1">
+                              <Check className="w-3.5 h-3.5" /> Geprüft
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => handleApproveTimesheet(ts.id)}
+                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer"
+                            >
+                              Freigeben
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom Table Summary Bar */}
+              <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>DSGVO- & GoBD-konform protokolliert mit unveränderbarem Audit-Trail</span>
+                </div>
+                <div className="flex items-center gap-3 font-bold text-white">
+                  <span>Gesamtsumme: <strong className="text-brand-400 font-mono text-sm">38.75 Std.</strong></span>
+                  <span>= <strong className="text-emerald-400 font-mono text-sm">2.592,50 €</strong></span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 2. SMARTPHONE MOBILE APP VIEW */}
       {/* ========================================================================= */}
       {appMode === 'mobile' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
           
           {/* Left / Center: Interactive Smartphone Container */}
           <div className="lg:col-span-7 flex justify-center w-full">
@@ -508,10 +865,10 @@ export const TimeTrackProApp = ({ onBack }) => {
       )}
 
       {/* ========================================================================= */}
-      {/* 2. TABLET / KIOSK WERKSTATT-TERMINAL VIEW */}
+      {/* 3. TABLET / KIOSK WERKSTATT-TERMINAL VIEW */}
       {/* ========================================================================= */}
       {appMode === 'kiosk' && (
-        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-purple-500/30 shadow-2xl space-y-6 max-w-3xl mx-auto bg-slate-950">
+        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-purple-500/30 shadow-2xl space-y-6 max-w-3xl mx-auto bg-slate-950 flex-1">
           
           <div className="text-center space-y-1 pb-4 border-b border-slate-800">
             <span className="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
@@ -649,10 +1006,10 @@ export const TimeTrackProApp = ({ onBack }) => {
       )}
 
       {/* ========================================================================= */}
-      {/* 3. MEISTER / BÜRO LIVE-MONITOR COCKPIT */}
+      {/* 4. MEISTER / BÜRO LIVE-MONITOR COCKPIT */}
       {/* ========================================================================= */}
       {appMode === 'meister' && (
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1">
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="glass-panel p-4 rounded-2xl border border-slate-800">
