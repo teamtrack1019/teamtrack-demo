@@ -17,8 +17,13 @@ export const DemoProvider = ({ children }) => {
 
   // Active navigation with Browser & Mouse History Support
   const [activeModule, setActiveModuleState] = useState('overview');
+  const [lockedModule, setLockedModule] = useState(null);
 
   const setActiveModule = (newModule, pushHistory = true) => {
+    // If locked to a single module and not admin, prevent navigating away
+    if (lockedModule && !isAdmin && newModule !== lockedModule) {
+      return;
+    }
     setActiveModuleState(newModule);
     try {
       const url = new URL(window.location.href);
@@ -190,19 +195,31 @@ export const DemoProvider = ({ children }) => {
     setClientId(effectiveClientId);
     setTrialDays([3, 7, 14].includes(daysParam) ? daysParam : 7);
 
-    // Initial module selection from URL (?module=reinigung)
-    const moduleParam = params.get('module') || params.get('modul');
-    const initialMod = (moduleParam && ['overview', 'zeiterfassung', 'rechnungen', 'crm', 'fuhrpark', 'disposition', 'reinigung'].includes(moduleParam.toLowerCase()))
-      ? moduleParam.toLowerCase()
-      : 'overview';
-    setActiveModuleState(initialMod);
-    try {
-      window.history.replaceState({ module: initialMod }, '', window.location.href);
-    } catch (e) {}
+    // Initial module selection & Single-Module Isolation from URL (?module=zeiterfassung)
+    const moduleParam = params.get('module') || params.get('modul') || params.get('only');
+    const validSpecificModules = ['zeiterfassung', 'rechnungen', 'crm', 'fuhrpark', 'disposition', 'reinigung'];
+    const hasSpecificTarget = moduleParam && validSpecificModules.includes(moduleParam.toLowerCase());
 
-    // Is this a dedicated customer link specifically for cleaning?
-    const isDedicated = !adminState && (moduleParam?.toLowerCase() === 'reinigung' || params.get('only') === 'reinigung');
-    setIsDedicatedClient(isDedicated);
+    // If client link is targeted to a single module (and not admin), lock the demo to that single module!
+    if (!adminState && hasSpecificTarget) {
+      const singleMod = moduleParam.toLowerCase();
+      setLockedModule(singleMod);
+      setIsDedicatedClient(true);
+      setActiveModuleState(singleMod);
+      try {
+        window.history.replaceState({ module: singleMod }, '', window.location.href);
+      } catch (e) {}
+    } else {
+      setLockedModule(null);
+      setIsDedicatedClient(false);
+      const initialMod = (moduleParam && ['overview', ...validSpecificModules].includes(moduleParam.toLowerCase()))
+        ? moduleParam.toLowerCase()
+        : 'overview';
+      setActiveModuleState(initialMod);
+      try {
+        window.history.replaceState({ module: initialMod }, '', window.location.href);
+      } catch (e) {}
+    }
 
     // Check or init trial start time in localStorage for this client
     const timeKey = `teamtrack_trial_start_${effectiveClientId}`;
@@ -402,6 +419,7 @@ export const DemoProvider = ({ children }) => {
         trialDays,
         isAdmin,
         isDedicatedClient,
+        lockedModule,
         remainingTime,
         isExpired,
         activeModule,

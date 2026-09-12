@@ -35,13 +35,43 @@ const MainContent = () => {
 };
 
 const AppContent = () => {
-  const { isDedicatedClient } = useDemo();
+  const { isDedicatedClient, lockedModule, clientId } = useDemo();
+
+  const moduleNames = {
+    zeiterfassung: 'Mobile Zeiterfassung & Stempeluhr',
+    rechnungen: '1-Klick Rechnungen & XRechnung / ZUGFeRD',
+    crm: 'CRM & Kundenkartei',
+    fuhrpark: 'Fuhrpark & Werkzeug-Radar',
+    disposition: 'Auftragsdisposition & Tourenplanung',
+    reinigung: 'CleanPro Gebäudereinigung & Hotel-Dashboard'
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 selection:bg-brand-500 selection:text-white w-full max-w-full overflow-x-hidden">
       <Header />
-      {/* Hide the other 5 modules bar ONLY when a dedicated cleaning customer link is opened */}
-      {!isDedicatedClient && <ModuleSelector />}
+      
+      {/* If locked to single module, show clean isolation badge; otherwise show full 6-module switcher */}
+      {!isDedicatedClient ? (
+        <ModuleSelector />
+      ) : (
+        <div className="bg-slate-900/90 border-b border-brand-500/20 py-2.5 px-3 sm:px-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+              <span className="text-slate-300">
+                Exklusiver Modul-Zugang für <strong className="text-white font-bold">{clientId}</strong>:
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 font-bold hidden sm:inline">
+                {moduleNames[lockedModule] || lockedModule}
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-400 font-semibold hidden md:inline">
+              🔒 100% isolierte Mandanten-Umgebung
+            </span>
+          </div>
+        </div>
+      )}
+
       <MainContent />
       <Footer />
       

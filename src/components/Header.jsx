@@ -14,6 +14,7 @@ export const Header = () => {
   const { 
     clientId, 
     isAdmin,
+    lockedModule,
     remainingTime, 
     resetSandbox, 
     openUpgradeModal, 
@@ -28,7 +29,7 @@ export const Header = () => {
         {/* Brand & Client Identity */}
         <div className="flex items-center gap-2 shrink-0">
           <div 
-            onClick={() => setActiveModule('overview')}
+            onClick={() => lockedModule && !isAdmin ? setActiveModule(lockedModule) : setActiveModule('overview')}
             className="flex items-center gap-2 cursor-pointer group shrink-0"
           >
             <img 
