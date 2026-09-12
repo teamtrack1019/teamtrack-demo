@@ -122,18 +122,39 @@ export const ShareLinkModal = () => {
 
   const emailSubject = `Ihr persönlicher ${currentConfig.name} Demo-Zugang für ${displayClient} (${daysInput} Tage)`;
 
-  const emailBody = `Sehr geehrte Damen und Herren,\nliebes Team von ${displayClient},\n\nvielen Dank für Ihr Interesse an TeamTrack.\n\nWir haben für Ihr Unternehmen eine 100% isolierte, persönliche Test-Umgebung für den Bereich "${currentConfig.name}" eingerichtet. Sie können alle Funktionen für die nächsten ${daysInput} Tage unverbindlich testen:\n\n👉 Hier geht es zu Ihrem persönlichen Demo-Zugang:\n${generatedUrl}\n\nEnthaltene Module & Funktionen:\n${currentConfig.bullets.join('\n')}\n\nBei Fragen oder für eine kurze gemeinsame Online-Vorstellung stehen wir Ihnen jederzeit gerne zur Verfügung.\n\nMit freundlichen Grüßen,\nTeamTrack Softwareentwicklung\nE-Mail: info@team-track.de\nWeb: https://team-track.de`;
+  const emailLines = [
+    `Sehr geehrte Damen und Herren,`,
+    `liebes Team von ${displayClient},`,
+    ``,
+    `vielen Dank für Ihr Interesse an TeamTrack.`,
+    ``,
+    `Wir haben für Ihr Unternehmen eine 100% isolierte, persönliche Test-Umgebung für den Bereich "${currentConfig.name}" eingerichtet. Sie können alle Funktionen für die nächsten ${daysInput} Tage unverbindlich testen.`,
+    ``,
+    `👉 Hier klicken für Ihren persönlichen Demo-Zugang:`,
+    `${generatedUrl}`,
+    ``,
+    `Enthaltene Module & Funktionen:`,
+    ...currentConfig.bullets,
+    ``,
+    `Bei Fragen oder für eine kurze gemeinsame Online-Vorstellung stehen wir Ihnen jederzeit gerne zur Verfügung.`,
+    ``,
+    `Mit freundlichen Grüßen,`,
+    `TeamTrack Softwareentwicklung`,
+    `E-Mail: info@team-track.de`,
+    `Web: https://team-track.de`
+  ];
 
-  const mailtoUrl = `mailto:${encodeURIComponent(emailInput.trim())}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+  const emailBody = emailLines.join('\r\n');
+  const mailtoUrl = `mailto:${encodeURIComponent(emailInput.trim())}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody).replace(/%0A/g, '%0D%0A').replace(/%0D%0D%0A/g, '%0D%0A')}`;
 
   const handleCopyEmailText = () => {
-    navigator.clipboard.writeText(`Betreff: ${emailSubject}\n\n${emailBody}`);
+    navigator.clipboard.writeText(`Betreff: ${emailSubject}\r\n\r\n${emailBody}`);
     setEmailCopied(true);
     addToast('E-Mail-Text kopiert', 'Der vollständige E-Mail-Text inkl. Link wurde kopiert.', 'success');
     setTimeout(() => setEmailCopied(false), 2500);
   };
 
-  const whatsappMessage = `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für ${currentConfig.title} (${displayClient}):\n\n🔗 ${generatedUrl}\n\nEnthaltene Module:\n${currentConfig.bullets.join('\n')}\n\nViele Grüße,\nTeamTrack Softwareentwicklung`;
+  const whatsappMessage = `Hallo,\n\nhier ist Ihr persönlicher ${daysInput}-Tage Demo-Zugang für ${currentConfig.title} (${displayClient}):\n\n${generatedUrl}\n\nEnthaltene Module:\n${currentConfig.bullets.join('\n')}\n\nViele Grüße,\nTeamTrack Softwareentwicklung`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
